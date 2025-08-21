@@ -1,0 +1,155 @@
+/*  /* reset */
+*, *::after, *::before{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  
+ }
+
+ .section-0{
+  display: grid;
+  place-items: center;
+  grid-gap: 0rem;
+  grid-template-columns: repeat(auto-fit, minmax(40rem, 1fr));
+  width: 100%;
+  background-color: var(--paper);
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+}
+
+/* ......./ my picture box /......... */
+.box-type h3{
+  font-size: var(--font-size-400);
+}
+
+.section-0-container{
+    display: flex;
+    position: relative;
+    max-width: 100%;
+    min-height: auto;
+    width: 99%;
+    top: 0;
+    justify-self: center;
+    margin-top: 1rem;
+    padding-bottom: 8rem;
+}
+
+.section-0-container img{
+  max-inline-size: 100%;
+  min-block-size: auto;
+  inline-size: 100%;
+  margin: auto;
+  max-block-size: 300px;
+  border-radius: 10px;
+  
+  /*object-fit: cover;
+  object-position: center;*/
+}
+
+.container{
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 2rem;
+}
+
+.img-container{
+  position: relative;
+}
+
+.img-content{
+  position: absolute;
+  inset-block-start: 70%;
+  inset-inline-start: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  z-index: 2;
+  text-align: center;
+  transition: all 0.3s ease-in-out 0.1s;
+}
+
+/* .img-content h3{
+  color: var(--white);
+  font-size: 2rem;
+  text-align: center;
+} */
+
+.img-content a{
+  font-size: 1.2rem;
+ /*  transform: scaleY(1); */
+}
+
+.img-container:hover::after{
+  opacity: 1;
+  transform: scaleY(3);
+}
+
+.img-container:hover .img-content{
+  opacity: 1;
+  inset-block-start: 60%;
+}
+
+.box-type{
+  text-transform: uppercase;
+  color: var(--rich-black);
+  text-align: center;
+  font-size: var(--font-size-600);
+}
+
+.btn{
+  display: inline-block;
+  padding: 0.5em 1.5em;
+  text-decoration: none;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+  margin-block-start: 2em;
+  text-transform: uppercase;
+  font-weight: small;
+}
+
+.btn-primary{
+  /* color: var(--white); */
+  background: #16a083;
+}
+
+.btn-primary:hover{
+  background: var(--sage);
+  transition:0.3s ease-in-out;
+}
+
+ /* ......./ header section /......... */
+.section-0 h2{
+  display: flex;
+  justify-content: center;
+  color: var(--rich-black);
+  font-size: var(--font-size-650);
+  padding-bottom: 1rem;
+}
+
+.section-0 p{
+  display: block;
+  color: var(--rich-black);
+  font-size: var(--font-size-400);
+  text-align: left;
+  width: 100%;
+}
+
+
+@media screen and (max-width: 78rem){
+  
+  #header-title{
+    font-size: var(--font-size-700);
+  }
+   
+  .box-type h3{
+    font-size: var(--font-size-200);
+  }
+}
+  
+  
+
+@media screen and (max-width: 50rem){
+
+  
+} 

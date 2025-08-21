@@ -1,0 +1,129 @@
+/* reset */
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.header-hero{
+    z-index: -1;
+}
+
+/* intro */
+.intro {
+    width: 100%;
+    height: auto;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.my-img-container {
+    z-index: 9999999999;
+}
+
+.my-img {
+    width: 15rem; 
+    height: auto; 
+    float: right;
+    border-radius: 10px;
+    margin-top: -10rem;
+    margin-right: 3rem;
+    margin-bottom: 7rem;
+}
+
+/* cards section */
+.info-cards-wrapper {
+    display: flex;
+    place-content: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 85%;
+    row-gap: 3rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 4rem;
+    transition: all 1s ease-in-out;
+}
+
+.info-card {
+    display: flex;
+    flex-direction: column;
+    place-content: center;
+    place-items: center;
+    width: 25rem;
+    height: 15rem;
+    padding: 1rem 1rem;
+    border: 2px var(--unwc-grey) solid;
+    box-shadow: 3px 3px 0px var(--unwc-grey);
+    border-radius: 10px;
+}
+
+/* Resources */
+.resource-links-section {
+    margin-bottom: 4rem;
+}
+
+.ul-list {
+    width: 60%;
+    margin: 0 auto;
+}
+
+li {
+    line-height: 2.5rem;
+}
+
+.li-no-dec {
+    list-style: none;
+}
+
+.with-dec {
+    display: list-item;
+}
+
+#ul-6,
+#ul-5 {
+    margin-top: 1.5rem;
+}
+
+li a:hover,
+.resource-link:hover {
+    color: var(--powder);
+}
+
+/* Resources Ends */
+
+@keyframes animate {
+
+    50% {
+        transform: scale(1.07);
+    }
+
+}
+
+@media screen and (max-width: 112.5rem) {
+
+    .youth-volunteers-img {
+        width: 30rem;
+        transition: all 1s ease-in-out;
+    }
+
+    .youth-pic-container {
+        grid-template-rows: 1fr;
+        grid-template:
+            "img-one"
+            "img-two"
+            "img-three";
+    }
+}
+
+/* media screens */
+@media screen and (max-width: 75rem) {
+
+}
+
+@media screen and (max-width: 50rem) {
+
+}
