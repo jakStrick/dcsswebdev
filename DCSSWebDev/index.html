@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html>
-    <head>
-        <!--
+<html lang="en">
+	<head>
+		<!--
         /**
         * Creator/ David Strickland
-        * Date: August, 2022
+        * Date: August, 2025
         * Copyright: David Strickland
         *
         * Fonts:
@@ -24,177 +24,246 @@
         */
         -->
 
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <link rel="stylesheet" type="text/css" href="assets/css/styles.css">
-        <link rel="stylesheet" type="text/css" href="assets/css/font-and-color-palette-styles.css">
-        <link rel="stylesheet" type="text/css" href="assets/css/header-footer-styles.css" defer>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
-        <script type="text/jscript" src="assets/js/navigation-and-footer-markup.js" defer></script>
-        <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="./assets/css/nav-styles.css" />
 
-        <title>Jak's Home Page</title>
-    </head>
+		<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 
-    <body onload="setup()">
-        
-        
-        <header class="header-hero">
-            <!-- propogates navigation boilerplate -->
-            <div class="section-navigation">
-                <navigation-component></navigation-component>
-            </div>
-        
-            <div style="width: 100%; height: 30rem; border: 3px black solid; background-color: black;">
-                <h1 class="main-header">Welcome To Jak's Website</h1>
-                <div id="bounceBall"></div>
-            </div>
-        </header>
-        
-        <div class="my-img-container">
-            <img class="my-img" src="images/me102.JPG">
-        </div>
-      
-        <main>
+		<!-- Primary SEO Meta Tags -->
+		<title>
+			David Strickland | Full-Stack Web Developer Portland Oregon | Custom
+			Websites, Wordpress & Apps
+		</title>
+		<meta
+			name="title"
+			content="About David Strickland - Full-Stack Web Developer | Silicon Valley Experience" />
+		<meta
+			name="description"
+			content="Learn about David Strickland, a full-stack web developer born in Seychelles with Silicon Valley semiconductor experience. DeVry graduate specializing in precision web development and digital solutions." />
+		<meta
+			name="keywords"
+			content="David Strickland, web developer, full-stack developer, Silicon Valley, semiconductor software, Seychelles developer, DeVry University, DCSS LLC, digital solutions architect" />
+		<meta name="author" content="David Strickland" />
+		<meta name="robots" content="index, follow" />
 
-            <section>
-                <div class="intro">
-                    <h2 class="section-header">Intro</h2>
-                    <p>
-                        I am an independent web developer working with small businesses to create their dream website.
-                    </p>
-                
-                </div>
-            </section>
-            <!--   <section class="section-module">
-                    <div class="outer-wrapper">
-                        <div class="s-wrap" role="slider">
-                            <ul class="s-content">
-                                <li class="s-item s-item-1"></li>
-                                <li class="s-item s-item-2"></li>
-                                <li class="s-item s-item-3"></li>
-                                <li class="s-item s-item-4"></li>
-                                <li class="s-item s-item-5"></li>
-                            </ul>
-                        </div>
-                    </div>
-                </section> -->
-                
-            <section class="section-module">
-                <div class="info-cards-wrapper btm-separator-line-thin">
-                    <div class="info-card">
-                        <h3 class="minor-header">1. Consultation</h3>
-                        <p>1st step is our consultation phase. We sit with you and discuss your business and your business goals.</p>
-                    </div>
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://dcsswebdev.com/about" />
+		<meta
+			property="og:title"
+			content="About David Strickland - Full-Stack Web Developer | Silicon Valley Experience" />
+		<meta
+			property="og:description"
+			content="Learn about David Strickland, a full-stack web developer born in Seychelles with Silicon Valley semiconductor experience. DeVry graduate specializing in precision web development." />
+		<meta
+			property="og:image"
+			content="https://dcsswebdev.com/images/me/meSR71.jpg" />
+		<meta property="og:locale" content="en_US" />
+		<meta
+			property="og:site_name"
+			content="David Strickland - Web Developer" />
 
-                    <div class="info-card">
-                        <h3 class="minor-header">2. Design</h3>
-                        <p>2nd Step is the design phase. We work with top Portland designers.</p>
-                    </div>
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content="https://dcsswebdev.com/about" />
+		<meta
+			property="twitter:title"
+			content="About David Strickland - Full-Stack Web Developer | Silicon Valley Experience" />
+		<meta
+			property="twitter:description"
+			content="Learn about David Strickland, a full-stack web developer born in Seychelles with Silicon Valley semiconductor experience. DeVry graduate specializing in precision web development." />
+		<meta
+			property="twitter:image"
+			content="https://dcsswebdev.com/images/me/meSR71.jpg" />
 
-                    <div class="info-card">
-                        <h3 class="minor-header">3. Develop</h3>
-                        <p>3rd Step is development phase. This is where I turn your vision into reality.</p>
-                
-                    </div>
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://dcsswebdev.com/about" />
 
-                    <div class="info-card">
-                        <h3 class="minor-header">Project Porfolio</h3>
-                        <p>You can view my projects <a href="#">here</a>.</p>
-                    </div>
-                </div>
+		<!-- Favicon -->
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link
+			rel="apple-touch-icon"
+			sizes="180x180"
+			href="/apple-touch-icon.png" />
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="32x32"
+			href="/favicon-32x32.png" />
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="16x16"
+			href="/favicon-16x16.png" />
 
-                <div class="section-module">
-                    <h2 class="section-header">Next Step</h2>
-                    <div class="intro">
-                        <p>
-                            Let me help you by giving me a call to setup a free consultation.
-                        </p>
-                    </div>
-                    
-                    <div class="intro">
-                        <h3>Call For A Consultation today: 503-858-8274</h3>
-                    </div>
-                </div>
+		<!-- Structured Data (JSON-LD) -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Person",
+				"name": "David Strickland",
+				"jobTitle": "Full-Stack Web Developer",
+				"worksFor": {
+					"@type": "Organization",
+					"name": "DCSS LLC"
+				},
+				"alumniOf": {
+					"@type": "CollegeOrUniversity",
+					"name": "DeVry University"
+				},
+				"birthPlace": {
+					"@type": "Place",
+					"name": "Mahé, Seychelles"
+				},
+				"knowsAbout": [
+					"Web Development",
+					"Full-Stack Development",
+					"Semiconductor Software",
+					"Digital Solutions",
+					"JavaScript",
+					"HTML",
+					"CSS",
+					"React",
+					"Node.js"
+				],
+				"url": "https://dcsswebdev.com",
+				"sameAs": [
+					"https://linkedin.com/in/davidstrickland",
+					"https://github.com/jakstrick"
+				],
+				"image": "https://dcsswebdev.com/images/me/meSR71.jpg",
+				"description": "Full-stack web developer born in Seychelles with Silicon Valley semiconductor experience. DeVry University graduate specializing in precision web development and digital solutions architecture."
+			}
+		</script>
+	</head>
 
-                <div id="rndNum">
-                    
-                </div>
-            </section>
-        </main>
+	<body page-data="index">
+		<!-- NavBar and Banner Sections -->
+		<div id="navbar-placeholder"></div>
+		<div id="banner-placeholder"></div>
 
-        <!--Links boilerplate footer-->
-        <footer-component></footer-component>
+		<!-- Hero Section -->
+		<section class="hero">
+			<div class="hero-content">
+				<h1 class="hero-title">
+					Turn Your Business Into a Digital Conversion Engine
+				</h1>
 
-    </body>
+				<p class="hero-description">
+					I create professional websites that not only look amazing—they
+					drive results. From concept to launch, I develop digital
+					experiences that captivate users and grow your business.
+				</p>
+				<a href="#contact" class="cta-button"
+					>Let's Build Something Amazing</a
+				>
+			</div>
+		</section>
+
+		<!-- Profile Section -->
+		<section class="profile-section">
+			<div class="profile-container">
+				<img
+					src="images/me/meSR71.jpg"
+					alt="David Strickland"
+					class="profile-image" />
+				<h2 class="developer-name">David Strickland</h2>
+				<p class="developer-title">
+					Full-Stack Web Developer & Digital Solutions Architect
+				</p>
+			</div>
+		</section>
+
+		<!-- Process Section -->
+		<section class="process-section">
+			<div class="process-container">
+				<h2 class="section-title">How We Build Success Together</h2>
+
+				<div class="process-steps">
+					<div class="process-step">
+						<div class="step-number">01</div>
+						<h3 class="step-title">Consult</h3>
+						<p class="step-description">
+							We dive deep into your business goals, target audience, and
+							vision. This isn't just a chat—it's strategic planning. I
+							analyze your market, competitors, and unique value
+							proposition to craft a digital strategy that sets you apart
+							and drives real results.
+						</p>
+					</div>
+
+					<div class="process-step">
+						<div class="step-number">02</div>
+						<h3 class="step-title">Design</h3>
+						<p class="step-description">
+							Your brand comes to life through stunning, user-focused
+							design. From intuitive navigation to conversion-optimized
+							layouts. I create websites that ensure they look incredible
+							and perform flawlessly.
+						</p>
+					</div>
+
+					<div class="process-step">
+						<div class="step-number">03</div>
+						<h3 class="step-title">Develop</h3>
+						<p class="step-description">
+							Clean, scalable code meets cutting-edge technology. I build
+							responsive, lightning-fast websites optimized for SEO,
+							Accessibility, and Peak Performance. Your site will work
+							beautifully across all devices and load in
+							milliseconds—because first impressions matter.
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Why Choose Section -->
+		<section class="why-choose">
+			<div class="why-choose-container">
+				<h2 class="why-choose-title">Why Partner With Me?</h2>
+				<p class="why-choose-text">
+					Your website is often a customer's first impression of your
+					business—and you only get one chance to make it count. I help
+					small businesses create websites that don't just look
+					professional, but actually drive results: more leads, higher
+					conversions, and measurable growth.
+				</p>
+				<p class="why-choose-text">
+					As a small business owner myself, I understand your challenges
+					and budget realities. That's why I offer both custom websites and
+					optimized WordPress solutions, always built with modern
+					technologies and conversion-focused design.
+				</p>
+				<p class="why-choose-text" style="text-align: center">
+					Ready to turn your website into your best sales tool?
+				</p>
+				<section
+					class="contact-cta"
+					id="contact"
+					style="border-radius: 5rem">
+					<h2>
+						<p
+							class="contact-text"
+							style="border-radius: 3rem; font-size: 1.5em">
+							Let's discuss how we can bring your vision to life.
+						</p>
+					</h2>
+					<a
+						href="mailto:david@dcsswebdev.com?subject=I would like to know more about your website services"
+						class="cta-button"
+						>Start Your Project Today</a
+					>
+				</section>
+			</div>
+		</section>
+	</body>
 </html>
-
-<script>
- /*function rndNum() {
-    
-        const randomNum = Math.floor(Math.random() * 82);
-
-
-        document.getElementById("rndNum").innerHTML = randomNum;
-} */
-    
-let posX;
-let posY;
-let GRAVITY_x = -1;
-let GRAVITY_y = -1;
-let cnt = 0;
-let circSize = 30;
-
-function setup() {
-  
-  //start somewhere in the square
-  posX = Math.floor(Math.random() * 470);
-  posY = Math.floor(Math.random() * 470);
-  circle(posX, posY, circSize);
-  createCanvas(500, 500);
-  draw();
-}
-
-function draw(){
-  
-  background(50, 80, 100);
-  fill(255, 204, 0);
-  
-  posX += GRAVITY_x;
-  posY += GRAVITY_y;
-  
-  circle(posX, posY, circSize);
-  
-  //since Canvas is a square only need one axis.
-  if(posX <= 15 || posX > width - 15){
-    
-    if(cnt < 30){
-      GRAVITY_x *= -1.1;
-      cnt++
-    }
-    else{
-      GRAVITY_x *= -1;
-    }
-    //circSize /= .5;
-  }
-  
-  if(posY <= 15 || posY > width - 15){
-    
-    if(cnt < 33){
-      GRAVITY_y *= -1.01;
-      cnt++;
-    }
-    else{
-      GRAVITY_y *= -1;
-    }
-    //circSize *= .5;
-  }
-  
-  
-  /*console.log("POS X / Y = " + posX + " " + posY);
-  console.log("Gravity X / Y = " + GRAVITY_x + " " + GRAVITY_y);*/
-  //console.log("cnt = " + circSize);
-  
-  
-}
-</script>
+<script src="./assets/js/script.js"></script>

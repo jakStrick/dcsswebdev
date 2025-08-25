@@ -1,101 +1,107 @@
-<html>
+<!DOCTYPE html>
 
-<head>
-  <!--
-        /**
-        * Creator/ David Strickland
-        * Date: March, 2022
-        * Copyright: UNWC
-        *
-        * Fonts:
-        * @license
-        * MyFonts Webfont Build ID 158821
-        *
-        * The fonts listed in this notice are subject to the End User License
-        * Agreement(s) entered into by the website owner. All other parties are
-        * explicitly restricted from using the Licensed Webfonts(s).
-        *
-        * You may obtain a valid license from one of MyFonts official sites.
-        * http://www.fonts.com
-        * http://www.myfonts.com
-        * http://www.linotype.com
-        *
-        */
-        -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" type="text/css" href="assets/css/styles.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/font-and-color-palette-styles.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/header-footer-styles.css" defer>
-  <link rel="stylesheet" type="text/css" href="assets/Fonts/MyFontsWebfontsKit.css">
-  <link rel="icon" type="image/png" href="images/logo/2018.UNWC.FINAL.web.png" sizes="32x32">
-  <link rel="stylesheet" href="assets/sass/unwc-slider.css">
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
 
-  <script type="text/jscript" src="assets/js/navigation-and-footer-markup.js" defer></script>
-  <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
-  <title>Jak's Project Page</title>
-</head>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="./assets/css/nav-styles.css" />
 
-<body>
+		<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 
-  <header class="header-hero">
-    <!-- propogates navigation boilerplate -->
-    <div class="section-navigation">
-      <navigation-component></navigation-component>
-    </div>
+		<title>
+			Web Development Portfolio | JavaScript React Apps Wordpress Custom
+			Websites | David Strickland Portland Oregon
+		</title>
+	</head>
 
-    <div style="width: 100%; height: 30rem; border: 3px darkgrey solid; background-color: grey;">
-      <h1 class="main-header">Welcome To Jak's Project Page</h1>
-    </div>
-  </header>
+	<body page-data="projects">
+		<!-- NavBar and Banner Sections -->
+		<div id="navbar-placeholder"></div>
+		<div id="banner-placeholder"></div>
 
-  <main>
-    <section class="section-module">
-      <div class="resource-links-container">
-        <div id="resource-links">
-          <div class="resource-links-section ">
-            <h3 class="minor-header btm-separator-line-thick">Non Profits<h3>
-                <ul id="ul-1" class="ul-list">
-                  <li><a href="http://unwc.org.jakspage.com">Upper Nehalem Watershed Council</a></li>
-                  <li><a href="#">Example 2</a></li>
-                </ul>
-          </div>
+		<div class="container">
+			<h1>Latests Projects</h1>
 
-          <div class="resource-links-section">
-            <h3 class="minor-header btm-separator-line-thick">Private Business<h3>
-                <ul id="ul-2" class="fire-danger ul-list">
-                  <li><a href="#">Example 1</a></li>
-                  <li><a href="#">Example 2</a></li>
-                </ul>
-          </div>
+			<!-- Project thumbnail Template -->
+			<div class="project">
+				<div class="project-thumbnail">
+					<img
+						src="./images/thumbnails/ACJLLC2025.png"
+						alt="ACJ LLC Website Thumbnail" />
+				</div>
+				<div class="project-content">
+					<div class="project-title">ACJ LLC Website</div>
+					<div class="project-meta">
+						<strong>DESCRIPTION:</strong> A Website I built for a local
+						painting business. <br />
+						<strong>PROJECT TECHNOLOGY:</strong> Built with the DIVI
+						Builder for WordPress. <br />
+						<strong>COMPLETION DATE:</strong> Month Day, Year<br />
+					</div>
+					<a
+						href="https://jakspage.com"
+						class="project-link"
+						target="_blank"
+						>View Website</a
+					>
+				</div>
+			</div>
 
-          <div class="resource-links-section">
-            <h3 class="minor-header btm-separator-line-thick">Government<h3>
-                <ul id="ul-3" class="ul-list">
-                  <li><a href="#">Example 1</a></li>
-                  <li><a href="#">Example 2</a></li>
-                  <li><a href="#">Example 3</a></li>
-                </ul>
-          </div>
+			<div class="project">
+				<div class="project-thumbnail">
+					<img
+						src="./images/thumbnails/UNWC2025.png"
+						alt="UNWC Home Page Thumbnail" />
+				</div>
+				<div class="project-content">
+					<div class="project-title">UNWC Website</div>
+					<div class="project-meta">
+						<strong>DESCRIPTION:</strong> A website I built for a non
+						profit that manages the Upper Nahalem Watershed.<br />
+						<strong>PROJECT TECHNOLOGY:</strong> Custom Built using HTML,
+						CSS, and JavaScript. <br />
+						<strong>COMPLETION DATE:</strong>
+						Month Day, Year<br />
+					</div>
+					<a
+						href="https://www.unwc.org"
+						class="project-link"
+						target="_blank"
+						>View Website</a
+					>
+				</div>
+			</div>
 
-          <div class="resource-links-section">
-            <h3 class="minor-header btm-separator-line-thick">Just For Fun<h3>
-                <ul id="ul-4" class="ul-list">
-                  <li>
-                    <a href="http://solsgame.jakspage.com/">Sol's Game</a>
-                  </li>
-                </ul>
-          </div>
-          
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!--Links boilerplate footer-->
-  <footer-component></footer-component>
-
-</body>
-
+			<div class="project">
+				<div class="project-thumbnail">
+					<img
+						src="https://via.placeholder.com/160x120/4a597c/ffffff?text=Project+Image"
+						alt="Sample Project 3" />
+				</div>
+				<div class="project-content">
+					<div class="project-title">Another Sample Project</div>
+					<div class="project-meta">
+						<strong>BUDGET:</strong> $XX,XXX<br />
+						<strong>COLLABORATORS:</strong> Partner Names<br />
+						<strong>COMPLETION DATE:</strong> Month Day, Year
+					</div>
+					<div class="project-description">
+						Description of another project with different formatting in
+						the meta information to show flexibility. You can customize
+						the meta fields based on what's most relevant for each
+						project.
+					</div>
+					<a href="#" class="project-link" target="_blank">Learn More</a>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
+<script src="./assets/js/script.js"></script>
