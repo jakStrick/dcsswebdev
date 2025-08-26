@@ -6,12 +6,7 @@
   padding: 0;
 }
 
-body {
-  font-family: "Arial", sans-serif;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
+/* ===== NAVIGATION STYLES ===== */
 .navbar {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(0.625rem);
@@ -138,102 +133,6 @@ body {
   transform: translateX(0.3125rem);
 }
 
-.hamburger {
-  display: none;
-  flex-direction: column;
-  cursor: pointer;
-  padding: 0.3125rem;
-}
-
-.bar {
-  width: 1.5625rem;
-  height: 0.1875rem;
-  background: #333;
-  margin: 0.1875rem 0;
-  transition: all 0.3s ease;
-  border-radius: 0.125rem;
-}
-
-.hamburger.active .bar:nth-child(1) {
-  transform: translateY(0.5625rem) rotate(45deg);
-}
-
-.hamburger.active .bar:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
-}
-
-.hamburger.active .bar:nth-child(3) {
-  transform: translateY(-0.5625rem) rotate(-45deg);
-}
-
-/* Mobile Styles */
-@media screen and (max-width: 48rem) {
-  .hamburger {
-    display: flex;
-  }
-
-  .nav-menu {
-    position: fixed;
-    left: -100%;
-    top: 4.375rem;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(0.625rem);
-    width: 100%;
-    text-align: center;
-    transition: 0.3s;
-    box-shadow: 0 0.625rem 1.6875rem rgba(0, 0, 0, 0.05);
-    padding: 1.25rem 0;
-  }
-
-  .nav-menu.active {
-    left: 0;
-  }
-
-  .nav-item {
-    margin: 0.625rem 0;
-  }
-
-  .nav-link {
-    padding: 0.9375rem 1.875rem;
-    display: block;
-    margin: 0 1.25rem;
-  }
-
-  .dropdown-menu {
-    position: static;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    box-shadow: none;
-    background: rgba(102, 126, 234, 0.1);
-    border-radius: 0.625rem;
-    margin: 0.625rem 1.25rem;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
-
-  .dropdown.active .dropdown-menu {
-    max-height: 12.5rem;
-  }
-
-  .dropdown-item {
-    margin: 0;
-    border-radius: 0.3125rem;
-  }
-
-  .content h1 {
-    font-size: 2rem;
-  }
-
-  .content p {
-    font-size: 1rem;
-  }
-}
-
-/* Banner section */
 .banner-section {
   background: white;
   padding: 1.25rem 0;
@@ -265,15 +164,6 @@ body {
   height: 12.5rem;
   width: auto;
   max-width: 100%;
-}
-
-@media (max-width: 48rem) {
-  .banner-svg {
-    height: 10.1875rem;
-  }
-  .banner-section {
-    padding: 0.9375rem 0;
-  }
 }
 
 .contact-cta {
@@ -339,4 +229,108 @@ body {
 .cta-button:hover {
   transform: translateY(-0.1875rem);
   box-shadow: 0 0.9375rem 2.5rem rgba(59, 130, 246, 0.5);
+}
+
+/* ===== HAMBURGER MENU ===== */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 0.3125rem;
+}
+
+.bar {
+  width: 1.5625rem;
+  height: 0.1875rem;
+  background: #333;
+  margin: 0.1875rem 0;
+  transition: all 0.3s ease;
+  border-radius: 0.125rem;
+}
+
+.hamburger.active .bar:nth-child(1) {
+  transform: translateY(0.5625rem) rotate(45deg);
+}
+
+.hamburger.active .bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger.active .bar:nth-child(3) {
+  transform: translateY(-0.5625rem) rotate(-45deg);
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+@media screen and (max-width: 48rem) {
+  .hamburger {
+    display: flex;
+  }
+
+  /* Banner section */
+  .banner-svg {
+    height: 10.1875rem;
+  }
+  .banner-section {
+    padding: 0.9375rem 0;
+  }
+
+  .nav-menu {
+    position: fixed;
+    left: -100%;
+    top: 4.375rem;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(0.625rem);
+    width: 100%;
+    text-align: center;
+    transition: 0.3s;
+    box-shadow: 0 0.625rem 1.6875rem rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 0;
+  }
+
+  .nav-menu.active {
+    left: 0;
+  }
+
+  .nav-item {
+    margin: 0.625rem 0;
+  }
+
+  .nav-link {
+    padding: 0.9375rem 1.875rem;
+    display: block;
+    margin: 0 1.25rem;
+  }
+
+  .dropdown-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 0.625rem;
+    margin: 0.625rem 1.25rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .dropdown.active .dropdown-menu {
+    max-height: 12.5rem;
+  }
+
+  .dropdown-item {
+    margin: 0;
+    border-radius: 0.3125rem;
+  }
+
+  .content h1 {
+    font-size: 2rem;
+  }
+
+  .content p {
+    font-size: 1rem;
+  }
 }
