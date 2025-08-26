@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -172,3 +173,170 @@
 	</body>
 </html>
 <script src="./assets/js/script.js"></script>
+=======
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Banner Template</title>
+	</head>
+
+	<!-- banner.html -->
+	<body>
+		<div id="navbar-placeholder"></div>
+
+		<!-- Banner Section -->
+		<section class="banner-section">
+			<div class="banner-container">
+				<svg
+					class="banner-svg"
+					viewBox="0 0 1080 268"
+					xmlns="http://www.w3.org/2000/svg">
+					<!-- About Page Banner - Modified with artifact on left -->
+					<rect width="1080" height="268" fill="white" />
+
+					<defs>
+						<linearGradient
+							id="textGradient"
+							x1="0%"
+							y1="0%"
+							x2="100%"
+							y2="0%">
+							<stop
+								offset="0%"
+								style="stop-color: #1e40af; stop-opacity: 1" />
+							<stop
+								offset="100%"
+								style="stop-color: #7c3aed; stop-opacity: 1" />
+						</linearGradient>
+						<linearGradient
+							id="iconGradient"
+							x1="0%"
+							y1="0%"
+							x2="100%"
+							y2="100%">
+							<stop
+								offset="0%"
+								style="stop-color: #3b82f6; stop-opacity: 1" />
+							<stop
+								offset="50%"
+								style="stop-color: #8b5cf6; stop-opacity: 1" />
+							<stop
+								offset="100%"
+								style="stop-color: #ef4444; stop-opacity: 1" />
+						</linearGradient>
+						<filter id="dropShadow">
+							<feDropShadow
+								dx="2"
+								dy="4"
+								stdDeviation="3"
+								flood-opacity="0.3" />
+						</filter>
+					</defs>
+
+					<!-- Left side - Decorative bracket elements (moved 10% back from text) -->
+					<g transform="translate(135, 50)">
+						<!-- Code brackets -->
+						<path
+							d="M80 40 L60 40 Q50 40 50 50 L50 120 Q50 130 60 130 L80 130"
+							stroke="url(#iconGradient)"
+							stroke-width="6"
+							fill="none"
+							stroke-linecap="round" />
+						<path
+							d="M120 40 L140 40 Q150 40 150 50 L150 120 Q150 130 140 130 L120 130"
+							stroke="url(#iconGradient)"
+							stroke-width="6"
+							fill="none"
+							stroke-linecap="round" />
+
+						<!-- Central geometric elements positioned within brackets -->
+						<circle
+							cx="100"
+							cy="65"
+							r="5"
+							fill="url(#iconGradient)"
+							opacity="0.8" />
+						<circle
+							cx="85"
+							cy="85"
+							r="2"
+							fill="url(#iconGradient)"
+							opacity="0.6" />
+						<circle
+							cx="115"
+							cy="85"
+							r="2"
+							fill="url(#iconGradient)"
+							opacity="0.6" />
+						<circle
+							cx="100"
+							cy="105"
+							r="5"
+							fill="url(#iconGradient)"
+							opacity="0.8" />
+
+						<!-- Connecting lines -->
+						<line
+							x1="100"
+							y1="68"
+							x2="85"
+							y2="83"
+							stroke="url(#iconGradient)"
+							stroke-width="2"
+							opacity="0.7" />
+						<line
+							x1="100"
+							y1="68"
+							x2="115"
+							y2="83"
+							stroke="url(#iconGradient)"
+							stroke-width="2"
+							opacity="0.7" />
+						<line
+							x1="85"
+							y1="87"
+							x2="100"
+							y2="102"
+							stroke="url(#iconGradient)"
+							stroke-width="2"
+							opacity="0.7" />
+						<line
+							x1="115"
+							y1="87"
+							x2="100"
+							y2="102"
+							stroke="url(#iconGradient)"
+							stroke-width="2"
+							opacity="0.7" />
+					</g>
+
+					<!-- Right side - About Me text (moved to accommodate left artifact) -->
+					<g transform="translate(300, 100)">
+						<text
+							x="0"
+							y="30"
+							font-family="Arial, sans-serif"
+							font-size="48"
+							font-weight="bold"
+							fill="url(#textGradient)"
+							filter="url(#dropShadow)">
+							{{PAGE_TITLE}}
+						</text>
+						<line
+							x1="0"
+							y1="80"
+							x2="400"
+							y2="80"
+							stroke="url(#iconGradient)"
+							stroke-width="3"
+							opacity="0.6" />
+					</g>
+				</svg>
+			</div>
+		</section>
+	</body>
+</html>
+<script src="./assets/js/script.js"></script>
+>>>>>>> d348c5d9bfa42ad110e7c20e219e806538300555
