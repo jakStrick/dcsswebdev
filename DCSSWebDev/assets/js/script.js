@@ -1,6 +1,6 @@
 async function loadNavbar() {
 	try {
-		const response = await fetch("./assets/banners/navbar.html");
+		const response = await fetch("./assets/templates/navbar.html");
 
 		const html = await response.text();
 
@@ -10,33 +10,21 @@ async function loadNavbar() {
 	}
 }
 
-async function loadBanner(pn) {
+async function loadBanner(pgName) {
 	try {
-		var html;
 		var response;
 
-		if (pn === "index") {
-			response = await fetch("./assets/banners/index-banner.html");
+		if (pgName === "index") {
+			response = await fetch("./assets/templates/index-banner.html");
 		} else {
-			response = await fetch("./assets/banners/banner.html");
+			response = await fetch("./assets/templates/banner.html");
 		}
 
-		html = await response.text();
-
-		// Get the page-data attribute from the current page's body tag
-		const pageData = document.body.getAttribute("page-data");
+		var html = await response.text();
 
 		//add correct page title if not loading the index page
-		if (pn != "index") {
-			if (pageData) {
-				html = html.replace("{{PAGE_TITLE}}", capitalize(pageData));
-
-				// Or if you want to replace the text content of the <text> element
-				html = html.replace(
-					/(<text[^>]*>)[^<]*(<\/text>)/g,
-					`$1${capitalize(pageData)}$2`
-				);
-			}
+		if (pgName != "index") {
+			html = html.replace("{{PAGE_TITLE}}", capitalize(pgName));
 		}
 
 		document.getElementById("banner-placeholder").innerHTML = html;
