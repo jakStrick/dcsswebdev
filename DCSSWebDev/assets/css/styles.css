@@ -303,6 +303,23 @@ body {
   margin-right: auto;
 }
 
+/* ===== INDEX SECTION ===== */
+
+.index-cta-section {
+  background: var(--gradient-primary);
+  color: var(--text-white);
+  padding: var(--spacing-4xl) var(--spacing-xl);
+  text-align: center;
+  border-top: 0.063rem solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0.063rem 0 rgba(255, 255, 255, 0.1);
+  border-radius: 2.5rem;
+}
+
+.index-cta-title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: 1.875rem;
+}
+
 /* ===== PROCESS SECTION ===== */
 .process-section {
   background: var(--gradient-primary);
@@ -446,7 +463,6 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18.75rem, 1fr));
   gap: var(--spacing-xl);
-  margin: var(--spacing-xl) 0;
 }
 
 .service-card {
@@ -495,15 +511,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xs);
   font-size: 1.5em;
   color: var(--text-white);
 }
 
 .service-title {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
   font-weight: bold;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
 }
 
 .service-description {
