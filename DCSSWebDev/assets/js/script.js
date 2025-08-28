@@ -193,11 +193,9 @@ class WebsiteController {
 
   validateForm(data) {
     const requiredFields = [
-      "firstName",
-      "lastName",
-      "email",
-      "subject",
-      "message",
+      "full-name",
+      "email-address",
+      "detailed-description",
     ];
 
     // Check for empty required fields
@@ -210,8 +208,10 @@ class WebsiteController {
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
-      this.showError("Please enter a valid email address.");
+    if (!emailRegex.test(data["email-address"])) {
+      this.showError(
+        "Please enter a valid email address. " + data["email-address"]
+      );
       return false;
     }
 
@@ -234,3 +234,41 @@ class WebsiteController {
 
 // Initialize the website controller
 new WebsiteController();
+
+function setCookie(name, value, days) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie =
+    name +
+    "=" +
+    encodeURIComponent(value) +
+    "; expires=" +
+    expires +
+    "; path=/";
+}
+
+function hideConsent() {
+  document.getElementById("cookie-consent").style.display = "none";
+}
+
+function acceptCookies() {
+  setCookie("cookieConsent", "accepted", 365);
+  hideConsent();
+}
+
+function rejectCookies() {
+  setCookie("cookieConsent", "rejected", 365);
+  hideConsent();
+}
+
+function customizeCookies() {
+  alert("Customize options coming soon...");
+  // Replace this with a modal or redirect to a settings page
+}
+
+window.onload = function () {
+  if (document.cookie.indexOf("cookieConsent") === -1) {
+    document.getElementById("cookie-consent").style.display = "block";
+  } else {
+    hideConsent();
+  }
+};
