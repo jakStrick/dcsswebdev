@@ -1086,6 +1086,7 @@ fieldset {
 	line-height: 1.25rem;
 	width: 60%;
 	margin: 0 auto;
+	text-align: center;
 }
 
 /* ===== FORM INPUTS ===== */
@@ -1403,27 +1404,27 @@ h3 {
 	box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
-#sendButton {
-	padding: 10px 30px;
+#send-button {
+	padding: 0.8rem 2rem;
 	background-color: #007bff;
 	color: white;
 	border: none;
-	border-radius: 5px;
+	border-radius: 0.3rem;
 	cursor: pointer;
 	font-size: var(--font-size-base);
-	margin: 10px;
+	margin: 2rem;
 }
 
-#sendButton:hover {
+#send-button:hover {
 	background-color: #0056b3;
 }
 
-#sendButton:disabled {
+#send-button:disabled {
 	background-color: #ccc;
 	cursor: not-allowed;
 }
 
-/*#response-output {
+#response-output {
 	margin-top: 20px;
 	background-color: #f0f0f0;
 	padding: 10px;
@@ -1443,7 +1444,7 @@ h3 {
 	white-space: pre-wrap;
 	margin: 10px 0 0 0;
 	line-height: 1.5;
-}*/
+}
 
 .loading {
 	color: #666;
