@@ -31,7 +31,7 @@
 
       // Convert mm to pixels
       const mmToPx = 96 / 25.4;
-      const colSpacing = 5 * mmToPx;
+      const colSpacing = 3 * mmToPx;
       const rowSpacing = 2 * mmToPx;
 
       // Calculate grid dimensions
@@ -48,8 +48,8 @@
 
           // Gradient: Teal -> Cyan -> Blue -> Purple
           const r = Math.floor(20 + progress * 140);
-          const g = Math.floor(180 - progress * 80);
-          const b = Math.floor(200 + progress * 55);
+          const g = Math.floor(130 - progress * 80);
+          const b = Math.floor(100 + progress * 45);
 
           dots.push({
             baseX: x,
@@ -67,9 +67,9 @@
       let time = 0;
 
       function animate() {
-        time += 0.015; // Animation speed - increase for faster, decrease for slower (try 0.01-0.03)
+        time += 0.025; // Animation speed - increase for faster, decrease for slower (try 0.01-0.03)
 
-        ctx.fillStyle = "#000";
+        ctx.fillStyle = "#110";
         ctx.fillRect(0, 0, width, height);
 
         // More dynamic wave motion
@@ -126,7 +126,7 @@
           const y3 = x2 * sinZ + y1 * cosZ;
 
           // Perspective projection with dynamic focal length
-          const perspective = 500 + Math.sin(time * 0.5) * 100;
+          const perspective = 300 + Math.sin(time * 0.5) * 100;
           const scale = perspective / (perspective + z2);
 
           dot.x = x3 * scale + width / 2;
@@ -141,14 +141,14 @@
         dots.forEach((dot) => {
           // Dynamic sizing based on depth
           const baseSize = 2.5;
-          const size = Math.max(0.8, baseSize + dot.z / 40);
+          const size = Math.max(0.8, baseSize + dot.z / 60);
 
           // Fade based on depth
-          const alpha = Math.max(0.2, Math.min(1, 1 - dot.z / 250));
+          const alpha = Math.max(0.2, Math.min(1, 1 - dot.z / 100));
 
           // Add glow effect for closer dots
           if (dot.z > 0) {
-            const glowSize = size * 2;
+            const glowSize = size * 0.5 + 5;
             const gradient = ctx.createRadialGradient(
               dot.x,
               dot.y,

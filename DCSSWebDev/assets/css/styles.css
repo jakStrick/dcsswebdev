@@ -1834,7 +1834,7 @@ li {
 #waveCanvas {
   display: flex;
   margin-top: 8rem;
-  padding: 1rem;
+  padding: 0.2rem;
   overflow: hidden;
   background: #000;
   height: 80vh;
