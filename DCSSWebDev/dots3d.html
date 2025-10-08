@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wave Dot Matrix 3D</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: black;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  </head>
+  <body>
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        2000
+      );
+      camera.position.z = 800;
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const mmToPx = 96 / 25.4;
+      const colSpacing = 5 * mmToPx;
+      const rowSpacing = 2 * mmToPx;
+      const width = 900;
+      const height = 750;
+      const cols = Math.floor(width / colSpacing);
+      const rows = Math.floor(height / rowSpacing);
+
+      const dots = [];
+      const geometry = new THREE.SphereGeometry(2.5, 8, 8);
+
+      for (let col = 0; col < cols; col++) {
+        for (let row = 0; row < rows; row++) {
+          const x = col * colSpacing - width / 2 + colSpacing / 2;
+          const y = row * rowSpacing - height / 2 + rowSpacing / 2;
+          const progress = col / (cols - 1);
+
+          const r = Math.floor(20 + progress * 140);
+          const g = Math.floor(180 - progress * 80);
+          const b = Math.floor(200 + progress * 55);
+
+          const color = new THREE.Color(`rgb(${r}, ${g}, ${b})`);
+          const material = new THREE.MeshBasicMaterial({ color });
+          const dot = new THREE.Mesh(geometry, material);
+          dot.position.set(x, y, 0);
+          scene.add(dot);
+          dots.push({ mesh: dot, col, row, baseX: x, baseY: y });
+        }
+      }
+
+      let time = 0;
+
+      function animate() {
+        time += 0.015;
+
+        dots.forEach((dot) => {
+          const normX = dot.col / cols;
+          const normY = dot.row / rows;
+
+          const wave1 = Math.sin(normX * Math.PI * 3 + time * 1.2) * 40;
+          const wave2 = Math.cos(normY * Math.PI * 4 + time * 1.8) * 35;
+          const wave3 =
+            Math.sin((normX + normY) * Math.PI * 2.5 + time * 1.5) * 38;
+          const wave4 = Math.cos((normX - normY) * Math.PI * 3 + time) * 30;
+
+          const distFromCenter = Math.sqrt(
+            Math.pow(normX - 0.5, 2) + Math.pow(normY - 0.5, 2)
+          );
+          const radialWave =
+            Math.sin(distFromCenter * Math.PI * 6 + time * 2) * 25;
+
+          const zOffset = wave1 + wave2 + wave3 + wave4 + radialWave;
+
+          dot.mesh.position.z = zOffset;
+        });
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>
