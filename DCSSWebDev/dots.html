@@ -24,10 +24,8 @@
       const ctx = canvas.getContext("2d");
 
       // Set canvas size
-      const width = 900;
-      const height = 750;
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = 1000;
+      canvas.height = 750;
 
       // Convert mm to pixels
       const mmToPx = 96 / 25.4;
@@ -35,10 +33,10 @@
       const rowSpacing = 2 * mmToPx;
 
       // Calculate grid dimensions
-      const cols = Math.floor(width / colSpacing);
-      const rows = Math.floor(height / rowSpacing);
+      const cols = Math.floor(canvas.width / colSpacing);
+      const rows = Math.floor(canvas.height / rowSpacing);
 
-      // Professional tech gradient: Teal/Cyan to Purple/Blue
+      // Adjust the gradient for each column
       const dots = [];
       for (let col = 0; col < cols; col++) {
         for (let row = 0; row < rows; row++) {
@@ -46,10 +44,13 @@
           const y = row * rowSpacing + rowSpacing / 2;
           const progress = col / (cols - 1);
 
-          // Gradient: Teal -> Cyan -> Blue -> Purple
-          const r = Math.floor(20 + progress * 140);
-          const g = Math.floor(130 - progress * 80);
-          const b = Math.floor(100 + progress * 45);
+          const r1 = Math.random() * 255;
+          const g1 = Math.random() * 255;
+          const b1 = Math.random() * 255;
+          // Gradient
+          const r = Math.floor(r1 + progress * 140);
+          const g = Math.floor(g1 - progress * 80);
+          const b = Math.floor(b1 + progress * 45);
 
           dots.push({
             baseX: x,
@@ -70,7 +71,7 @@
         time += 0.015; // Animation speed - increase for faster, decrease for slower (try 0.01-0.03)
 
         ctx.fillStyle = "#110";
-        ctx.fillRect(0, 0, width, height);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // More dynamic wave motion
         dots.forEach((dot) => {
@@ -103,8 +104,8 @@
           const zOffset = wave1 + wave2 + wave3 + wave4 + radialWave;
 
           // 3D rotations
-          let tempX = dot.baseX - width / 2;
-          let tempY = dot.baseY - height / 2;
+          let tempX = dot.baseX - canvas.width / 2;
+          let tempY = dot.baseY - canvas.height / 2;
           let tempZ = zOffset;
 
           // Rotate around X axis
@@ -129,8 +130,8 @@
           const perspective = 300 + Math.sin(time * 0.5) * 100;
           const scale = perspective / (perspective + z2);
 
-          dot.x = x3 * scale + width / 2;
-          dot.y = y3 * scale + height / 2;
+          dot.x = x3 * scale + canvas.width / 2;
+          dot.y = y3 * scale + canvas.height / 2;
           dot.z = z2;
         });
 
