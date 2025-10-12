@@ -1,196 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
-    <link rel="stylesheet" type="text/css" href="./assets/css/nav-styles.css" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="./assets/css/font-color-styles.css"
-    />
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="./assets/css/nav-styles.css" />
+		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
-    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-    <title>Wave Dot Matrix</title>
-  </head>
-  <body>
-    <div id="navbar-placeholder"></div>
-    <canvas id="waveCanvas"></canvas>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="./assets/css/font-color-styles.css" />
 
-    <script>
-      const canvas = document.getElementById("waveCanvas");
-      const ctx = canvas.getContext("2d");
+		<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+		<title>Wave Dot Matrix</title>
+	</head>
+	<body>
+		<div id="navbar-placeholder"></div>
+		<canvas id="waveCanvas"></canvas>
 
-      // Set canvas size
-      canvas.width = window.innerWidth * 0.6;
-      canvas.height = window.innerHeight * 0.8;
+		<script>
+			const canvas = document.getElementById("waveCanvas");
+			const ctx = canvas.getContext("2d");
 
-      // Convert mm to pixels
-      const mmToPx = 96 / 25.4;
-      const colSpacing = 4 * mmToPx;
-      const rowSpacing = 2 * mmToPx;
+			// Set canvas size
+			canvas.width = window.innerWidth * 0.6;
+			canvas.height = window.innerHeight * 0.8;
 
-      // Calculate grid dimensions
-      const cols = Math.floor(canvas.width / colSpacing);
-      const rows = Math.floor(canvas.height / rowSpacing);
+			// Convert mm to pixels
+			const mmToPx = 96 / 25.4;
+			const colSpacing = 4 * mmToPx;
+			const rowSpacing = 2 * mmToPx;
 
-      // Adjust the gradient for each column
-      const dots = [];
-      for (let col = 0; col < cols; col++) {
-        for (let row = 0; row < rows; row++) {
-          const x = col * colSpacing + colSpacing / 2;
-          const y = row * rowSpacing + rowSpacing / 2;
-          const progress = col / (cols - 1);
+			// Calculate grid dimensions
+			const cols = Math.floor(canvas.width / colSpacing);
+			const rows = Math.floor(canvas.height / rowSpacing);
 
-          const r1 = Math.random() * 255; // random base color
-          const g1 = Math.random() * 255;
-          const b1 = Math.random() * 255;
+			// Adjust the gradient for each column
+			const dots = [];
+			for (let col = 0; col < cols; col++) {
+				for (let row = 0; row < rows; row++) {
+					const x = col * colSpacing + colSpacing / 2;
+					const y = row * rowSpacing + rowSpacing / 2;
+					const progress = col / (cols - 1);
 
-          const w1 = Math.random() * 255; // Random weight
-          const w2 = Math.random() * 255;
-          const w3 = Math.random() * 255;
-          // Gradient
-          const r = Math.floor(r1 + progress * w1);
-          const g = Math.floor(g1 - progress * w2);
-          const b = Math.floor(b1 + progress * w3);
+					const r1 = Math.random() * 255; // random base color
+					const g1 = Math.random() * 255;
+					const b1 = Math.random() * 255;
 
-          dots.push({
-            baseX: x,
-            baseY: y,
-            x: x,
-            y: y,
-            z: 0,
-            col: col,
-            row: row,
-            color: `rgb(${r}, ${g}, ${b})`,
-          });
-        }
-      }
+					const w1 = Math.random() * 255; // Random weight
+					const w2 = Math.random() * 255;
+					const w3 = Math.random() * 255;
+					// Gradient
+					const r = Math.floor(r1 + progress * w1);
+					const g = Math.floor(g1 - progress * w2);
+					const b = Math.floor(b1 + progress * w3);
 
-      let time = 0;
+					dots.push({
+						baseX: x,
+						baseY: y,
+						x: x,
+						y: y,
+						z: 0,
+						col: col,
+						row: row,
+						color: `rgb(${r}, ${g}, ${b})`,
+					});
+				}
+			}
 
-      function animate() {
-        time += 0.02; // Animation speed - increase for faster, decrease for slower (try 0.01-0.03)
+			let time = 0;
 
-        ctx.fillStyle = "#110";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+			function animate() {
+				time += 0.02; // Animation speed - increase for faster, decrease for slower (try 0.01-0.03)
 
-        // More dynamic wave motion
-        dots.forEach((dot) => {
-          const normX = dot.col / cols;
-          const normY = dot.row / rows;
+				ctx.fillStyle = "#110";
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-          // Multiple layered waves with different frequencies and amplitudes
-          const wave1 = Math.sin(normX * Math.PI * 3 + time * 1.2) * 40;
-          const wave2 = Math.cos(normY * Math.PI * 4 + time * 1.8) * 35;
-          const wave3 =
-            Math.sin((normX + normY) * Math.PI * 2.5 + time * 1.5) * 38;
-          const wave4 = Math.cos((normX - normY) * Math.PI * 3 + time) * 30;
+				// More dynamic wave motion
+				dots.forEach((dot) => {
+					const normX = dot.col / cols;
+					const normY = dot.row / rows;
 
-          // Additional circular wave pattern
-          const distFromCenter = Math.sqrt(
-            Math.pow(normX - 0.5, 2) + Math.pow(normY - 0.5, 2)
-          );
-          const radialWave =
-            Math.sin(distFromCenter * Math.PI * 6 + time * 2) * 25;
+					// Multiple layered waves with different frequencies and amplitudes
+					const wave1 = Math.sin(normX * Math.PI * 3 + time * 1.2) * 40;
+					const wave2 = Math.cos(normY * Math.PI * 4 + time * 1.8) * 35;
+					const wave3 =
+						Math.sin((normX + normY) * Math.PI * 2.5 + time * 1.5) * 38;
+					const wave4 =
+						Math.cos((normX - normY) * Math.PI * 3 + time) * 30;
 
-          // Dynamic twisting with multiple axes
-          const twistX =
-            (Math.sin(normX * Math.PI * 2.5 + time * 1.1) * Math.PI) / 3;
-          const twistY =
-            (Math.cos(normY * Math.PI * 2 + time * 0.9) * Math.PI) / 4;
-          const twistZ =
-            (Math.sin((normX + normY) * Math.PI + time * 1.3) * Math.PI) / 5;
+					// Additional circular wave pattern
+					const distFromCenter = Math.sqrt(
+						Math.pow(normX - 0.5, 2) + Math.pow(normY - 0.5, 2)
+					);
+					const radialWave =
+						Math.sin(distFromCenter * Math.PI * 6 + time * 2) * 25;
 
-          // Combine all wave components
-          const zOffset = wave1 + wave2 + wave3 + wave4 + radialWave;
+					// Dynamic twisting with multiple axes
+					const twistX =
+						(Math.sin(normX * Math.PI * 2.5 + time * 1.1) * Math.PI) / 3;
+					const twistY =
+						(Math.cos(normY * Math.PI * 2 + time * 0.9) * Math.PI) / 4;
+					const twistZ =
+						(Math.sin((normX + normY) * Math.PI + time * 1.3) * Math.PI) /
+						5;
 
-          // 3D rotations
-          let tempX = dot.baseX - canvas.width / 2;
-          let tempY = dot.baseY - canvas.height / 2;
-          let tempZ = zOffset;
+					// Combine all wave components
+					const zOffset = wave1 + wave2 + wave3 + wave4 + radialWave;
 
-          // Rotate around X axis
-          const cosX = Math.cos(twistX);
-          const sinX = Math.sin(twistX);
-          const y1 = tempY * cosX - tempZ * sinX;
-          const z1 = tempY * sinX + tempZ * cosX;
+					// 3D rotations
+					let tempX = dot.baseX - canvas.width / 2;
+					let tempY = dot.baseY - canvas.height / 2;
+					let tempZ = zOffset;
 
-          // Rotate around Y axis
-          const cosY = Math.cos(twistY);
-          const sinY = Math.sin(twistY);
-          const x2 = tempX * cosY + z1 * sinY;
-          const z2 = -tempX * sinY + z1 * cosY;
+					// Rotate around X axis
+					const cosX = Math.cos(twistX);
+					const sinX = Math.sin(twistX);
+					const y1 = tempY * cosX - tempZ * sinX;
+					const z1 = tempY * sinX + tempZ * cosX;
 
-          // Rotate around Z axis for spiral effect
-          const cosZ = Math.cos(twistZ);
-          const sinZ = Math.sin(twistZ);
-          const x3 = x2 * cosZ - y1 * sinZ;
-          const y3 = x2 * sinZ + y1 * cosZ;
+					// Rotate around Y axis
+					const cosY = Math.cos(twistY);
+					const sinY = Math.sin(twistY);
+					const x2 = tempX * cosY + z1 * sinY;
+					const z2 = -tempX * sinY + z1 * cosY;
 
-          // Perspective projection with dynamic focal length
-          const perspective = 300 + Math.sin(time * 0.5) * 100;
-          const scale = perspective / (perspective + z2);
+					// Rotate around Z axis for spiral effect
+					const cosZ = Math.cos(twistZ);
+					const sinZ = Math.sin(twistZ);
+					const x3 = x2 * cosZ - y1 * sinZ;
+					const y3 = x2 * sinZ + y1 * cosZ;
 
-          dot.x = x3 * scale + canvas.width / 2;
-          dot.y = y3 * scale + canvas.height / 2;
-          dot.z = z2;
-        });
+					// Perspective projection with dynamic focal length
+					const perspective = 300 + Math.sin(time * 0.5) * 100;
+					const scale = perspective / (perspective + z2);
 
-        // Sort by depth
-        dots.sort((a, b) => a.z - b.z);
+					dot.x = x3 * scale + canvas.width / 2;
+					dot.y = y3 * scale + canvas.height / 2;
+					dot.z = z2;
+				});
 
-        // Draw with enhanced effects
-        dots.forEach((dot) => {
-          // Dynamic sizing based on depth
-          const baseSize = 2.5;
-          const size = Math.max(0.8, baseSize + dot.z / 100);
+				// Sort by depth
+				dots.sort((a, b) => a.z - b.z);
 
-          // Fade based on depth
-          const alpha = Math.max(0.2, Math.min(1, 1 - dot.z / 100));
+				// Draw with enhanced effects
+				dots.forEach((dot) => {
+					// Dynamic sizing based on depth
+					const baseSize = 2.5;
+					const size = Math.max(0.8, baseSize + dot.z / 100);
 
-          // Add glow effect for closer dots
-          if (dot.z > 0) {
-            const glowSize = size * 0.5 + 5;
-            const gradient = ctx.createRadialGradient(
-              dot.x,
-              dot.y,
-              0,
-              dot.x,
-              dot.y,
-              glowSize
-            );
-            gradient.addColorStop(
-              0,
-              dot.color.replace("rgb", "rgba").replace(")", `, ${alpha * 0.8})`)
-            );
-            gradient.addColorStop(
-              1,
-              dot.color.replace("rgb", "rgba").replace(")", ", 0)")
-            );
+					// Fade based on depth
+					const alpha = Math.max(0.2, Math.min(1, 1 - dot.z / 100));
 
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(dot.x, dot.y, glowSize, 0, Math.PI * 2);
-            ctx.fill();
-          }
+					// Add glow effect for closer dots
+					if (dot.z > 0) {
+						const glowSize = size * 0.5 + 5;
+						const gradient = ctx.createRadialGradient(
+							dot.x,
+							dot.y,
+							0,
+							dot.x,
+							dot.y,
+							glowSize
+						);
+						gradient.addColorStop(
+							0,
+							dot.color
+								.replace("rgb", "rgba")
+								.replace(")", `, ${alpha * 0.8})`)
+						);
+						gradient.addColorStop(
+							1,
+							dot.color.replace("rgb", "rgba").replace(")", ", 0)")
+						);
 
-          // Draw main dot
-          ctx.fillStyle = dot.color;
-          ctx.globalAlpha = alpha;
-          ctx.beginPath();
-          ctx.arc(dot.x, dot.y, size, 0, Math.PI * 2);
-          ctx.fill();
-        });
+						ctx.fillStyle = gradient;
+						ctx.beginPath();
+						ctx.arc(dot.x, dot.y, glowSize, 0, Math.PI * 2);
+						ctx.fill();
+					}
 
-        ctx.globalAlpha = 1;
-        requestAnimationFrame(animate);
-      }
+					// Draw main dot
+					ctx.fillStyle = dot.color;
+					ctx.globalAlpha = alpha;
+					ctx.beginPath();
+					ctx.arc(dot.x, dot.y, size, 0, Math.PI * 2);
+					ctx.fill();
+				});
 
-      animate();
-    </script>
-    <script src="./assets/js/script.js"></script>
-  </body>
+				ctx.globalAlpha = 1;
+				requestAnimationFrame(animate);
+			}
+
+			animate();
+		</script>
+		<script src="./assets/js/script.js"></script>
+	</body>
 </html>

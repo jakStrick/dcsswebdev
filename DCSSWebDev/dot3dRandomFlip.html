@@ -13,7 +13,8 @@
 			type="text/css"
 			href="./assets/css/font-color-styles.css" />
 		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
-		<title>Wave Dot Matrix 3D</title>
+		<title>Wave Dot Matrix 3D Flip</title>
+
 		<style>
 			body {
 				margin: 0;
@@ -73,9 +74,36 @@
 			}
 
 			let time = 0;
+			let currentTheta = 0; // Horizontal rotation
+			let currentPhi = Math.PI / 2; // Vertical rotation (start at equator)
+			let targetTheta = 0;
+			let targetPhi = Math.PI / 2;
+			let rotationTimer = 0;
+			const rotationInterval = 400; // frames between rotation changes (slower)
 
 			function animate() {
-				time += 0.015;
+				time += 0.01; // Slowed down wave animation
+				rotationTimer++;
+
+				// Pick new random rotation angles every interval
+				if (rotationTimer >= rotationInterval) {
+					targetTheta = Math.random() * Math.PI * 2; // Random horizontal angle 0 to 360 degrees
+					targetPhi = Math.random() * Math.PI; // Random vertical angle 0 to 180 degrees
+					rotationTimer = 0;
+				}
+
+				// Smoothly interpolate to target rotations (slower transition)
+				currentTheta += (targetTheta - currentTheta) * 0.01;
+				currentPhi += (targetPhi - currentPhi) * 0.01;
+
+				// Apply spherical coordinates to camera position
+				const radius = 800;
+				camera.position.x =
+					radius * Math.sin(currentPhi) * Math.cos(currentTheta);
+				camera.position.y = radius * Math.cos(currentPhi);
+				camera.position.z =
+					radius * Math.sin(currentPhi) * Math.sin(currentTheta);
+				camera.lookAt(0, 0, 0);
 
 				dots.forEach((dot) => {
 					const normX = dot.col / cols;

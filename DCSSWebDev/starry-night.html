@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Diamond Starry Night with White Horse</title>
 		<link rel="icon" type="image/x-icon" href="favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
@@ -14,9 +15,6 @@
 			rel="stylesheet"
 			type="text/css"
 			href="./assets/css/font-color-styles.css" />
-
-		<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-		<title>Diamond Starry Night with White Horse</title>
 		<style>
 			* {
 				margin: 0;
@@ -46,10 +44,12 @@
 				transform: rotate(45deg);
 				filter: drop-shadow(0 0 6px #ff6b9d);
 				animation: twinkle 2s ease-in-out infinite alternate;
+				box-shadow: 0 0 8px rgba(255, 255, 255, 0.3),
+					0 0 15px rgba(255, 255, 255, 0.15);
 			}
 
 			.star.rotating {
-				animation: twinkle 1s ease-in-out infinite alternate,
+				animation: twinkle 2s ease-in-out infinite alternate,
 					starRotate 500ms linear;
 			}
 
@@ -67,11 +67,15 @@
 					opacity: 0.3;
 					transform: rotate(45deg) scale(0.8);
 					filter: drop-shadow(0 0 6px #ff6b9d) hue-rotate(0deg);
+					box-shadow: 0 0 6px rgba(255, 255, 255, 0.2),
+						0 0 12px rgba(255, 255, 255, 0.1);
 				}
 				100% {
 					opacity: 1;
 					transform: rotate(45deg) scale(1.2);
 					filter: drop-shadow(0 0 12px #ff1744) hue-rotate(30deg);
+					box-shadow: 0 0 12px rgba(255, 255, 255, 0.4),
+						0 0 20px rgba(255, 255, 255, 0.2);
 				}
 			}
 
@@ -114,7 +118,7 @@
 				background: linear-gradient(135deg, #c0c0c0, #808080);
 				border-radius: 50%;
 				box-shadow: 0 0 30px rgba(192, 192, 192, 0.3);
-				animation: moonGlow 3s ease-in-out infinite alternate;
+				animation: moonGlow 4s ease-in-out infinite alternate;
 				z-index: 1;
 			}
 
@@ -136,7 +140,7 @@
 				);
 				border-radius: 50px;
 				opacity: 0.7;
-				animation: cloudDrift 15s ease-in-out infinite;
+				animation: cloudDrift 20s ease-in-out infinite;
 			}
 
 			.cloud:before {
@@ -257,9 +261,7 @@
 			}
 		</style>
 	</head>
-
-	<body page-data="starry-night">
-		<!-- NavBar and Banner Sections -->
+	<body>
 		<div id="navbar-placeholder"></div>
 		<div class="night-sky" id="nightSky">
 			<div class="moon"></div>
