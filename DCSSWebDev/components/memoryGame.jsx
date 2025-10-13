@@ -1,3 +1,5 @@
+// need to create a React project at some point to run this properly
+
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, RotateCcw, Lightbulb } from "lucide-react";
 

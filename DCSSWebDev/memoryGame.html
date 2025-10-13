@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Memory Game</title>
 		<script
 			crossorigin
 			src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -12,8 +11,21 @@
 			src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 		<script src="https://cdn.tailwindcss.com"></script>
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="./assets/css/nav-styles.css" />
+		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="./assets/css/font-color-styles.css" />
+		<title>Memory Game</title>
 	</head>
 	<body>
+		<div id="navbar-placeholder"></div>
 		<div id="root"></div>
 
 		<script type="text/babel">
@@ -240,7 +252,7 @@
 				};
 
 				return (
-					<div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+					<div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-start justify-center p-4 pt-20">
 						<div className="max-w-4xl w-full bg-slate-800 rounded-2xl shadow-2xl p-8">
 							<div className="text-center mb-8">
 								<h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-2">
@@ -496,5 +508,6 @@
 			const root = ReactDOM.createRoot(document.getElementById("root"));
 			root.render(<EchoCipher />);
 		</script>
+		<script src="./assets/js/script.js"></script>
 	</body>
 </html>
