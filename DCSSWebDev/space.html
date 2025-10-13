@@ -16,7 +16,6 @@
 			href="./assets/css/font-color-styles.css" />
 
 		<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-		<title>Wave Dot Matrix</title>
 		<title>Planet on Spacetime Fabric</title>
 		<style>
 			body {
@@ -31,11 +30,68 @@
 			canvas {
 				display: block;
 			}
+
+			.hero-title {
+				position: absolute;
+				top: 12%;
+				left: 50%;
+				transform: translateX(-50%);
+				font-family: "Arial Black", sans-serif;
+				font-size: 8rem;
+				font-weight: 900;
+				letter-spacing: 0.15em;
+				text-align: center;
+				margin: 0;
+				background: linear-gradient(
+					135deg,
+					#667eea 0%,
+					#764ba2 50%,
+					#f093fb 100%
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				text-shadow: 0 0 80px rgba(102, 126, 234, 0.5);
+				animation: glow 3s ease-in-out infinite alternate;
+			}
+
+			@keyframes glow {
+				from {
+					filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.6));
+				}
+				to {
+					filter: drop-shadow(0 0 40px rgba(118, 75, 162, 0.8));
+				}
+			}
+
+			/* Fine-tune for specific breakpoints */
+			@media (max-width: 1200px) {
+				.hero-title {
+					font-size: clamp(5rem, 12vw, 10rem);
+				}
+			}
+
+			@media (max-width: 768px) {
+				.hero-title {
+					font-size: clamp(2rem, 10vw, 6rem);
+					letter-spacing: 0.1em;
+					top: 12%;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.hero-title {
+					font-size: clamp(5rem, 8vw, 2.5rem);
+					letter-spacing: 0.08em;
+					top: 10%;
+				}
+			}
 		</style>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 	</head>
 	<body>
 		<div id="navbar-placeholder"></div>
+		<div class="hero-banner"><h1 class="hero-title">SPACE</h1></div>
 		<script>
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera(
@@ -259,7 +315,7 @@
 				time += 0.01;
 
 				// Trigger CME periodically (every 8 seconds)
-				if (time % 8 < 0.02 && !cmeActive.value) {
+				if (time % (Math.random() * 20) < 0.02 && !cmeActive.value) {
 					createCME();
 				}
 
@@ -376,7 +432,7 @@
 					}
 
 					// Add subtle wave motion
-					const wave = Math.sin(distanceToSun * 0.02 - time * 2) * 2;
+					const wave = Math.sin(distanceToSun * 0.02 - time * 2) * 4;
 
 					dot.mesh.position.y = yOffset + wave;
 				});

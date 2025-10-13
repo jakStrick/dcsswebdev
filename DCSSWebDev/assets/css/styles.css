@@ -1853,3 +1853,23 @@ li {
 	margin-left: auto;
 	margin-right: auto;
 }
+
+.space-placeholder-styles {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 25rem;
+	height: 25rem;
+	position: absolute;
+	top: 30%;
+	left: 80%;
+	transform: translate(-50%, -50%);
+	z-index: 10;
+}
+
+@media (max-width: 480px) {
+	.space-placeholder-styles {
+		width: 10rem;
+		height: 10rem;
+	}
+}

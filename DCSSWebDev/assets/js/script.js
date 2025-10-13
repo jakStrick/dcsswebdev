@@ -11,8 +11,8 @@ class WebsiteController {
 		document.addEventListener("DOMContentLoaded", () => {
 			this.loadTemplates().then(() => {
 				this.initializeNavigation();
-				this.initializeScrollAnimations();
-				this.initializeSmoothScrolling();
+				//this.initializeScrollAnimations();
+				//this.initializeSmoothScrolling();
 				this.initializeContactForm();
 			});
 		});
@@ -23,7 +23,10 @@ class WebsiteController {
 		const pageName = document.body.getAttribute("page-data");
 
 		try {
-			await Promise.all([this.loadNavbar(), this.loadBanner(pageName)]);
+			await Promise.all([
+				await this.loadNavbar(),
+				await this.loadBanner(pageName),
+			]);
 		} catch (error) {
 			console.error("Failed to load templates:", error);
 		}
@@ -67,6 +70,18 @@ class WebsiteController {
 		}
 	}
 
+	async loadSpace() {
+		try {
+			const placeholder = document.getElementById("space-placeholder");
+			if (placeholder) {
+				placeholder.innerHTML =
+					'<iframe src="./space.html" style="width: 100%; height: 100%; border: none;"></iframe>';
+			}
+		} catch (error) {
+			console.error("Failed to load space:", error);
+		}
+	}
+
 	// Initialize mobile navigation hamburger menu
 	initializeNavigation() {
 		const hamburger = document.querySelector(".hamburger");
@@ -81,7 +96,7 @@ class WebsiteController {
 	}
 
 	// Initialize scroll animations for elements
-	initializeScrollAnimations() {
+	/*initializeScrollAnimations() {
 		const observerOptions = {
 			threshold: 0.1,
 			rootMargin: "0px 0px -50px 0px",
@@ -118,7 +133,7 @@ class WebsiteController {
 				}
 			});
 		});
-	}
+	}*/
 
 	// Initialize contact form handling
 	initializeContactForm() {
@@ -320,7 +335,7 @@ function addConversationHistory(userMessage, aiResponse) {
   responseOutput.parentNode.insertBefore(conversationDiv, responseOutput);
 }*/
 
-const messageInput = document.getElementById("messageInput");
+/*const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
 
 async function sendMessage() {
@@ -384,7 +399,7 @@ async function sendMessage() {
 }
 
 // Test server connection on load
-fetch("http://localhost:3001/health")
+/*fetch("http://localhost:3001/health")
 	.then((response) => response.json())
 	.then((data) => {
 		console.log("Server connection successful:", data);
@@ -426,13 +441,13 @@ window.onload = function () {
 	} else {
 		hideConsent();
 	}
-};
+};*/
 
 class DiamondSky extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: "open" });
-		alert("DiamondSky component initialized");
+
 		const style = document.createElement("style");
 		style.textContent = `
       .diamond {
@@ -463,6 +478,7 @@ class DiamondSky extends HTMLElement {
 		container.style.position = "absolute";
 		container.style.width = "100%";
 		container.style.height = "100%";
+		container.style.top = "60rem";
 		this.shadowRoot.appendChild(container);
 
 		const spacing = 8;
@@ -511,7 +527,7 @@ class DiamondSky extends HTMLElement {
 
 customElements.define("diamond-sky", DiamondSky);
 
-document.addEventListener("DOMContentLoaded", () => {
+/*document.addEventListener("DOMContentLoaded", () => {
 	// Event listeners
 	sendButton.addEventListener("click", sendMessage);
 	messageInput.addEventListener("keypress", (e) => {
@@ -520,9 +536,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			sendMessage();
 		}
 	});
-});
+});*/
 
 //for schematic.jsximport React from 'react';
 // Then add this at the bottom:
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(React.createElement(OptocouplerSchematic));
+/*const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(OptocouplerSchematic));*/

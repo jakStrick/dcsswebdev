@@ -162,6 +162,10 @@
 	height: 25rem;
 }
 
+#banner-placeholder {
+	position: relative;
+}
+
 @media (max-width: 48rem) {
 	.banner-svg,
 	.index-banner-svg {
