@@ -34,7 +34,7 @@ class WebsiteController {
 
 	async loadNavbar() {
 		try {
-			const response = await fetch("./assets/templates/navbar.html");
+			const response = await fetch("/assets/templates/navbar.html");
 			const html = await response.text();
 
 			const placeholder = document.getElementById("navbar-placeholder");
@@ -50,8 +50,8 @@ class WebsiteController {
 		try {
 			const templatePath =
 				pageName === "index"
-					? "./assets/templates/index-banner.html"
-					: "./assets/templates/banner.html";
+					? "/assets/templates/index-banner.html"
+					: "/assets/templates/banner.html";
 
 			const response = await fetch(templatePath);
 			let html = await response.text();
@@ -75,7 +75,7 @@ class WebsiteController {
 			const placeholder = document.getElementById("space-placeholder");
 			if (placeholder) {
 				placeholder.innerHTML =
-					'<iframe src="./space.html" style="width: 100%; height: 100%; border: none;"></iframe>';
+					'<iframe src="/space.html" style="width: 100%; height: 100%; border: none;"></iframe>';
 			}
 		} catch (error) {
 			console.error("Failed to load space:", error);
