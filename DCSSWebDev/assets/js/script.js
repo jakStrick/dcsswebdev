@@ -34,7 +34,7 @@ class WebsiteController {
 
 	async loadNavbar() {
 		try {
-			const response = await fetch("/assets/templates/navbar.html");
+			const response = await fetch("./assets/templates/navbar.html");
 			const html = await response.text();
 
 			const placeholder = document.getElementById("navbar-placeholder");
@@ -50,8 +50,8 @@ class WebsiteController {
 		try {
 			const templatePath =
 				pageName === "index"
-					? "/assets/templates/index-banner.html"
-					: "/assets/templates/banner.html";
+					? "./assets/templates/index-banner.html"
+					: "./assets/templates/banner.html";
 
 			const response = await fetch(templatePath);
 			let html = await response.text();
