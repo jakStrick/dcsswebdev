@@ -1,0 +1,111 @@
+:root {
+	/* Colors */
+	--primary-blue: #1e40af;
+	--primary-blue-light: #3b82f6;
+	--primary-purple: #7c3aed;
+	--primary-purple-light: #8b5cf6;
+	--accent-red: #ef4444;
+	--success-green: #10b981;
+
+	/* Gradients */
+	--gradient-primary: linear-gradient(
+		135deg,
+		var(--primary-blue),
+		var(--primary-blue-light)
+	);
+	--gradient-hero: linear-gradient(
+		-45deg,
+		var(--primary-blue),
+		var(--primary-blue-light),
+		var(--primary-purple-light),
+		var(--primary-purple)
+	);
+	--gradient-text: linear-gradient(
+		135deg,
+		var(--primary-blue-light),
+		var(--primary-purple-light),
+		var(--accent-red)
+	);
+	--gradient-cta: linear-gradient(
+		135deg,
+		var(--primary-blue-light),
+		var(--primary-purple-light)
+	);
+	--gradient-card: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+	--gradient-section: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+
+	/* Typography */
+	--font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		"Helvetica Neue", Arial, sans-serif;
+	--font-family-display: "Nunito Sans", sans-serif;
+	--font-family-body: "Open Sans", sans-serif;
+
+	/* Fluid Typography - scales between mobile (320px) and desktop (1200px) */
+	--font-size-xs: clamp(0.75rem, 0.68rem + 0.35vw, 0.875rem);
+	--font-size-sm: clamp(0.875rem, 0.79rem + 0.43vw, 1rem);
+	--font-size-base: clamp(1rem, 0.91rem + 0.43vw, 1.2rem);
+	--font-size-lg: clamp(1.125rem, 0.97rem + 0.78vw, 1.5rem);
+	--font-size-xl: clamp(1.25rem, 1.02rem + 1.14vw, 1.8rem);
+	--font-size-2xl: clamp(1.5rem, 1.16rem + 1.7vw, 2.5rem);
+	--font-size-3xl: clamp(2rem, 1.43rem + 2.84vw, 3.5rem);
+	--font-size-4xl: clamp(2.5rem, 1.68rem + 4.09vw, 4.5rem);
+	--font-size-hero: clamp(2.5rem, 1.25rem + 6.25vw, 5rem);
+
+	/* Spacing */
+	--spacing-xs: 0.25rem;
+	--spacing-sm: 0.5rem;
+	--spacing-md: 1rem;
+	--spacing-lg: 1.5rem;
+	--spacing-xl: 2rem;
+	--spacing-2xl: 2.5rem;
+	--spacing-3xl: 3rem;
+	--spacing-4xl: 5rem;
+	--spacing-5xl: 6.25rem;
+
+	/* Borders */
+	--border-radius-sm: 0.5rem;
+	--border-radius-md: 0.75rem;
+	--border-radius-lg: 1rem;
+	--border-radius-xl: 1.25rem;
+	--border-radius-full: 50%;
+
+	/* Shadows */
+	--shadow-sm: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 0.5rem 1.25rem rgba(59, 130, 246, 0.3);
+	--shadow-lg: 0 0.9375rem 2.1875rem rgba(0, 0, 0, 0.12),
+		0 0.3125rem 0.9375rem rgba(0, 0, 0, 0.07);
+	--shadow-xl: 0 1.25rem 3.125rem rgba(0, 0, 0, 0.15),
+		0 0.5rem 1.25rem rgba(0, 0, 0, 0.1);
+
+	/* Text Colors */
+	--text-primary: #1e293b;
+	--text-secondary: #475569;
+	--text-muted: #64748b;
+	--text-light: #94a3b8;
+	--text-white: #ffffff;
+
+	/* Background Colors */
+	--bg-white: #ffffff;
+	--bg-gray-50: #f8fafc;
+	--bg-gray-100: #f1f5f9;
+	--bg-gray-200: #e2e8f0;
+	--bg-gray-300: #cbd5e1;
+	--bg-gray-400: #94a3b8;
+	--bg-blue: #3b82f6;
+
+	/* Form Colors */
+	--color-border-default: #e5e7eb;
+	--color-border-active: #3b82f6;
+	--color-background: #cbd5e1;
+	--color-background-alt: #8ec6ff;
+	--color-highlight: #8ec6ff;
+	--color-primary: #144be1;
+	--color-primary-active: #19388f;
+	--color-text-default: #0f172a;
+	--color-text-muted: #475569;
+
+	/* Transitions */
+	--transition-fast: 0.2s ease;
+	--transition-normal: 0.3s ease;
+	--transition-slow: 0.5s ease;
+}

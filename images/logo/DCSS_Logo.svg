@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+<!-- Background with subtle gradient -->
+<defs>
+<linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+</linearGradient>
+<linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+</linearGradient>
+<linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+<stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+</linearGradient>
+<!-- Drop shadow filter -->
+<filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+<feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+</filter>
+</defs>
+
+<!-- Background -->
+<rect width="400" height="400" rx="12" fill="url(#bgGradient)" stroke="#cbd5e1" stroke-width="1"/>
+
+<!-- Icon: Abstract code brackets with modern twist -->
+<g transform="translate(175, 150)" filter="url(#dropShadow)">
+<!-- Left bracket with animation-ready design -->
+<path d="M15 10 L5 10 Q0 10 0 15 L0 55 Q0 60 5 60 L15 60"
+stroke="url(#iconGradient)"
+stroke-width="4"
+fill="none"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+<!-- Right bracket -->
+<path d="M35 10 L45 10 Q50 10 50 15 L50 55 Q50 60 45 60 L35 60"
+stroke="url(#iconGradient)"
+stroke-width="4"
+fill="none"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+<!-- Central geometric elements representing web structure -->
+<circle cx="25" cy="25" r="3" fill="url(#iconGradient)" opacity="0.8"/>
+<circle cx="18" cy="35" r="2" fill="url(#iconGradient)" opacity="0.6"/>
+<circle cx="32" cy="35" r="2" fill="url(#iconGradient)" opacity="0.6"/>
+<circle cx="25" cy="45" r="3" fill="url(#iconGradient)" opacity="0.8"/>
+
+<!-- Connecting lines -->
+<line x1="25" y1="28" x2="18" y2="33" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+<line x1="25" y1="28" x2="32" y2="33" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+<line x1="18" y1="37" x2="25" y2="42" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+<line x1="32" y1="37" x2="25" y2="42" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+</g>
+
+<!-- Company Name -->
+<text x="200" y="264"
+font-family="Arial, Helvetica, sans-serif"
+font-size="32"
+font-weight="bold"
+fill="url(#textGradient)"
+filter="url(#dropShadow)"
+text-anchor="middle">DCSS LLC</text>
+
+<!-- Tagline -->
+<text x="200" y="289"
+font-family="Arial, Helvetica, sans-serif"
+font-size="14"
+font-weight="300"
+fill="#475569"
+letter-spacing="1px"
+text-anchor="middle">WEB DEVELOPMENT</text>
+
+<!-- Subtle accent line -->
+<line x1="120" y1="299" x2="280" y2="299" stroke="url(#iconGradient)" stroke-width="2" opacity="0.5"/>
+
+<!-- Small decorative elements -->
+<circle cx="130" cy="319" r="2" fill="url(#iconGradient)" opacity="0.4"/>
+<circle cx="200" cy="329" r="1.5" fill="url(#iconGradient)" opacity="0.3"/>
+<circle cx="270" cy="319" r="1" fill="url(#iconGradient)" opacity="0.5"/>
+</svg>
