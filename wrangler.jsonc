@@ -3,5 +3,21 @@
   "compatibility_date": "2025-10-13",
   "assets": {
     "directory": "./dcsswebdev"
-  }
+  },
+  // D1 Database configuration
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dcss-personal-db",
+      "database_id": "YOUR_DATABASE_ID_HERE"
+    }
+  ],
+  // Environment variables (use for production)
+  "vars": {
+    "JWT_SECRET": "YOUR_JWT_SECRET_KEY_CHANGE_THIS_IN_PRODUCTION"
+  },
+  // Node.js compatibility for bcrypt
+  "node_compat": true,
+  // Pages Functions configuration
+  "pages_build_output_dir": "."
 }
