@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/nav-styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/font-color-styles.css"
+    />
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+    <title>Fishing Net 3D Wave</title>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #001122;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        2000
+      );
+      camera.position.z = 800;
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const mmToPx = 96 / 25.4;
+      const colSpacing = 5 * mmToPx; // Wider spacing for net pattern
+      const rowSpacing = 5 * mmToPx; // Square grid
+      const width = 900;
+      const height = 750;
+      const cols = Math.floor(width / colSpacing);
+      const rows = Math.floor(height / rowSpacing);
+
+      const netNodes = [];
+      const netLines = [];
+
+      // Create node geometry (small spheres at intersections)
+      const nodeGeometry = new THREE.SphereGeometry(1.8, 6, 6);
+      // Create line geometry for net strands
+      const lineGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1, 6);
+
+      // Fishing net colors - weathered rope
+      const netColors = [
+        new THREE.Color(0x8b4513), // Saddle brown
+        new THREE.Color(0xa0522d), // Sienna
+        new THREE.Color(0x654321), // Dark brown
+        new THREE.Color(0x696969), // Dim gray
+      ];
+
+      // Create intersection nodes
+      for (let col = 0; col < cols; col++) {
+        for (let row = 0; row < rows; row++) {
+          const x = col * colSpacing - width / 2 + colSpacing / 2;
+          const y = row * rowSpacing - height / 2 + rowSpacing / 2;
+
+          const colorIndex = (col + row) % netColors.length;
+          const material = new THREE.MeshBasicMaterial({
+            color: netColors[colorIndex],
+            transparent: true,
+            opacity: 0.9,
+          });
+
+          const node = new THREE.Mesh(nodeGeometry, material);
+          node.position.set(x, y, 0);
+          scene.add(node);
+          netNodes.push({ mesh: node, col, row, baseX: x, baseY: y });
+        }
+      }
+
+      // Create horizontal net lines
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols - 1; col++) {
+          const x1 = col * colSpacing - width / 2 + colSpacing / 2;
+          const x2 = (col + 1) * colSpacing - width / 2 + colSpacing / 2;
+          const y = row * rowSpacing - height / 2 + rowSpacing / 2;
+
+          const colorIndex = (col + row) % netColors.length;
+          const material = new THREE.MeshBasicMaterial({
+            color: netColors[colorIndex],
+            transparent: true,
+            opacity: 0.7,
+          });
+
+          const line = new THREE.Mesh(lineGeometry.clone(), material);
+          line.position.set((x1 + x2) / 2, y, 0);
+          line.rotation.z = Math.PI / 2; // Rotate to horizontal
+          line.scale.y = colSpacing; // Stretch to connect nodes
+          scene.add(line);
+          netLines.push({
+            mesh: line,
+            col1: col,
+            col2: col + 1,
+            row,
+            type: "horizontal",
+            baseX: (x1 + x2) / 2,
+            baseY: y,
+          });
+        }
+      }
+
+      // Create vertical net lines
+      for (let col = 0; col < cols; col++) {
+        for (let row = 0; row < rows - 1; row++) {
+          const x = col * colSpacing - width / 2 + colSpacing / 2;
+          const y1 = row * rowSpacing - height / 2 + rowSpacing / 2;
+          const y2 = (row + 1) * rowSpacing - height / 2 + rowSpacing / 2;
+
+          const colorIndex = (col + row) % netColors.length;
+          const material = new THREE.MeshBasicMaterial({
+            color: netColors[colorIndex],
+            transparent: true,
+            opacity: 0.7,
+          });
+
+          const line = new THREE.Mesh(lineGeometry.clone(), material);
+          line.position.set(x, (y1 + y2) / 2, 0);
+          // Already vertical, no rotation needed
+          line.scale.y = rowSpacing; // Stretch to connect nodes
+          scene.add(line);
+          netLines.push({
+            mesh: line,
+            col,
+            row1: row,
+            row2: row + 1,
+            type: "vertical",
+            baseX: x,
+            baseY: (y1 + y2) / 2,
+          });
+        }
+      }
+
+      let time = 0;
+      let currentTheta = 0; // Horizontal rotation
+      let currentPhi = Math.PI / 2; // Vertical rotation (start at equator)
+      let targetTheta = 0;
+      let targetPhi = Math.PI / 2;
+      let rotationTimer = 0;
+      const rotationInterval = 400; // frames between rotation changes (slower)
+
+      function animate() {
+        time += 0.01; // Slowed down wave animation
+        rotationTimer++;
+
+        // Pick new random rotation angles every interval
+        if (rotationTimer >= rotationInterval) {
+          targetTheta = Math.random() * Math.PI * 2; // Random horizontal angle 0 to 360 degrees
+          targetPhi = Math.random() * Math.PI; // Random vertical angle 0 to 180 degrees
+          rotationTimer = 0;
+        }
+
+        // Smoothly interpolate to target rotations (slower transition)
+        currentTheta += (targetTheta - currentTheta) * 0.01;
+        currentPhi += (targetPhi - currentPhi) * 0.01;
+
+        // Apply spherical coordinates to camera position
+        const radius = 800;
+        camera.position.x =
+          radius * Math.sin(currentPhi) * Math.cos(currentTheta);
+        camera.position.y = radius * Math.cos(currentPhi);
+        camera.position.z =
+          radius * Math.sin(currentPhi) * Math.sin(currentTheta);
+        camera.lookAt(0, 0, 0);
+
+        // Animate net nodes (intersection points)
+        netNodes.forEach((node) => {
+          const normX = node.col / cols;
+          const normY = node.row / rows;
+
+          // PULLING FROM WATER EFFECT
+          // The net twists along the vertical axis as it's being pulled up
+          // Bottom of net (normY near 0) stays more stable
+          // Top of net (normY near 1) twists more dramatically
+
+          // Vertical position determines twist intensity (like being wrung out)
+          const pullHeight = normY; // 0 at bottom, 1 at top
+
+          // Create a wringing/twisting motion along the vertical axis
+          const twistAmount = pullHeight * Math.PI * 4; // More twist at the top
+          const twistPhase = time * 1.5; // Speed of the twisting
+          const totalTwist = twistAmount + twistPhase;
+
+          // Distance from vertical centerline (for radial twist)
+          const centerX = 0.5;
+          const radialDist = Math.abs(normX - centerX);
+
+          // Wringing effect - points rotate around the vertical center axis
+          const wringRadius = (normX - centerX) * width * 0.4;
+          const wringX = Math.cos(totalTwist) * wringRadius;
+          const wringZ = Math.sin(totalTwist) * wringRadius;
+
+          // Add dripping/sagging effect - heavier at bottom
+          const sag =
+            (1 - pullHeight) * 30 * Math.sin(normX * Math.PI * 2 + time * 0.8);
+
+          // Water weight makes it undulate as it's pulled
+          const waterDrip =
+            Math.sin(normX * Math.PI * 3 + time * 2 - pullHeight * 5) *
+            10 *
+            (1 - pullHeight);
+
+          // Edge constraint - edges held firmly
+          const edgeFactorX = Math.sin(normX * Math.PI);
+          const edgeFactorY = Math.sin(normY * Math.PI) * 0.5 + 0.5; // Less constraint vertically
+          const edgeFactor = edgeFactorX * edgeFactorY;
+
+          // Combine all motions
+          node.mesh.position.x = node.baseX + wringX * edgeFactor;
+          node.mesh.position.y = node.baseY - sag * edgeFactorX;
+          node.mesh.position.z = wringZ * edgeFactor + waterDrip;
+
+          // Add rotation to show the twisting more clearly
+          node.mesh.rotation.z = totalTwist * 0.15 * edgeFactor;
+        });
+
+        // Animate net lines to follow their connected nodes
+        netLines.forEach((line) => {
+          if (line.type === "horizontal") {
+            const node1 = netNodes.find(
+              (n) => n.col === line.col1 && n.row === line.row
+            );
+            const node2 = netNodes.find(
+              (n) => n.col === line.col2 && n.row === line.row
+            );
+
+            if (node1 && node2) {
+              line.mesh.position.x =
+                (node1.mesh.position.x + node2.mesh.position.x) / 2;
+              line.mesh.position.y =
+                (node1.mesh.position.y + node2.mesh.position.y) / 2;
+              line.mesh.position.z =
+                (node1.mesh.position.z + node2.mesh.position.z) / 2;
+
+              // Slightly rotate line to follow the wave motion
+              const angle = Math.atan2(
+                node2.mesh.position.z - node1.mesh.position.z,
+                node2.mesh.position.x - node1.mesh.position.x
+              );
+              line.mesh.rotation.y = angle;
+            }
+          } else if (line.type === "vertical") {
+            const node1 = netNodes.find(
+              (n) => n.col === line.col && n.row === line.row1
+            );
+            const node2 = netNodes.find(
+              (n) => n.col === line.col && n.row === line.row2
+            );
+
+            if (node1 && node2) {
+              line.mesh.position.x =
+                (node1.mesh.position.x + node2.mesh.position.x) / 2;
+              line.mesh.position.y =
+                (node1.mesh.position.y + node2.mesh.position.y) / 2;
+              line.mesh.position.z =
+                (node1.mesh.position.z + node2.mesh.position.z) / 2;
+
+              // Slightly rotate line to follow the wave motion
+              const angle = Math.atan2(
+                node2.mesh.position.z - node1.mesh.position.z,
+                node2.mesh.position.y - node1.mesh.position.y
+              );
+              line.mesh.rotation.x = angle;
+            }
+          }
+        });
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+    <script src="./assets/js/script.js"></script>
+  </body>
+</html>
