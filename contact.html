@@ -1,123 +1,139 @@
 <!DOCTYPE html>
 
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<link rel="icon" type="image/x-icon" href="favicon.ico" />
-		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/nav-styles.css" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/font-color-styles.css" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/nav-styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/font-color-styles.css"
+    />
 
-		<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 
-		<title>
-			Contact Web Developer Portland Oregon | Free Consultation | David
-			Strickland
-		</title>
-	</head>
+    <!-- Cloudflare Turnstile Script -->
+    <script
+      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+      async
+      defer
+    ></script>
 
-	<body page-data="contact">
-		<!-- NavBar and Banner Sections -->
-		<div id="navbar-placeholder"></div>
-		<div id="banner-placeholder"></div>
-		<diamond-sky></diamond-sky>
+    <title>
+      Contact Web Developer Portland Oregon | Free Consultation | David
+      Strickland
+    </title>
+  </head>
 
-		<!-- Contact Section -->
-		<section class="contact-section">
-			<!-- Contact Information -->
-			<div class="contact-info">
-				<h2 class="contact-title">Schedule a Free Consultation</h2>
-				<p class="contact-description">
-					Whether you have a project in mind, or need technical
-					consultation, we're here to help. Fill out our contact form below
-					for a free consultation.
-				</p>
-			</div>
-		</section>
+  <body page-data="contact">
+    <!-- NavBar and Banner Sections -->
+    <div id="navbar-placeholder"></div>
+    <div id="banner-placeholder"></div>
+    <diamond-sky></diamond-sky>
 
-		<section class="contact-section">
-			<div class="contact-container">
-				<!-- Contact Form -->
-				<h3 class="contact-title">Send Us a Message</h3>
+    <!-- Contact Section -->
+    <section class="contact-section">
+      <!-- Contact Information -->
+      <div class="contact-info">
+        <h2 class="contact-title">Schedule a Free Consultation</h2>
+        <p class="contact-description">
+          Whether you have a project in mind, or need technical consultation,
+          we're here to help. Fill out our contact form below for a free
+          consultation.
+        </p>
+      </div>
+    </section>
 
-				<form
-					action="https://formspree.io/f/mjkebalg"
-					class="contact-form"
-					id="contact-form"
-					target="_top"
-					method="POST">
-					<fieldset>
-						<legend class="contact-fieldset-title">
-							Contact Information
-						</legend>
-						<div class="contact-field">
-							<label class="contact-label" for="full-name"
-								>Full Name*
-							</label>
-							<input
-								class="contact-input"
-								id="full-name"
-								name="full-name"
-								placeholder="Enter your full name"
-								required />
-						</div>
-						<div class="contact-field">
-							<label class="contact-label" for="email-address"
-								>Email Address*</label
-							>
-							<input
-								class="contact-input"
-								id="email-address"
-								name="email-address"
-								placeholder="Enter your email address"
-								required />
-						</div>
-					</fieldset>
-					<fieldset>
-						<legend class="contact-fieldset-title">
-							Support Request Details
-						</legend>
+    <section class="contact-section">
+      <div class="contact-container">
+        <!-- Contact Form -->
+        <h3 class="contact-title">Send Us a Message</h3>
 
-						<div class="contact-field col-span-full">
-							<label class="contact-label" for="detailed-description">
-								Detailed Description of the Issue or Request*
-							</label>
-							<textarea
-								class="contact-textarea"
-								id="detailed-description"
-								name="detailed-description"
-								placeholder="Provide a detailed description"
-								required></textarea>
-						</div>
+        <form
+          action="https://formspree.io/f/mjkebalg"
+          class="contact-form"
+          id="contact-form"
+          target="_top"
+          method="POST"
+        >
+          <fieldset>
+            <legend class="contact-fieldset-title">Contact Information</legend>
+            <div class="contact-field">
+              <label class="contact-label" for="full-name">Full Name* </label>
+              <input
+                class="contact-input"
+                id="full-name"
+                name="full-name"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+            <div class="contact-field">
+              <label class="contact-label" for="email-address"
+                >Email Address*</label
+              >
+              <input
+                class="contact-input"
+                id="email-address"
+                name="email-address"
+                placeholder="Enter your email address"
+                required
+              />
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="contact-fieldset-title">
+              Support Request Details
+            </legend>
 
-						<div class="contact-field">
-							<label class="contact-label" for="best-time-to-reach">
-								Best Time to Reach You (optional)
-							</label>
-							<input
-								class="contact-input"
-								id="best-time-to-reach"
-								name="best-time-to-reach"
-								placeholder="e.g., Weekdays 2-5 PM" />
-						</div>
-						<div class="contact-button-group">
-							<button class="contact-button" type="submit">
-								Submit
-							</button>
-						</div>
-					</fieldset>
-				</form>
-			</div>
-		</section>
-		<script src="./assets/js/script.js"></script>
-	</body>
+            <div class="contact-field col-span-full">
+              <label class="contact-label" for="detailed-description">
+                Detailed Description of the Issue or Request*
+              </label>
+              <textarea
+                class="contact-textarea"
+                id="detailed-description"
+                name="detailed-description"
+                placeholder="Provide a detailed description"
+                required
+              ></textarea>
+            </div>
+
+            <div class="contact-field">
+              <label class="contact-label" for="best-time-to-reach">
+                Best Time to Reach You (optional)
+              </label>
+              <input
+                class="contact-input"
+                id="best-time-to-reach"
+                name="best-time-to-reach"
+                placeholder="e.g., Weekdays 2-5 PM"
+              />
+            </div>
+
+            <!-- Cloudflare Turnstile Widget -->
+            <div
+              class="cf-turnstile"
+              data-sitekey="0x4AAAAAAB78oLdGOamx8q46"
+              data-theme="auto"
+              data-size="flexible"
+              data-callback="onTurnstileSuccess"
+              data-error-callback="onTurnstileError"
+              data-expired-callback="onTurnstileExpired"
+            ></div>
+
+            <div class="contact-button-group">
+              <button class="contact-button" type="submit">Submit</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </section>
+    <script src="./assets/js/script.js"></script>
+  </body>
 </html>
