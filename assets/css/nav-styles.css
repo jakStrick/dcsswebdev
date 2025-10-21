@@ -111,6 +111,25 @@
   transform: translateX(5px);
 }
 
+.dropdown-header {
+  display: block;
+  padding: 8px 20px;
+  color: #667eea;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 5px;
+  pointer-events: none;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #667eea, transparent);
+  margin: 8px 10px;
+  opacity: 0.3;
+}
+
 /* ===== HAMBURGER SECTION ===== */
 .hamburger {
   display: none;
