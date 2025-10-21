@@ -1,7 +1,17 @@
 // Cloudflare Pages Functions - Authentication Worker
 // This handles login, registration, and session management with D1 database
 
-import bcrypt from "bcryptjs";
+// Helper to verify password using Web Crypto API (Cloudflare compatible)
+async function verifyPassword(password, hash) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const computedHash = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return computedHash === hash;
+}
 
 // Helper to generate JWT tokens
 async function generateToken(payload) {
@@ -91,7 +101,7 @@ export async function onRequestPost({ request, env }) {
     }
 
     // Verify password
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    const passwordMatch = await verifyPassword(password, user.password_hash);
 
     if (!passwordMatch) {
       return new Response(

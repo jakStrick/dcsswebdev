@@ -1,13 +1,14 @@
 -- Sample data for testing the personal dashboard
 -- Run this after creating the schema
 
--- Insert a test user (password is 'password123' hashed with bcrypt)
--- You should change this after setup!
+-- Insert a test user (password is 'password123' hashed with SHA-256)
+-- SHA-256 hash of 'password123' = ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f
+-- You should change this after setup or just use the registration page!
 INSERT INTO users (name, email, password_hash, created_at, last_login) 
 VALUES (
     'Test User',
     'test@example.com',
-    '$2a$10$YourHashedPasswordHere', -- Replace with actual bcrypt hash
+    'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f',
     datetime('now'),
     datetime('now')
 );

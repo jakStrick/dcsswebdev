@@ -1,6 +1,14 @@
 // Cloudflare Pages Functions - Registration Worker
 
-import bcrypt from "bcryptjs";
+// Helper to hash password using Web Crypto API (Cloudflare compatible)
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  return hash;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -69,8 +77,7 @@ export async function onRequestPost({ request, env }) {
     }
 
     // Hash password
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
+    const passwordHash = await hashPassword(password);
 
     // Insert new user
     const result = await env.DB.prepare(
