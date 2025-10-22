@@ -553,9 +553,11 @@
 						Drag & Drop files here or click to add data
 					</div>
 					<div class="drop-zone-hint">
-						Supports: Text files, JSON, ZIP files, images, PDFs, and
-						more<br />
-						<small style="color: #999">Maximum file size: 1 MB</small>
+						Supports: Text files, JSON, ZIP files, images, PDFs, videos,
+						and more<br />
+						<small style="color: #999"
+							>Maximum file size: <strong>5 GB</strong> (5120 MB)</small
+						>
 					</div>
 				</div>
 
@@ -835,23 +837,80 @@
 				}
 			}
 
+			// Upload large file to R2
+			async function uploadLargeFile(file) {
+				const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+
+				if (
+					!confirm(
+						`📦 Large File Upload\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nThis file will be uploaded to cloud storage.\n\nContinue?`
+					)
+				) {
+					return;
+				}
+
+				// Show progress
+				const progressMsg = alert(
+					`⏳ Uploading ${file.name}...\n\nPlease wait, this may take a moment.`
+				);
+
+				try {
+					const formData = new FormData();
+					formData.append("file", file);
+					formData.append("title", file.name);
+					formData.append("category", "other");
+					formData.append("description", `Large file: ${file.name}`);
+
+					const response = await fetch("/api/files/upload", {
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${authToken}`,
+						},
+						body: formData,
+					});
+
+					const result = await response.json();
+
+					if (!response.ok) {
+						throw new Error(
+							result.error || result.details || "Upload failed"
+						);
+					}
+
+					alert(
+						`✅ File uploaded successfully!\n\n${file.name}\nSize: ${fileSizeMB} MB`
+					);
+
+					// Reload dashboard
+					loadDashboardData();
+				} catch (error) {
+					console.error("Upload error:", error);
+					alert(`❌ Upload failed:\n\n${error.message}`);
+				}
+			}
+
 			// Handle file reading
 			async function handleFiles(files) {
 				for (let file of files) {
-					// File size limit: 1MB (D1 database has limits)
-					const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-					const MAX_FILE_SIZE_MB = 1;
+					// File size limits
+					const SMALL_FILE_LIMIT = 1 * 1024 * 1024; // 1MB - stored in D1
+					const LARGE_FILE_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB - stored in R2
+					const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
 
-					if (file.size > MAX_FILE_SIZE) {
+					// Check maximum file size
+					if (file.size > LARGE_FILE_LIMIT) {
 						alert(
-							`❌ File too large!\n\nFile: ${file.name}\nSize: ${(
-								file.size /
-								1024 /
-								1024
-							).toFixed(
-								2
-							)} MB\n\nMaximum allowed: ${MAX_FILE_SIZE_MB} MB\n\nPlease choose a smaller file or compress it further.`
+							`❌ File too large!\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nMaximum allowed: 5 GB (5120 MB)\n\nPlease choose a smaller file.`
 						);
+						continue;
+					}
+
+					// Determine if file should use R2 (large files) or D1 (small files)
+					const useR2 = file.size > SMALL_FILE_LIMIT;
+
+					if (useR2) {
+						// Upload large file directly to R2
+						await uploadLargeFile(file);
 						continue;
 					}
 
@@ -1118,7 +1177,7 @@
 				});
 
 			// Download item as file
-			window.downloadItem = function (itemId, title) {
+			window.downloadItem = async function (itemId, title) {
 				const item = window.personalDataRecords.find(
 					(r) => r.id === itemId
 				);
@@ -1147,7 +1206,43 @@
 					// Not JSON metadata, use defaults
 				}
 
-				// Create file content
+				// Check if file is stored in R2
+				if (metadata && metadata.contentType === "r2") {
+					// Download from R2
+					try {
+						const response = await fetch(
+							`/api/files/download/${itemId}`,
+							{
+								headers: {
+									Authorization: `Bearer ${authToken}`,
+								},
+							}
+						);
+
+						if (!response.ok) {
+							throw new Error("Download failed");
+						}
+
+						const blob = await response.blob();
+						const url = URL.createObjectURL(blob);
+
+						const a = document.createElement("a");
+						a.href = url;
+						a.download = fileName;
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+						URL.revokeObjectURL(url);
+
+						alert("✅ File downloaded successfully!");
+					} catch (error) {
+						console.error("Download error:", error);
+						alert("❌ Download failed: " + error.message);
+					}
+					return;
+				}
+
+				// Create file content for D1-stored files
 				const content = item.content || "";
 				let blob;
 
