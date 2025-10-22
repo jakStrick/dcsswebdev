@@ -30,6 +30,24 @@ export async function onRequestOptions() {
 // Upload file to R2
 export async function onRequestPost({ request, env }) {
 	try {
+		console.log("Upload request received");
+
+		// Check if R2 binding exists
+		if (!env.FILES) {
+			console.error("R2 binding 'FILES' not found");
+			return new Response(
+				JSON.stringify({
+					error: "Storage not configured",
+					details:
+						"R2 bucket binding is not set up. Please configure the FILES binding in Cloudflare Pages settings.",
+				}),
+				{
+					status: 500,
+					headers: { "Content-Type": "application/json", ...corsHeaders },
+				}
+			);
+		}
+
 		// Verify authentication
 		const authHeader = request.headers.get("Authorization");
 
@@ -53,6 +71,8 @@ export async function onRequestPost({ request, env }) {
 			);
 		}
 
+		console.log("User authenticated:", payload.userId);
+
 		// Parse multipart form data
 		const formData = await request.formData();
 		const file = formData.get("file");
@@ -67,16 +87,27 @@ export async function onRequestPost({ request, env }) {
 			});
 		}
 
+		console.log(
+			"File received:",
+			file.name,
+			"Size:",
+			file.size,
+			"Type:",
+			file.type
+		);
+
 		// Generate unique file ID
 		const fileId = crypto.randomUUID();
 		const timestamp = Date.now();
-		const fileExtension = file.name.split(".").pop();
+		const fileExtension = file.name.split(".").pop() || "bin";
 		const r2Key = `${payload.userId}/${timestamp}-${fileId}.${fileExtension}`;
+
+		console.log("Uploading to R2 with key:", r2Key);
 
 		// Upload file to R2
 		await env.FILES.put(r2Key, file.stream(), {
 			httpMetadata: {
-				contentType: file.type,
+				contentType: file.type || "application/octet-stream",
 			},
 			customMetadata: {
 				userId: payload.userId.toString(),
@@ -84,6 +115,8 @@ export async function onRequestPost({ request, env }) {
 				uploadDate: new Date().toISOString(),
 			},
 		});
+
+		console.log("File uploaded to R2 successfully");
 
 		// Store metadata in D1 database
 		const result = await env.DB.prepare(
@@ -95,7 +128,7 @@ export async function onRequestPost({ request, env }) {
 				title || file.name,
 				JSON.stringify({
 					fileName: file.name,
-					fileType: file.type,
+					fileType: file.type || "application/octet-stream",
 					fileSize: file.size,
 					contentType: "r2",
 					r2Key: r2Key,
@@ -108,10 +141,13 @@ export async function onRequestPost({ request, env }) {
 			.run();
 
 		if (!result.success) {
+			console.error("Database insert failed");
 			// If DB insert fails, delete the R2 object
 			await env.FILES.delete(r2Key);
 			throw new Error("Failed to save file metadata");
 		}
+
+		console.log("Metadata saved to database, ID:", result.meta.last_row_id);
 
 		return new Response(
 			JSON.stringify({
@@ -128,10 +164,12 @@ export async function onRequestPost({ request, env }) {
 		);
 	} catch (error) {
 		console.error("Upload error:", error);
+		console.error("Error stack:", error.stack);
 		return new Response(
 			JSON.stringify({
 				error: "Internal server error",
 				details: error.message,
+				stack: error.stack,
 			}),
 			{
 				status: 500,

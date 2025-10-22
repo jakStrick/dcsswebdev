@@ -869,7 +869,22 @@
 						body: formData,
 					});
 
-					const result = await response.json();
+					// Check if response has content
+					const contentType = response.headers.get("content-type");
+					let result;
+
+					if (contentType && contentType.includes("application/json")) {
+						result = await response.json();
+					} else {
+						// Response is not JSON
+						const text = await response.text();
+						console.error("Non-JSON response:", text);
+						throw new Error(
+							`Server error: ${response.status} - ${
+								text || "No response body"
+							}`
+						);
+					}
 
 					if (!response.ok) {
 						throw new Error(
@@ -885,7 +900,15 @@
 					loadDashboardData();
 				} catch (error) {
 					console.error("Upload error:", error);
-					alert(`❌ Upload failed:\n\n${error.message}`);
+
+					// More detailed error message
+					let errorMsg = error.message;
+					if (errorMsg.includes("R2 bucket binding")) {
+						errorMsg +=
+							"\n\n⚠️ R2 Storage Configuration Required:\n\n1. Go to Cloudflare Dashboard\n2. Navigate to Workers & Pages → dcsswebdev\n3. Settings → Functions\n4. Add R2 bucket binding:\n   - Variable: FILES\n   - Bucket: dcsswebdev-files\n5. Redeploy the site";
+					}
+
+					alert(`❌ Upload failed:\n\n${errorMsg}`);
 				}
 			}
 
