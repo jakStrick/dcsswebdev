@@ -553,7 +553,7 @@
 						Drag & Drop files here or click to add data
 					</div>
 					<div class="drop-zone-hint">
-						Supports: Text files, JSON, or click to manually enter data
+						Supports: Text files, JSON, ZIP files, images, PDFs, and more
 					</div>
 				</div>
 
@@ -837,25 +837,66 @@
 			async function handleFiles(files) {
 				for (let file of files) {
 					const reader = new FileReader();
+					const isZipFile =
+						file.name.toLowerCase().endsWith(".zip") ||
+						file.type === "application/zip" ||
+						file.type === "application/x-zip-compressed";
+					const isBinaryFile =
+						isZipFile ||
+						file.type.includes("image/") ||
+						file.type.includes("video/") ||
+						file.type.includes("audio/") ||
+						file.type === "application/pdf";
 
 					reader.onload = async (e) => {
-						const content = e.target.result;
+						let content = e.target.result;
+						let contentType = "text";
+
+						if (isBinaryFile) {
+							// For binary files, convert to base64
+							const base64 = btoa(
+								new Uint8Array(content).reduce(
+									(data, byte) => data + String.fromCharCode(byte),
+									""
+								)
+							);
+							content = base64;
+							contentType = "binary";
+						}
 
 						// Pre-fill the form with file data
 						document.getElementById("itemTitle").value = file.name;
 						document.getElementById("itemContent").value = content;
-						document.getElementById(
-							"itemDescription"
-						).value = `Uploaded file: ${file.name} (${
-							file.type || "unknown type"
-						})`;
+
+						// Store metadata in description
+						const metadata = JSON.stringify({
+							fileName: file.name,
+							fileType: file.type || "unknown",
+							fileSize: file.size,
+							contentType: contentType,
+							uploadDate: new Date().toISOString(),
+						});
+
+						document.getElementById("itemDescription").value = metadata;
+
+						// Set category based on file type
+						const categorySelect =
+							document.getElementById("itemCategory");
+						if (isZipFile) {
+							categorySelect.value = "other";
+						}
 
 						// Show the form
 						addItemForm.classList.add("show");
 						dropZone.style.display = "none";
 					};
 
-					reader.readAsText(file);
+					// Read as binary for zip and other binary files, text otherwise
+					if (isBinaryFile) {
+						reader.readAsArrayBuffer(file);
+					} else {
+						reader.readAsText(file);
+					}
 				}
 			}
 
@@ -921,6 +962,50 @@
 				);
 				if (!item) return;
 
+				// Try to parse metadata
+				let metadata = null;
+				let isBinaryFile = false;
+				try {
+					metadata = JSON.parse(item.description);
+					isBinaryFile = metadata.contentType === "binary";
+				} catch (e) {
+					// Not metadata JSON
+				}
+
+				// Format content display based on type
+				let contentDisplay = item.content || "No content";
+				if (isBinaryFile) {
+					const sizeKB = metadata.fileSize
+						? (metadata.fileSize / 1024).toFixed(2)
+						: "Unknown";
+					contentDisplay = `<strong>📦 Binary File</strong><br>
+						Type: ${metadata.fileType || "Unknown"}<br>
+						Size: ${sizeKB} KB<br>
+						<em>This is a binary file (zip, image, etc.). Click the download button to retrieve the original file.</em>`;
+				} else if (contentDisplay.length > 500) {
+					contentDisplay =
+						contentDisplay.substring(0, 500) +
+						"...<br><em>(Content truncated. Download to see full content.)</em>";
+				}
+
+				// Format description
+				let descriptionDisplay = item.description || "--";
+				if (metadata) {
+					descriptionDisplay = `<strong>File Info:</strong><br>
+						Name: ${metadata.fileName || "Unknown"}<br>
+						Type: ${metadata.fileType || "Unknown"}<br>
+						Size: ${
+							metadata.fileSize
+								? (metadata.fileSize / 1024).toFixed(2) + " KB"
+								: "Unknown"
+						}<br>
+						Uploaded: ${
+							metadata.uploadDate
+								? new Date(metadata.uploadDate).toLocaleString()
+								: "Unknown"
+						}`;
+				}
+
 				const modalBody = document.getElementById("modalBody");
 				modalBody.innerHTML = `
 					<div class="modal-field">
@@ -932,12 +1017,12 @@
 						<div class="modal-field-content">${item.category || "--"}</div>
 					</div>
 					<div class="modal-field">
-						<label>Description:</label>
-						<div class="modal-field-content">${item.description || "--"}</div>
+						<label>File Information:</label>
+						<div class="modal-field-content">${descriptionDisplay}</div>
 					</div>
 					<div class="modal-field">
-						<label>Content:</label>
-						<div class="modal-field-content">${item.content || "No content"}</div>
+						<label>Content Preview:</label>
+						<div class="modal-field-content">${contentDisplay}</div>
 					</div>
 					<div class="modal-field">
 						<label>Created:</label>
@@ -977,16 +1062,53 @@
 				);
 				if (!item) return;
 
+				// Parse metadata from description if available
+				let metadata = null;
+				let fileName = title;
+				let fileType = "text/plain";
+				let fileExtension = ".txt";
+
+				try {
+					metadata = JSON.parse(item.description);
+					if (metadata.fileName) {
+						fileName = metadata.fileName;
+						// Extract file extension
+						const lastDot = fileName.lastIndexOf(".");
+						if (lastDot > 0) {
+							fileExtension = fileName.substring(lastDot);
+						}
+					}
+					if (metadata.fileType) {
+						fileType = metadata.fileType;
+					}
+				} catch (e) {
+					// Not JSON metadata, use defaults
+				}
+
 				// Create file content
 				const content = item.content || "";
-				const blob = new Blob([content], { type: "text/plain" });
+				let blob;
+
+				// Check if content is base64 encoded (binary file)
+				if (metadata && metadata.contentType === "binary") {
+					// Decode base64 to binary
+					const binaryString = atob(content);
+					const bytes = new Uint8Array(binaryString.length);
+					for (let i = 0; i < binaryString.length; i++) {
+						bytes[i] = binaryString.charCodeAt(i);
+					}
+					blob = new Blob([bytes], { type: fileType });
+				} else {
+					// Text file
+					blob = new Blob([content], { type: fileType });
+				}
+
 				const url = URL.createObjectURL(blob);
 
 				// Create download link
 				const a = document.createElement("a");
 				a.href = url;
-				a.download =
-					title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + ".txt";
+				a.download = fileName;
 				document.body.appendChild(a);
 				a.click();
 				document.body.removeChild(a);
