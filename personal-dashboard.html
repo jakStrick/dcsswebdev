@@ -789,69 +789,69 @@
 
 		<script src="./assets/js/script.js"></script>
 		<script>
-				// Check authentication
-				const authToken = localStorage.getItem("authToken");
-				if (!authToken) {
+			// Check authentication
+			const authToken = localStorage.getItem("authToken");
+			if (!authToken) {
+				window.location.href = "personal.html";
+			}
+
+			// Verify token and load user data
+			async function verifyAuth() {
+				try {
+					const response = await fetch("/api/auth/verify", {
+						headers: {
+							Authorization: `Bearer ${authToken}`,
+						},
+					});
+
+					if (!response.ok) {
+						throw new Error("Invalid session");
+					}
+
+					const data = await response.json();
+					document.getElementById("userName").textContent =
+						data.name || data.email;
+					return data;
+				} catch (error) {
+					console.error("Auth verification failed:", error);
+					localStorage.removeItem("authToken");
 					window.location.href = "personal.html";
 				}
+			}
 
-				// Verify token and load user data
-				async function verifyAuth() {
-					try {
-						const response = await fetch("/api/auth/verify", {
-							headers: {
-								Authorization: `Bearer ${authToken}`,
-							},
-						});
+			// Load dashboard data from D1
+			async function loadDashboardData() {
+				const dataContent = document.getElementById("dataContent");
 
-						if (!response.ok) {
-							throw new Error("Invalid session");
-						}
+				try {
+					const response = await fetch("/api/data/personal", {
+						headers: {
+							Authorization: `Bearer ${authToken}`,
+						},
+					});
 
-						const data = await response.json();
-						document.getElementById("userName").textContent =
-							data.name || data.email;
-						return data;
-					} catch (error) {
-						console.error("Auth verification failed:", error);
-						localStorage.removeItem("authToken");
-						window.location.href = "personal.html";
+					if (!response.ok) {
+						throw new Error("Failed to load data");
 					}
-				}
 
-				// Load dashboard data from D1
-				async function loadDashboardData() {
-					const dataContent = document.getElementById("dataContent");
+					const data = await response.json();
 
-					try {
-						const response = await fetch("/api/data/personal", {
-							headers: {
-								Authorization: `Bearer ${authToken}`,
-							},
-						});
+					// Update statistics
+					document.getElementById("totalRecords").textContent =
+						data.totalRecords || 0;
+					document.getElementById("activeItems").textContent =
+						data.activeItems || 0;
+					document.getElementById("lastUpdated").textContent =
+						data.lastUpdated
+							? new Date(data.lastUpdated).toLocaleTimeString()
+							: "--";
+					document.getElementById("lastLogin").textContent = new Date(
+						data.lastLogin
+					).toLocaleString();
 
-						if (!response.ok) {
-							throw new Error("Failed to load data");
-						}
-
-						const data = await response.json();
-
-						// Update statistics
-						document.getElementById("totalRecords").textContent =
-							data.totalRecords || 0;
-						document.getElementById("activeItems").textContent =
-							data.activeItems || 0;
-						document.getElementById("lastUpdated").textContent =
-							data.lastUpdated
-								? new Date(data.lastUpdated).toLocaleTimeString()
-								: "--";
-						document.getElementById("lastLogin").textContent = new Date(
-							data.lastLogin
-						).toLocaleString();
-
-						// Display data table
-						if (data.records && data.records.length > 0) {
-							let tableHTML = `
+					// Display data table
+					if (data.records && data.records.length > 0) {
+						let tableHTML = `
 			            <table class="data-table">
 			              <thead>
 			                <tr>
@@ -867,8 +867,8 @@
 			              <tbody>
 			          `;
 
-							data.records.forEach((record) => {
-								tableHTML += `
+						data.records.forEach((record) => {
+							tableHTML += `
 			              <tr>
 			                <td>${record.id}</td>
 			                <td>${record.title || "--"}</td>
@@ -878,293 +878,293 @@
 			                <td>${record.status || "Active"}</td>
 			                <td>
 			                  <button class="action-btn view-btn" onclick="viewItem(${
-									record.id
-								})" title="View">👁️</button>
+										record.id
+									})" title="View">👁️</button>
 			                  <button class="action-btn download-btn" onclick="downloadItem(${
-									record.id
-								}, '${record.title}')" title="Download">💾</button>
+										record.id
+									}, '${record.title}')" title="Download">💾</button>
 			                  <button class="action-btn delete-btn" onclick="deleteItem(${
-									record.id
-								})" title="Delete">🗑️</button>
+										record.id
+									})" title="Delete">🗑️</button>
 			                </td>
 			              </tr>
 			            `;
-							});
+						});
 
-							tableHTML += `
+						tableHTML += `
 			              </tbody>
 			            </table>
 			          `;
 
-							dataContent.innerHTML = tableHTML;
+						dataContent.innerHTML = tableHTML;
 
-							// Store records globally for access by action buttons
-							window.personalDataRecords = data.records;
-						} else {
-							dataContent.innerHTML = `
+						// Store records globally for access by action buttons
+						window.personalDataRecords = data.records;
+					} else {
+						dataContent.innerHTML = `
 			            <div class="empty-state">
 			              <div class="empty-state-icon">📭</div>
 			              <h3>No Data Yet</h3>
 			              <p>Your personal data will appear here once you start adding items.</p>
 			            </div>
 			          `;
-						}
-					} catch (error) {
-						console.error("Error loading data:", error);
-						dataContent.innerHTML = `
+					}
+				} catch (error) {
+					console.error("Error loading data:", error);
+					dataContent.innerHTML = `
 			          <div class="error-message">
 			            <strong>⚠️ Error Loading Data</strong><br>
 			            ${error.message}. Please try refreshing the page.
 			          </div>
 			        `;
-					}
 				}
+			}
 
-				// Logout functionality
-				document.getElementById("logoutBtn").addEventListener("click", () => {
-					if (confirm("Are you sure you want to logout?")) {
-						localStorage.removeItem("authToken");
-						localStorage.removeItem("rememberMe");
-						window.location.href = "personal.html";
-					}
-				});
+			// Logout functionality
+			document.getElementById("logoutBtn").addEventListener("click", () => {
+				if (confirm("Are you sure you want to logout?")) {
+					localStorage.removeItem("authToken");
+					localStorage.removeItem("rememberMe");
+					window.location.href = "personal.html";
+				}
+			});
 
-				// Refresh data
-				document.getElementById("refreshBtn").addEventListener("click", () => {
-					document.getElementById("dataContent").innerHTML = `
+			// Refresh data
+			document.getElementById("refreshBtn").addEventListener("click", () => {
+				document.getElementById("dataContent").innerHTML = `
 			        <div class="loading">
 			          <div class="loading-spinner"></div>
 			          <p>Refreshing your data...</p>
 			        </div>
 			      `;
-					loadDashboardData();
-				});
+				loadDashboardData();
+			});
 
-				// Drag and Drop functionality
-				const dropZone = document.getElementById("dropZone");
-				const addItemForm = document.getElementById("addItemForm");
-				const itemForm = document.getElementById("itemForm");
-				const cancelFormBtn = document.getElementById("cancelFormBtn");
+			// Drag and Drop functionality
+			const dropZone = document.getElementById("dropZone");
+			const addItemForm = document.getElementById("addItemForm");
+			const itemForm = document.getElementById("itemForm");
+			const cancelFormBtn = document.getElementById("cancelFormBtn");
 
-				// Prevent default drag behaviors
-				["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-					dropZone.addEventListener(eventName, preventDefaults, false);
-					document.body.addEventListener(eventName, preventDefaults, false);
-				});
+			// Prevent default drag behaviors
+			["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+				dropZone.addEventListener(eventName, preventDefaults, false);
+				document.body.addEventListener(eventName, preventDefaults, false);
+			});
 
-				function preventDefaults(e) {
-					e.preventDefault();
-					e.stopPropagation();
+			function preventDefaults(e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+
+			// Highlight drop zone when dragging over it
+			["dragenter", "dragover"].forEach((eventName) => {
+				dropZone.addEventListener(
+					eventName,
+					() => {
+						dropZone.classList.add("drag-over");
+					},
+					false
+				);
+			});
+
+			["dragleave", "drop"].forEach((eventName) => {
+				dropZone.addEventListener(
+					eventName,
+					() => {
+						dropZone.classList.remove("drag-over");
+					},
+					false
+				);
+			});
+
+			// Handle dropped files
+			dropZone.addEventListener("drop", handleDrop, false);
+
+			function handleDrop(e) {
+				const dt = e.dataTransfer;
+				const files = dt.files;
+
+				if (files.length > 0) {
+					handleFiles(files);
+				}
+			}
+
+			// Upload large file to R2 using chunked upload (avoids 100MB POST limit)
+			async function uploadLargeFile(file) {
+				const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+
+				if (
+					!confirm(
+						`📦 Large File Upload\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nThis file will be uploaded to cloud storage in chunks.\n\nContinue?`
+					)
+				) {
+					return;
 				}
 
-				// Highlight drop zone when dragging over it
-				["dragenter", "dragover"].forEach((eventName) => {
-					dropZone.addEventListener(
-						eventName,
-						() => {
-							dropZone.classList.add("drag-over");
-						},
-						false
+				// Show progress overlay
+				showProgress("📤 Uploading", file.name, 0, "Preparing upload...");
+
+				try {
+					// Step 1: Get upload metadata
+					console.log("Step 1: Getting upload metadata...");
+					updateProgress(5, "Getting upload metadata...");
+
+					const presignedResponse = await fetch(
+						"/api/files/presigned-url",
+						{
+							method: "POST",
+							headers: {
+								Authorization: `Bearer ${authToken}`,
+								"Content-Type": "application/json",
+							},
+							body: JSON.stringify({
+								fileName: file.name,
+								fileType: file.type || "application/octet-stream",
+								fileSize: file.size,
+							}),
+						}
 					);
-				});
 
-				["dragleave", "drop"].forEach((eventName) => {
-					dropZone.addEventListener(
-						eventName,
-						() => {
-							dropZone.classList.remove("drag-over");
-						},
-						false
-					);
-				});
-
-				// Handle dropped files
-				dropZone.addEventListener("drop", handleDrop, false);
-
-				function handleDrop(e) {
-					const dt = e.dataTransfer;
-					const files = dt.files;
-
-					if (files.length > 0) {
-						handleFiles(files);
-					}
-				}
-
-				// Upload large file to R2 using chunked upload (avoids 100MB POST limit)
-				async function uploadLargeFile(file) {
-					const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
-
+					// Check if response is JSON
+					const contentType1 =
+						presignedResponse.headers.get("content-type");
 					if (
-						!confirm(
-							`📦 Large File Upload\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nThis file will be uploaded to cloud storage in chunks.\n\nContinue?`
-						)
+						!contentType1 ||
+						!contentType1.includes("application/json")
 					) {
-						return;
+						const text = await presignedResponse.text();
+						console.error("Non-JSON response from presigned-url:", text);
+						throw new Error(
+							`Server error: ${presignedResponse.status} - ${
+								text || "No response body"
+							}`
+						);
 					}
 
-					// Show progress overlay
-					showProgress("📤 Uploading", file.name, 0, "Preparing upload...");
+					const presignedData = await presignedResponse.json();
 
-					try {
-						// Step 1: Get upload metadata
-						console.log("Step 1: Getting upload metadata...");
-						updateProgress(5, "Getting upload metadata...");
+					if (!presignedResponse.ok) {
+						throw new Error(
+							presignedData.error ||
+								presignedData.details ||
+								"Failed to prepare upload"
+						);
+					}
 
-						const presignedResponse = await fetch(
-							"/api/files/presigned-url",
+					const { r2Key, recordId } = presignedData;
+					console.log("Upload metadata received:", { r2Key, recordId });
+
+					// Step 2: Upload file in chunks to avoid 100MB limit
+					const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
+					const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+					console.log(
+						`Step 2: Uploading ${totalChunks} chunk(s) to R2...`
+					);
+
+					for (
+						let chunkIndex = 0;
+						chunkIndex < totalChunks;
+						chunkIndex++
+					) {
+						const start = chunkIndex * CHUNK_SIZE;
+						const end = Math.min(start + CHUNK_SIZE, file.size);
+						const chunk = file.slice(start, end);
+
+						// Calculate progress (5% for metadata, 90% for upload, 5% for finalize)
+						const uploadProgress = 5 + (chunkIndex / totalChunks) * 90;
+						const chunkSizeMB = ((end - start) / 1024 / 1024).toFixed(2);
+
+						updateProgress(
+							uploadProgress,
+							`Uploading chunk ${
+								chunkIndex + 1
+							} of ${totalChunks} (${chunkSizeMB} MB)`
+						);
+
+						console.log(
+							`Uploading chunk ${
+								chunkIndex + 1
+							}/${totalChunks} (${chunkSizeMB} MB)...`
+						);
+
+						const uploadResponse = await fetch(
+							"/api/files/stream-upload",
 							{
 								method: "POST",
 								headers: {
 									Authorization: `Bearer ${authToken}`,
-									"Content-Type": "application/json",
+									"Content-Type":
+										file.type || "application/octet-stream",
+									"X-R2-Key": r2Key,
+									"X-Record-Id": recordId,
+									"X-Chunk-Index": chunkIndex.toString(),
+									"X-Total-Chunks": totalChunks.toString(),
 								},
-								body: JSON.stringify({
-									fileName: file.name,
-									fileType: file.type || "application/octet-stream",
-									fileSize: file.size,
-								}),
+								body: chunk,
 							}
 						);
 
 						// Check if response is JSON
-						const contentType1 =
-							presignedResponse.headers.get("content-type");
+						const contentType2 =
+							uploadResponse.headers.get("content-type");
 						if (
-							!contentType1 ||
-							!contentType1.includes("application/json")
+							!contentType2 ||
+							!contentType2.includes("application/json")
 						) {
-							const text = await presignedResponse.text();
-							console.error("Non-JSON response from presigned-url:", text);
+							const text = await uploadResponse.text();
+							console.error(
+								"Non-JSON response from stream-upload:",
+								text
+							);
 							throw new Error(
-								`Server error: ${presignedResponse.status} - ${
+								`Server error: ${uploadResponse.status} - ${
 									text || "No response body"
 								}`
 							);
 						}
 
-						const presignedData = await presignedResponse.json();
+						const result = await uploadResponse.json();
 
-						if (!presignedResponse.ok) {
+						if (!uploadResponse.ok) {
 							throw new Error(
-								presignedData.error ||
-									presignedData.details ||
-									"Failed to prepare upload"
+								result.error || result.details || "Upload failed"
 							);
 						}
-
-						const { r2Key, recordId } = presignedData;
-						console.log("Upload metadata received:", { r2Key, recordId });
-
-						// Step 2: Upload file in chunks to avoid 100MB limit
-						const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
-						const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
 						console.log(
-							`Step 2: Uploading ${totalChunks} chunk(s) to R2...`
+							`Chunk ${chunkIndex + 1}/${totalChunks} uploaded`
 						);
+					}
 
-						for (
-							let chunkIndex = 0;
-							chunkIndex < totalChunks;
-							chunkIndex++
-						) {
-							const start = chunkIndex * CHUNK_SIZE;
-							const end = Math.min(start + CHUNK_SIZE, file.size);
-							const chunk = file.slice(start, end);
+					updateProgress(100, "Upload complete!");
+					console.log("All chunks uploaded successfully");
 
-							// Calculate progress (5% for metadata, 90% for upload, 5% for finalize)
-							const uploadProgress = 5 + (chunkIndex / totalChunks) * 90;
-							const chunkSizeMB = ((end - start) / 1024 / 1024).toFixed(2);
-
-							updateProgress(
-								uploadProgress,
-								`Uploading chunk ${
-									chunkIndex + 1
-								} of ${totalChunks} (${chunkSizeMB} MB)`
-							);
-
-							console.log(
-								`Uploading chunk ${
-									chunkIndex + 1
-								}/${totalChunks} (${chunkSizeMB} MB)...`
-							);
-
-							const uploadResponse = await fetch(
-								"/api/files/stream-upload",
-								{
-									method: "POST",
-									headers: {
-										Authorization: `Bearer ${authToken}`,
-										"Content-Type":
-											file.type || "application/octet-stream",
-										"X-R2-Key": r2Key,
-										"X-Record-Id": recordId,
-										"X-Chunk-Index": chunkIndex.toString(),
-										"X-Total-Chunks": totalChunks.toString(),
-									},
-									body: chunk,
-								}
-							);
-
-							// Check if response is JSON
-							const contentType2 =
-								uploadResponse.headers.get("content-type");
-							if (
-								!contentType2 ||
-								!contentType2.includes("application/json")
-							) {
-								const text = await uploadResponse.text();
-								console.error(
-									"Non-JSON response from stream-upload:",
-									text
-								);
-								throw new Error(
-									`Server error: ${uploadResponse.status} - ${
-										text || "No response body"
-									}`
-								);
-							}
-
-							const result = await uploadResponse.json();
-
-							if (!uploadResponse.ok) {
-								throw new Error(
-									result.error || result.details || "Upload failed"
-								);
-							}
-
-							console.log(
-								`Chunk ${chunkIndex + 1}/${totalChunks} uploaded`
-							);
-						}
-
-						updateProgress(100, "Upload complete!");
-						console.log("All chunks uploaded successfully");
-
-						// Hide progress after a brief delay
-						setTimeout(() => {
-							hideProgress();
-							alert(
-								`✅ File uploaded successfully!\n\n${file.name}\nSize: ${fileSizeMB} MB`
-							);
-							// Reload dashboard
-							loadDashboardData();
-						}, 1000);
-					} catch (error) {
-						console.error("Upload error:", error);
+					// Hide progress after a brief delay
+					setTimeout(() => {
 						hideProgress();
+						alert(
+							`✅ File uploaded successfully!\n\n${file.name}\nSize: ${fileSizeMB} MB`
+						);
+						// Reload dashboard
+						loadDashboardData();
+					}, 1000);
+				} catch (error) {
+					console.error("Upload error:", error);
+					hideProgress();
 
-						// More detailed error message
-						let errorMsg = error.message;
-						if (
-							errorMsg.includes("R2 bucket binding") ||
-							errorMsg.includes("Storage not configured")
-						) {
-							errorMsg +=
-								"\n\n⚠️ R2 Storage Configuration Required:\n\n1. Go to Cloudflare Dashboard\n2. Navigate to Workers & Pages → dcsswebdev\n3. Settings → Functions\n4. Add R2 bucket binding:\n   - Variable: FILES\n   - Bucket: dcsswebdev-files\n5. Redeploy the site";
-						}
+					// More detailed error message
+					let errorMsg = error.message;
+					if (
+						errorMsg.includes("R2 bucket binding") ||
+						errorMsg.includes("Storage not configured")
+					) {
+						errorMsg +=
+							"\n\n⚠️ R2 Storage Configuration Required:\n\n1. Go to Cloudflare Dashboard\n2. Navigate to Workers & Pages → dcsswebdev\n3. Settings → Functions\n4. Add R2 bucket binding:\n   - Variable: FILES\n   - Bucket: dcsswebdev-files\n5. Redeploy the site";
+					}
 
-										alert(`❌ Upload failed:\n\n${errorMsg}`);
+					alert(`❌ Upload failed:\n\n${errorMsg}`);
 				}
 			}
 
@@ -1207,231 +1207,226 @@
 
 			// Handle file reading
 			async function handleFiles(files) {
-					}
-				} // Handle file reading
-				async function handleFiles(files) {
-					for (let file of files) {
-						// File size limits
-						const SMALL_FILE_LIMIT = 1 * 1024 * 1024; // 1MB - stored in D1
-						const LARGE_FILE_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB - stored in R2
-						const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
-
-						// Check maximum file size
-						if (file.size > LARGE_FILE_LIMIT) {
-							alert(
-								`❌ File too large!\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nMaximum allowed: 5 GB (5120 MB)\n\nPlease choose a smaller file.`
-							);
-							continue;
-						}
-
-						// Determine if file should use R2 (large files) or D1 (small files)
-						const useR2 = file.size > SMALL_FILE_LIMIT;
-
-						if (useR2) {
-							// Upload large file directly to R2
-							await uploadLargeFile(file);
-							continue;
-						}
-
-						const reader = new FileReader();
-						const isZipFile =
-							file.name.toLowerCase().endsWith(".zip") ||
-							file.type === "application/zip" ||
-							file.type === "application/x-zip-compressed";
-						const isBinaryFile =
-							isZipFile ||
-							file.type.includes("image/") ||
-							file.type.includes("video/") ||
-							file.type.includes("audio/") ||
-							file.type === "application/pdf";
-
-						reader.onload = async (e) => {
-							let content = e.target.result;
-							let contentType = "text";
-
-							if (isBinaryFile) {
-								// For binary files, convert to base64
-								const base64 = btoa(
-									new Uint8Array(content).reduce(
-										(data, byte) => data + String.fromCharCode(byte),
-										""
-									)
-								);
-								content = base64;
-								contentType = "binary";
-
-								// Double-check encoded size (base64 is ~33% larger)
-								if (content.length > MAX_FILE_SIZE * 1.5) {
-									alert(
-										`❌ File too large after encoding!\n\nThe file becomes too large when prepared for storage.\nPlease choose a smaller file.`
-									);
-									return;
-								}
-							}
-
-							// Pre-fill the form with file data
-							document.getElementById("itemTitle").value = file.name;
-							document.getElementById("itemContent").value = content;
-
-							// Store metadata in description
-							const metadata = JSON.stringify({
-								fileName: file.name,
-								fileType: file.type || "unknown",
-								fileSize: file.size,
-								contentType: contentType,
-								uploadDate: new Date().toISOString(),
-							});
-
-							document.getElementById("itemDescription").value = metadata;
-
-							// Set category based on file type
-							const categorySelect =
-								document.getElementById("itemCategory");
-							if (isZipFile) {
-								categorySelect.value = "other";
-							}
-
-							// Show the form with file size warning if large
-							const sizeKB = file.size / 1024;
-							if (sizeKB > 500) {
-								alert(
-									`⚠️ Large file detected: ${sizeKB.toFixed(
-										0
-									)} KB\n\nThis file is close to the size limit. If saving fails, try a smaller file.`
-								);
-							}
-
-							addItemForm.classList.add("show");
-							dropZone.style.display = "none";
-						};
-
-						reader.onerror = function () {
-							alert(
-								`❌ Error reading file: ${file.name}\n\nPlease try again or choose a different file.`
-							);
-						};
-
-						// Read as binary for zip and other binary files, text otherwise
-						if (isBinaryFile) {
-							reader.readAsArrayBuffer(file);
-						} else {
-							reader.readAsText(file);
-						}
-					}
-				}
-
-				// Click to show form
-				dropZone.addEventListener("click", () => {
-					addItemForm.classList.add("show");
-					dropZone.style.display = "none";
-				});
-
-				// Cancel form
-				cancelFormBtn.addEventListener("click", () => {
-					addItemForm.classList.remove("show");
-					dropZone.style.display = "block";
-					itemForm.reset();
-				});
-
-				// Submit form to save data
-				itemForm.addEventListener("submit", async (e) => {
-					e.preventDefault();
-
-					const itemData = {
-						title: document.getElementById("itemTitle").value,
-						description: document.getElementById("itemDescription").value,
-						category: document.getElementById("itemCategory").value,
-						content: document.getElementById("itemContent").value,
-						status: "active",
-					};
-
-					// Check data size before sending
-					const dataSize = JSON.stringify(itemData).length;
-					const dataSizeMB = (dataSize / 1024 / 1024).toFixed(2);
-
-					if (dataSize > 1024 * 1024) {
-						// 1MB limit
+				for (let file of files) {
+					// File size limits
+					const SMALL_FILE_LIMIT = 1 * 1024 * 1024; // 1MB - stored in D1
+					const LARGE_FILE_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB - stored in R2
+					const fileSizeMB = (file.size / 1024 / 1024).toFixed(2); // Check maximum file size
+					if (file.size > LARGE_FILE_LIMIT) {
 						alert(
-							`❌ Data too large to save!\n\nSize: ${dataSizeMB} MB\nLimit: 1 MB\n\nPlease use a smaller file.`
+							`❌ File too large!\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nMaximum allowed: 5 GB (5120 MB)\n\nPlease choose a smaller file.`
 						);
-						return;
+						continue;
 					}
 
-					try {
-						const response = await fetch("/api/data/personal", {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-								Authorization: `Bearer ${authToken}`,
-							},
-							body: JSON.stringify(itemData),
+					// Determine if file should use R2 (large files) or D1 (small files)
+					const useR2 = file.size > SMALL_FILE_LIMIT;
+
+					if (useR2) {
+						// Upload large file directly to R2
+						await uploadLargeFile(file);
+						continue;
+					}
+
+					const reader = new FileReader();
+					const isZipFile =
+						file.name.toLowerCase().endsWith(".zip") ||
+						file.type === "application/zip" ||
+						file.type === "application/x-zip-compressed";
+					const isBinaryFile =
+						isZipFile ||
+						file.type.includes("image/") ||
+						file.type.includes("video/") ||
+						file.type.includes("audio/") ||
+						file.type === "application/pdf";
+
+					reader.onload = async (e) => {
+						let content = e.target.result;
+						let contentType = "text";
+
+						if (isBinaryFile) {
+							// For binary files, convert to base64
+							const base64 = btoa(
+								new Uint8Array(content).reduce(
+									(data, byte) => data + String.fromCharCode(byte),
+									""
+								)
+							);
+							content = base64;
+							contentType = "binary";
+
+							// Double-check encoded size (base64 is ~33% larger)
+							if (content.length > MAX_FILE_SIZE * 1.5) {
+								alert(
+									`❌ File too large after encoding!\n\nThe file becomes too large when prepared for storage.\nPlease choose a smaller file.`
+								);
+								return;
+							}
+						}
+
+						// Pre-fill the form with file data
+						document.getElementById("itemTitle").value = file.name;
+						document.getElementById("itemContent").value = content;
+
+						// Store metadata in description
+						const metadata = JSON.stringify({
+							fileName: file.name,
+							fileType: file.type || "unknown",
+							fileSize: file.size,
+							contentType: contentType,
+							uploadDate: new Date().toISOString(),
 						});
 
-						const result = await response.json();
+						document.getElementById("itemDescription").value = metadata;
 
-						if (!response.ok) {
-							throw new Error(
-								result.error || result.details || "Failed to save data"
+						// Set category based on file type
+						const categorySelect =
+							document.getElementById("itemCategory");
+						if (isZipFile) {
+							categorySelect.value = "other";
+						}
+
+						// Show the form with file size warning if large
+						const sizeKB = file.size / 1024;
+						if (sizeKB > 500) {
+							alert(
+								`⚠️ Large file detected: ${sizeKB.toFixed(
+									0
+								)} KB\n\nThis file is close to the size limit. If saving fails, try a smaller file.`
 							);
 						}
 
-						// Success - reset form and reload data
-						itemForm.reset();
-						addItemForm.classList.remove("show");
-						dropZone.style.display = "block";
+						addItemForm.classList.add("show");
+						dropZone.style.display = "none";
+					};
 
-						// Show success message
-						alert("✅ Item saved successfully!");
-
-						// Reload dashboard data
-						loadDashboardData();
-					} catch (error) {
-						console.error("Error saving data:", error);
+					reader.onerror = function () {
 						alert(
-							"❌ Error saving data:\n\n" +
-								error.message +
-								"\n\nTry using a smaller file (< 1MB)."
+							`❌ Error reading file: ${file.name}\n\nPlease try again or choose a different file.`
+						);
+					};
+
+					// Read as binary for zip and other binary files, text otherwise
+					if (isBinaryFile) {
+						reader.readAsArrayBuffer(file);
+					} else {
+						reader.readAsText(file);
+					}
+				}
+			}
+
+			// Click to show form
+			dropZone.addEventListener("click", () => {
+				addItemForm.classList.add("show");
+				dropZone.style.display = "none";
+			});
+
+			// Cancel form
+			cancelFormBtn.addEventListener("click", () => {
+				addItemForm.classList.remove("show");
+				dropZone.style.display = "block";
+				itemForm.reset();
+			});
+
+			// Submit form to save data
+			itemForm.addEventListener("submit", async (e) => {
+				e.preventDefault();
+
+				const itemData = {
+					title: document.getElementById("itemTitle").value,
+					description: document.getElementById("itemDescription").value,
+					category: document.getElementById("itemCategory").value,
+					content: document.getElementById("itemContent").value,
+					status: "active",
+				};
+
+				// Check data size before sending
+				const dataSize = JSON.stringify(itemData).length;
+				const dataSizeMB = (dataSize / 1024 / 1024).toFixed(2);
+
+				if (dataSize > 1024 * 1024) {
+					// 1MB limit
+					alert(
+						`❌ Data too large to save!\n\nSize: ${dataSizeMB} MB\nLimit: 1 MB\n\nPlease use a smaller file.`
+					);
+					return;
+				}
+
+				try {
+					const response = await fetch("/api/data/personal", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${authToken}`,
+						},
+						body: JSON.stringify(itemData),
+					});
+
+					const result = await response.json();
+
+					if (!response.ok) {
+						throw new Error(
+							result.error || result.details || "Failed to save data"
 						);
 					}
-				});
 
-				// View item in modal
-				window.viewItem = function (itemId) {
-					const item = window.personalDataRecords.find(
-						(r) => r.id === itemId
+					// Success - reset form and reload data
+					itemForm.reset();
+					addItemForm.classList.remove("show");
+					dropZone.style.display = "block";
+
+					// Show success message
+					alert("✅ Item saved successfully!");
+
+					// Reload dashboard data
+					loadDashboardData();
+				} catch (error) {
+					console.error("Error saving data:", error);
+					alert(
+						"❌ Error saving data:\n\n" +
+							error.message +
+							"\n\nTry using a smaller file (< 1MB)."
 					);
-					if (!item) return;
+				}
+			});
 
-					// Try to parse metadata
-					let metadata = null;
-					let isBinaryFile = false;
-					try {
-						metadata = JSON.parse(item.description);
-						isBinaryFile = metadata.contentType === "binary";
-					} catch (e) {
-						// Not metadata JSON
-					}
+			// View item in modal
+			window.viewItem = function (itemId) {
+				const item = window.personalDataRecords.find(
+					(r) => r.id === itemId
+				);
+				if (!item) return;
 
-					// Format content display based on type
-					let contentDisplay = item.content || "No content";
-					if (isBinaryFile) {
-						const sizeKB = metadata.fileSize
-							? (metadata.fileSize / 1024).toFixed(2)
-							: "Unknown";
-						contentDisplay = `<strong>📦 Binary File</strong><br>
+				// Try to parse metadata
+				let metadata = null;
+				let isBinaryFile = false;
+				try {
+					metadata = JSON.parse(item.description);
+					isBinaryFile = metadata.contentType === "binary";
+				} catch (e) {
+					// Not metadata JSON
+				}
+
+				// Format content display based on type
+				let contentDisplay = item.content || "No content";
+				if (isBinaryFile) {
+					const sizeKB = metadata.fileSize
+						? (metadata.fileSize / 1024).toFixed(2)
+						: "Unknown";
+					contentDisplay = `<strong>📦 Binary File</strong><br>
 							Type: ${metadata.fileType || "Unknown"}<br>
 							Size: ${sizeKB} KB<br>
 							<em>This is a binary file (zip, image, etc.). Click the download button to retrieve the original file.</em>`;
-					} else if (contentDisplay.length > 500) {
-						contentDisplay =
-							contentDisplay.substring(0, 500) +
-							"...<br><em>(Content truncated. Download to see full content.)</em>";
-					}
+				} else if (contentDisplay.length > 500) {
+					contentDisplay =
+						contentDisplay.substring(0, 500) +
+						"...<br><em>(Content truncated. Download to see full content.)</em>";
+				}
 
-					// Format description
-					let descriptionDisplay = item.description || "--";
-					if (metadata) {
-						descriptionDisplay = `<strong>File Info:</strong><br>
+				// Format description
+				let descriptionDisplay = item.description || "--";
+				if (metadata) {
+					descriptionDisplay = `<strong>File Info:</strong><br>
 							Name: ${metadata.fileName || "Unknown"}<br>
 							Type: ${metadata.fileType || "Unknown"}<br>
 							Size: ${
@@ -1444,10 +1439,10 @@
 									? new Date(metadata.uploadDate).toLocaleString()
 									: "Unknown"
 							}`;
-					}
+				}
 
-					const modalBody = document.getElementById("modalBody");
-					modalBody.innerHTML = `
+				const modalBody = document.getElementById("modalBody");
+				modalBody.innerHTML = `
 						<div class="modal-field">
 							<label>Title:</label>
 							<div class="modal-field-content">${item.title || "--"}</div>
@@ -1478,58 +1473,63 @@
 						</div>
 					`;
 
-					document.getElementById("viewModal").classList.add("show");
-				};
+				document.getElementById("viewModal").classList.add("show");
+			};
 
-				// Close modal
-				window.closeViewModal = function () {
-					document.getElementById("viewModal").classList.remove("show");
-				};
+			// Close modal
+			window.closeViewModal = function () {
+				document.getElementById("viewModal").classList.remove("show");
+			};
 
-				// Close modal when clicking outside
-				document
-					.getElementById("viewModal")
-					.addEventListener("click", function (e) {
-						if (e.target === this) {
-							closeViewModal();
-						}
-					});
-
-				// Download item as file
-				window.downloadItem = async function (itemId, title) {
-					const item = window.personalDataRecords.find(
-						(r) => r.id === itemId
-					);
-					if (!item) return;
-
-					// Parse metadata from description if available
-					let metadata = null;
-					let fileName = title;
-					let fileType = "text/plain";
-					let fileExtension = ".txt";
-
-					try {
-						metadata = JSON.parse(item.description);
-						if (metadata.fileName) {
-							fileName = metadata.fileName;
-							// Extract file extension
-							const lastDot = fileName.lastIndexOf(".");
-							if (lastDot > 0) {
-								fileExtension = fileName.substring(lastDot);
-							}
-						}
-						if (metadata.fileType) {
-							fileType = metadata.fileType;
-						}
-					} catch (e) {
-						// Not JSON metadata, use defaults
+			// Close modal when clicking outside
+			document
+				.getElementById("viewModal")
+				.addEventListener("click", function (e) {
+					if (e.target === this) {
+						closeViewModal();
 					}
+				});
+
+			// Download item as file
+			window.downloadItem = async function (itemId, title) {
+				const item = window.personalDataRecords.find(
+					(r) => r.id === itemId
+				);
+				if (!item) return;
+
+				// Parse metadata from description if available
+				let metadata = null;
+				let fileName = title;
+				let fileType = "text/plain";
+				let fileExtension = ".txt";
+
+				try {
+					metadata = JSON.parse(item.description);
+					if (metadata.fileName) {
+						fileName = metadata.fileName;
+						// Extract file extension
+						const lastDot = fileName.lastIndexOf(".");
+						if (lastDot > 0) {
+							fileExtension = fileName.substring(lastDot);
+						}
+					}
+					if (metadata.fileType) {
+						fileType = metadata.fileType;
+					}
+				} catch (e) {
+					// Not JSON metadata, use defaults
+				}
 
 				// Check if file is stored in R2
 				if (metadata && metadata.contentType === "r2") {
 					// Download from R2
 					try {
-						showProgress("📥 Downloading", fileName, 0, "Starting download...");
+						showProgress(
+							"📥 Downloading",
+							fileName,
+							0,
+							"Starting download..."
+						);
 
 						const response = await fetch(
 							`/api/files/download/${itemId}`,
@@ -1571,73 +1571,73 @@
 						alert("❌ Download failed: " + error.message);
 					}
 					return;
-				}					// Create file content for D1-stored files
-					const content = item.content || "";
-					let blob;
+				} // Create file content for D1-stored files
+				const content = item.content || "";
+				let blob;
 
-					// Check if content is base64 encoded (binary file)
-					if (metadata && metadata.contentType === "binary") {
-						// Decode base64 to binary
-						const binaryString = atob(content);
-						const bytes = new Uint8Array(binaryString.length);
-						for (let i = 0; i < binaryString.length; i++) {
-							bytes[i] = binaryString.charCodeAt(i);
-						}
-						blob = new Blob([bytes], { type: fileType });
-					} else {
-						// Text file
-						blob = new Blob([content], { type: fileType });
+				// Check if content is base64 encoded (binary file)
+				if (metadata && metadata.contentType === "binary") {
+					// Decode base64 to binary
+					const binaryString = atob(content);
+					const bytes = new Uint8Array(binaryString.length);
+					for (let i = 0; i < binaryString.length; i++) {
+						bytes[i] = binaryString.charCodeAt(i);
+					}
+					blob = new Blob([bytes], { type: fileType });
+				} else {
+					// Text file
+					blob = new Blob([content], { type: fileType });
+				}
+
+				const url = URL.createObjectURL(blob);
+
+				// Create download link
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = fileName;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+
+				alert("✅ File downloaded successfully!");
+			};
+
+			// Delete item
+			window.deleteItem = async function (itemId) {
+				if (
+					!confirm(
+						"Are you sure you want to delete this item? This action cannot be undone."
+					)
+				) {
+					return;
+				}
+
+				try {
+					const response = await fetch(`/api/data/personal/${itemId}`, {
+						method: "DELETE",
+						headers: {
+							Authorization: `Bearer ${authToken}`,
+						},
+					});
+
+					if (!response.ok) {
+						throw new Error("Failed to delete item");
 					}
 
-					const url = URL.createObjectURL(blob);
+					alert("✅ Item deleted successfully!");
+					loadDashboardData();
+				} catch (error) {
+					console.error("Error deleting item:", error);
+					alert("❌ Error deleting item: " + error.message);
+				}
+			};
 
-					// Create download link
-					const a = document.createElement("a");
-					a.href = url;
-					a.download = fileName;
-					document.body.appendChild(a);
-					a.click();
-					document.body.removeChild(a);
-					URL.revokeObjectURL(url);
-
-					alert("✅ File downloaded successfully!");
-				};
-
-				// Delete item
-				window.deleteItem = async function (itemId) {
-					if (
-						!confirm(
-							"Are you sure you want to delete this item? This action cannot be undone."
-						)
-					) {
-						return;
-					}
-
-					try {
-						const response = await fetch(`/api/data/personal/${itemId}`, {
-							method: "DELETE",
-							headers: {
-								Authorization: `Bearer ${authToken}`,
-							},
-						});
-
-						if (!response.ok) {
-							throw new Error("Failed to delete item");
-						}
-
-						alert("✅ Item deleted successfully!");
-						loadDashboardData();
-					} catch (error) {
-						console.error("Error deleting item:", error);
-						alert("❌ Error deleting item: " + error.message);
-					}
-				};
-
-				// Initialize dashboard
-				window.addEventListener("DOMContentLoaded", async () => {
-					await verifyAuth();
-					await loadDashboardData();
-				});
+			// Initialize dashboard
+			window.addEventListener("DOMContentLoaded", async () => {
+				await verifyAuth();
+				await loadDashboardData();
+			});
 		</script>
 	</body>
 </html>
