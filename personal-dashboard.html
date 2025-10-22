@@ -553,7 +553,9 @@
 						Drag & Drop files here or click to add data
 					</div>
 					<div class="drop-zone-hint">
-						Supports: Text files, JSON, ZIP files, images, PDFs, and more
+						Supports: Text files, JSON, ZIP files, images, PDFs, and
+						more<br />
+						<small style="color: #999">Maximum file size: 1 MB</small>
 					</div>
 				</div>
 
@@ -836,6 +838,23 @@
 			// Handle file reading
 			async function handleFiles(files) {
 				for (let file of files) {
+					// File size limit: 1MB (D1 database has limits)
+					const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+					const MAX_FILE_SIZE_MB = 1;
+
+					if (file.size > MAX_FILE_SIZE) {
+						alert(
+							`❌ File too large!\n\nFile: ${file.name}\nSize: ${(
+								file.size /
+								1024 /
+								1024
+							).toFixed(
+								2
+							)} MB\n\nMaximum allowed: ${MAX_FILE_SIZE_MB} MB\n\nPlease choose a smaller file or compress it further.`
+						);
+						continue;
+					}
+
 					const reader = new FileReader();
 					const isZipFile =
 						file.name.toLowerCase().endsWith(".zip") ||
@@ -862,6 +881,14 @@
 							);
 							content = base64;
 							contentType = "binary";
+
+							// Double-check encoded size (base64 is ~33% larger)
+							if (content.length > MAX_FILE_SIZE * 1.5) {
+								alert(
+									`❌ File too large after encoding!\n\nThe file becomes too large when prepared for storage.\nPlease choose a smaller file.`
+								);
+								return;
+							}
 						}
 
 						// Pre-fill the form with file data
@@ -886,9 +913,24 @@
 							categorySelect.value = "other";
 						}
 
-						// Show the form
+						// Show the form with file size warning if large
+						const sizeKB = file.size / 1024;
+						if (sizeKB > 500) {
+							alert(
+								`⚠️ Large file detected: ${sizeKB.toFixed(
+									0
+								)} KB\n\nThis file is close to the size limit. If saving fails, try a smaller file.`
+							);
+						}
+
 						addItemForm.classList.add("show");
 						dropZone.style.display = "none";
+					};
+
+					reader.onerror = function () {
+						alert(
+							`❌ Error reading file: ${file.name}\n\nPlease try again or choose a different file.`
+						);
 					};
 
 					// Read as binary for zip and other binary files, text otherwise
@@ -925,6 +967,18 @@
 					status: "active",
 				};
 
+				// Check data size before sending
+				const dataSize = JSON.stringify(itemData).length;
+				const dataSizeMB = (dataSize / 1024 / 1024).toFixed(2);
+
+				if (dataSize > 1024 * 1024) {
+					// 1MB limit
+					alert(
+						`❌ Data too large to save!\n\nSize: ${dataSizeMB} MB\nLimit: 1 MB\n\nPlease use a smaller file.`
+					);
+					return;
+				}
+
 				try {
 					const response = await fetch("/api/data/personal", {
 						method: "POST",
@@ -935,8 +989,12 @@
 						body: JSON.stringify(itemData),
 					});
 
+					const result = await response.json();
+
 					if (!response.ok) {
-						throw new Error("Failed to save data");
+						throw new Error(
+							result.error || result.details || "Failed to save data"
+						);
 					}
 
 					// Success - reset form and reload data
@@ -951,7 +1009,11 @@
 					loadDashboardData();
 				} catch (error) {
 					console.error("Error saving data:", error);
-					alert("❌ Error saving data: " + error.message);
+					alert(
+						"❌ Error saving data:\n\n" +
+							error.message +
+							"\n\nTry using a smaller file (< 1MB)."
+					);
 				}
 			});
 
