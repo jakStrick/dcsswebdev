@@ -125,13 +125,14 @@ export async function onRequestPost({ request, env }) {
 
 		console.log("Metadata created, ID:", recordId);
 
-		// Return the r2Key and recordId for direct upload from client
+		// For direct R2 upload, we need to use multipart upload for large files
+		// or return metadata for chunked upload through our endpoint
 		return new Response(
 			JSON.stringify({
 				success: true,
 				r2Key: r2Key,
 				recordId: recordId,
-				uploadUrl: `/api/files/direct-upload`,
+				uploadEndpoint: `/api/files/stream-upload`,
 			}),
 			{
 				status: 200,
