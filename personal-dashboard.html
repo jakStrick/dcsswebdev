@@ -837,7 +837,7 @@
 				}
 			}
 
-			// Upload large file to R2
+			// Upload large file to R2 using direct upload (avoids 100MB POST limit)
 			async function uploadLargeFile(file) {
 				const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
 
@@ -849,48 +849,57 @@
 					return;
 				}
 
-				// Show progress
-				const progressMsg = alert(
-					`⏳ Uploading ${file.name}...\n\nPlease wait, this may take a moment.`
-				);
-
 				try {
-					const formData = new FormData();
-					formData.append("file", file);
-					formData.append("title", file.name);
-					formData.append("category", "other");
-					formData.append("description", `Large file: ${file.name}`);
+					// Step 1: Get presigned URL / upload metadata
+					console.log("Step 1: Getting upload URL...");
+					const presignedResponse = await fetch(
+						"/api/files/presigned-url",
+						{
+							method: "POST",
+							headers: {
+								Authorization: `Bearer ${authToken}`,
+								"Content-Type": "application/json",
+							},
+							body: JSON.stringify({
+								fileName: file.name,
+								fileType: file.type || "application/octet-stream",
+								fileSize: file.size,
+							}),
+						}
+					);
 
-					const response = await fetch("/api/files/upload", {
-						method: "POST",
+					if (!presignedResponse.ok) {
+						const error = await presignedResponse.json();
+						throw new Error(
+							error.error || error.details || "Failed to prepare upload"
+						);
+					}
+
+					const { r2Key, recordId } = await presignedResponse.json();
+					console.log("Upload metadata received:", { r2Key, recordId });
+
+					// Step 2: Upload file directly to R2 with streaming
+					console.log("Step 2: Uploading file to R2...");
+					const uploadResponse = await fetch("/api/files/direct-upload", {
+						method: "PUT",
 						headers: {
 							Authorization: `Bearer ${authToken}`,
+							"Content-Type": file.type || "application/octet-stream",
+							"X-R2-Key": r2Key,
+							"X-Record-Id": recordId,
 						},
-						body: formData,
+						body: file, // Stream the file directly
 					});
 
-					// Check if response has content
-					const contentType = response.headers.get("content-type");
-					let result;
-
-					if (contentType && contentType.includes("application/json")) {
-						result = await response.json();
-					} else {
-						// Response is not JSON
-						const text = await response.text();
-						console.error("Non-JSON response:", text);
+					if (!uploadResponse.ok) {
+						const error = await uploadResponse.json();
 						throw new Error(
-							`Server error: ${response.status} - ${
-								text || "No response body"
-							}`
+							error.error || error.details || "Upload failed"
 						);
 					}
 
-					if (!response.ok) {
-						throw new Error(
-							result.error || result.details || "Upload failed"
-						);
-					}
+					const result = await uploadResponse.json();
+					console.log("Upload complete:", result);
 
 					alert(
 						`✅ File uploaded successfully!\n\n${file.name}\nSize: ${fileSizeMB} MB`
@@ -903,16 +912,17 @@
 
 					// More detailed error message
 					let errorMsg = error.message;
-					if (errorMsg.includes("R2 bucket binding")) {
+					if (
+						errorMsg.includes("R2 bucket binding") ||
+						errorMsg.includes("Storage not configured")
+					) {
 						errorMsg +=
 							"\n\n⚠️ R2 Storage Configuration Required:\n\n1. Go to Cloudflare Dashboard\n2. Navigate to Workers & Pages → dcsswebdev\n3. Settings → Functions\n4. Add R2 bucket binding:\n   - Variable: FILES\n   - Bucket: dcsswebdev-files\n5. Redeploy the site";
 					}
 
 					alert(`❌ Upload failed:\n\n${errorMsg}`);
 				}
-			}
-
-			// Handle file reading
+			} // Handle file reading
 			async function handleFiles(files) {
 				for (let file of files) {
 					// File size limits
