@@ -5,7 +5,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "dcss-personal-db",
+      "database_name": "dcsswebdevpersonal",
       "database_id": "a9e16f91-2992-4caf-922b-79b60bbb3fa2"
     }
   ]
