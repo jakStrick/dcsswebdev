@@ -868,14 +868,33 @@
 						}
 					);
 
-					if (!presignedResponse.ok) {
-						const error = await presignedResponse.json();
+					// Check if response is JSON
+					const contentType1 =
+						presignedResponse.headers.get("content-type");
+					if (
+						!contentType1 ||
+						!contentType1.includes("application/json")
+					) {
+						const text = await presignedResponse.text();
+						console.error("Non-JSON response from presigned-url:", text);
 						throw new Error(
-							error.error || error.details || "Failed to prepare upload"
+							`Server error: ${presignedResponse.status} - ${
+								text || "No response body"
+							}`
 						);
 					}
 
-					const { r2Key, recordId } = await presignedResponse.json();
+					const presignedData = await presignedResponse.json();
+
+					if (!presignedResponse.ok) {
+						throw new Error(
+							presignedData.error ||
+								presignedData.details ||
+								"Failed to prepare upload"
+						);
+					}
+
+					const { r2Key, recordId } = presignedData;
 					console.log("Upload metadata received:", { r2Key, recordId });
 
 					// Step 2: Upload file directly to R2 with streaming
@@ -891,14 +910,29 @@
 						body: file, // Stream the file directly
 					});
 
-					if (!uploadResponse.ok) {
-						const error = await uploadResponse.json();
+					// Check if response is JSON
+					const contentType2 = uploadResponse.headers.get("content-type");
+					if (
+						!contentType2 ||
+						!contentType2.includes("application/json")
+					) {
+						const text = await uploadResponse.text();
+						console.error("Non-JSON response from direct-upload:", text);
 						throw new Error(
-							error.error || error.details || "Upload failed"
+							`Server error: ${uploadResponse.status} - ${
+								text || "No response body"
+							}`
 						);
 					}
 
 					const result = await uploadResponse.json();
+
+					if (!uploadResponse.ok) {
+						throw new Error(
+							result.error || result.details || "Upload failed"
+						);
+					}
+
 					console.log("Upload complete:", result);
 
 					alert(
