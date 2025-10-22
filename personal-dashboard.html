@@ -206,6 +206,123 @@
         margin-bottom: 20px;
       }
 
+      /* Drag and Drop Styles */
+      .drop-zone {
+        border: 3px dashed #ccc;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fafafa;
+        margin-bottom: 20px;
+      }
+
+      .drop-zone:hover {
+        border-color: #667eea;
+        background: #f0f4ff;
+      }
+
+      .drop-zone.drag-over {
+        border-color: #667eea;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        transform: scale(1.02);
+      }
+
+      .drop-zone-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+      }
+
+      .drop-zone-text {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+      }
+
+      .drop-zone-hint {
+        color: #999;
+        font-size: 0.9rem;
+      }
+
+      .add-item-form {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .add-item-form.show {
+        display: block;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .form-field {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-field label {
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .form-field input,
+      .form-field select,
+      .form-field textarea {
+        padding: 10px;
+        border: 2px solid #e5e5e5;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 1rem;
+      }
+
+      .form-field input:focus,
+      .form-field select:focus,
+      .form-field textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .form-field textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      .btn-success {
+        background: #4caf50;
+        color: white;
+      }
+
+      .btn-success:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+      }
+
+      .btn-cancel {
+        background: #f44336;
+        color: white;
+      }
+
+      .btn-cancel:hover {
+        background: #da190b;
+      }
+
       @media (max-width: 768px) {
         .dashboard-header {
           flex-direction: column;
@@ -286,6 +403,50 @@
       <!-- Data Section -->
       <div class="data-section">
         <h2>📋 Personal Data</h2>
+        
+        <!-- Drag and Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-zone-icon">📁</div>
+          <div class="drop-zone-text">Drag & Drop files here or click to add data</div>
+          <div class="drop-zone-hint">Supports: Text files, JSON, or click to manually enter data</div>
+        </div>
+
+        <!-- Add Item Form -->
+        <div class="add-item-form" id="addItemForm">
+          <h3 style="margin-bottom: 15px;">Add New Item</h3>
+          <form id="itemForm">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="itemTitle">Title *</label>
+                <input type="text" id="itemTitle" required placeholder="Enter title">
+              </div>
+              <div class="form-field">
+                <label for="itemCategory">Category</label>
+                <select id="itemCategory">
+                  <option value="">Select category</option>
+                  <option value="personal">Personal</option>
+                  <option value="work">Work</option>
+                  <option value="project">Project</option>
+                  <option value="note">Note</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="itemDescription">Description</label>
+              <textarea id="itemDescription" placeholder="Enter description"></textarea>
+            </div>
+            <div class="form-field">
+              <label for="itemContent">Content</label>
+              <textarea id="itemContent" placeholder="Enter content"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-cancel" id="cancelFormBtn">Cancel</button>
+              <button type="submit" class="btn btn-success">Save Item</button>
+            </div>
+          </form>
+        </div>
+
         <div id="dataContent">
           <div class="loading">
             <div class="loading-spinner"></div>
@@ -430,6 +591,125 @@
           </div>
         `;
         loadDashboardData();
+      });
+
+      // Drag and Drop functionality
+      const dropZone = document.getElementById("dropZone");
+      const addItemForm = document.getElementById("addItemForm");
+      const itemForm = document.getElementById("itemForm");
+      const cancelFormBtn = document.getElementById("cancelFormBtn");
+
+      // Prevent default drag behaviors
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      // Highlight drop zone when dragging over it
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+          dropZone.classList.add('drag-over');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+          dropZone.classList.remove('drag-over');
+        }, false);
+      });
+
+      // Handle dropped files
+      dropZone.addEventListener('drop', handleDrop, false);
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0) {
+          handleFiles(files);
+        }
+      }
+
+      // Handle file reading
+      async function handleFiles(files) {
+        for (let file of files) {
+          const reader = new FileReader();
+          
+          reader.onload = async (e) => {
+            const content = e.target.result;
+            
+            // Pre-fill the form with file data
+            document.getElementById('itemTitle').value = file.name;
+            document.getElementById('itemContent').value = content;
+            document.getElementById('itemDescription').value = `Uploaded file: ${file.name} (${file.type || 'unknown type'})`;
+            
+            // Show the form
+            addItemForm.classList.add('show');
+            dropZone.style.display = 'none';
+          };
+          
+          reader.readAsText(file);
+        }
+      }
+
+      // Click to show form
+      dropZone.addEventListener('click', () => {
+        addItemForm.classList.add('show');
+        dropZone.style.display = 'none';
+      });
+
+      // Cancel form
+      cancelFormBtn.addEventListener('click', () => {
+        addItemForm.classList.remove('show');
+        dropZone.style.display = 'block';
+        itemForm.reset();
+      });
+
+      // Submit form to save data
+      itemForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const itemData = {
+          title: document.getElementById('itemTitle').value,
+          description: document.getElementById('itemDescription').value,
+          category: document.getElementById('itemCategory').value,
+          content: document.getElementById('itemContent').value,
+          status: 'active'
+        };
+
+        try {
+          const response = await fetch('/api/data/personal', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(itemData)
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to save data');
+          }
+
+          // Success - reset form and reload data
+          itemForm.reset();
+          addItemForm.classList.remove('show');
+          dropZone.style.display = 'block';
+          
+          // Show success message
+          alert('✅ Item saved successfully!');
+          
+          // Reload dashboard data
+          loadDashboardData();
+        } catch (error) {
+          console.error('Error saving data:', error);
+          alert('❌ Error saving data: ' + error.message);
+        }
       });
 
       // Initialize dashboard
