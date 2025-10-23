@@ -76,3 +76,6 @@ secrets.json
 *.bak
 *.swp
 *~
+
+# md specific files
+*.md
