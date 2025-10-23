@@ -24,7 +24,8 @@ export async function onRequestPost({ request, env }) {
   }
 
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, phoneNumber, twoFactorEnabled } =
+      await request.json();
 
     // Validate input
     if (!name || !email || !password) {
@@ -59,6 +60,19 @@ export async function onRequestPost({ request, env }) {
       );
     }
 
+    // Validate 2FA requirements
+    if (twoFactorEnabled && !phoneNumber) {
+      return new Response(
+        JSON.stringify({
+          error: "Phone number required for two-factor authentication",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     // Check if user already exists
     const existingUser = await env.DB.prepare(
       "SELECT id FROM users WHERE email = ?"
@@ -79,12 +93,20 @@ export async function onRequestPost({ request, env }) {
     // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Insert new user
+    // Insert new user with phone number and 2FA settings
     const result = await env.DB.prepare(
-      `INSERT INTO users (name, email, password_hash, created_at, last_login) 
-       VALUES (?, ?, ?, datetime('now'), datetime('now'))`
+      `INSERT INTO users 
+       (name, email, password_hash, phone_number, phone_verified, two_factor_enabled, created_at, last_login) 
+       VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
     )
-      .bind(name, email, passwordHash)
+      .bind(
+        name,
+        email,
+        passwordHash,
+        phoneNumber || null,
+        phoneNumber ? 1 : 0, // Auto-verify phone if provided during registration
+        twoFactorEnabled ? 1 : 0
+      )
       .run();
 
     if (!result.success) {

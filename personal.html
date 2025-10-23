@@ -384,6 +384,36 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label" for="registerPhone"
+              >Phone Number (Optional)</label
+            >
+            <input
+              type="tel"
+              id="registerPhone"
+              class="form-input"
+              placeholder="+1 (555) 123-4567"
+            />
+            <small
+              style="
+                color: #666;
+                font-size: 0.8rem;
+                margin-top: 4px;
+                display: block;
+              "
+            >
+              Required for SMS-based two-factor authentication. Format:
+              +1234567890
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="enable2FA" style="margin-right: 8px" />
+              Enable two-factor authentication (requires phone number)
+            </label>
+          </div>
+
+          <div class="form-group">
             <label class="form-label" for="registerPassword">Password</label>
             <input
               type="password"
@@ -519,6 +549,20 @@
         return strength;
       }
 
+      // 2FA checkbox handler - make phone number required when 2FA is enabled
+      const enable2FACheckbox = document.getElementById("enable2FA");
+      const phoneInput = document.getElementById("registerPhone");
+
+      enable2FACheckbox.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          phoneInput.required = true;
+          phoneInput.placeholder = "+1 (555) 123-4567 (Required for 2FA)";
+        } else {
+          phoneInput.required = false;
+          phoneInput.placeholder = "+1 (555) 123-4567";
+        }
+      });
+
       // Message handling
       function showMessage(text, type) {
         messageBox.textContent = text;
@@ -564,16 +608,42 @@
           const data = await response.json();
 
           if (response.ok) {
-            showMessage("Login successful! Redirecting...", "success");
-            // Store session token
-            localStorage.setItem("authToken", data.token);
-            if (rememberMe) {
-              localStorage.setItem("rememberMe", "true");
+            // Check if 2FA is required
+            if (data.requiresTwoFactor) {
+              // Store temporary auth data for 2FA verification
+              sessionStorage.setItem(
+                "tempAuthData",
+                JSON.stringify({
+                  userId: data.userId,
+                  phoneNumber: data.phoneNumber,
+                  maskedPhone: data.maskedPhone,
+                  rememberMe: data.rememberMe,
+                  expiresAt: data.expiresAt,
+                })
+              );
+
+              showMessage(
+                `Verification code sent to ${data.maskedPhone}`,
+                "success"
+              );
+
+              // Redirect to 2FA verification page after brief delay
+              setTimeout(() => {
+                window.location.href = "verify-2fa.html";
+              }, 1500);
+            } else {
+              // No 2FA - proceed with normal login
+              showMessage("Login successful! Redirecting...", "success");
+              // Store session token
+              localStorage.setItem("authToken", data.token);
+              if (rememberMe) {
+                localStorage.setItem("rememberMe", "true");
+              }
+              // Redirect to dashboard
+              setTimeout(() => {
+                window.location.href = "personal-dashboard.html";
+              }, 1000);
             }
-            // Redirect to dashboard
-            setTimeout(() => {
-              window.location.href = "personal-dashboard.html";
-            }, 1000);
           } else {
             showMessage(
               data.error || "Login failed. Please try again.",
@@ -608,6 +678,8 @@
 
         const name = document.getElementById("registerName").value;
         const email = document.getElementById("registerEmail").value;
+        const phone = document.getElementById("registerPhone").value;
+        const enable2FA = document.getElementById("enable2FA").checked;
         const password = document.getElementById("registerPassword").value;
         const confirmPassword = document.getElementById(
           "registerPasswordConfirm"
@@ -626,16 +698,45 @@
           return;
         }
 
+        // Validate phone number if 2FA is enabled
+        if (enable2FA && !phone) {
+          showMessage(
+            "Phone number is required for two-factor authentication!",
+            "error"
+          );
+          return;
+        }
+
+        // Basic phone validation (E.164 format)
+        if (
+          phone &&
+          !/^\+?[1-9]\d{1,14}$/.test(phone.replace(/[\s()-]/g, ""))
+        ) {
+          showMessage(
+            "Please enter a valid phone number in E.164 format (e.g., +12345678901)",
+            "error"
+          );
+          return;
+        }
+
         registerBtn.disabled = true;
         registerSpinner.classList.add("show");
 
         try {
+          const requestBody = {
+            name,
+            email,
+            password,
+            phoneNumber: phone ? phone.replace(/[\s()-]/g, "") : null,
+            twoFactorEnabled: enable2FA,
+          };
+
           const response = await fetch("/api/auth/register", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ name, email, password }),
+            body: JSON.stringify(requestBody),
           });
 
           const data = await response.json();

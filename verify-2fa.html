@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <title>Two-Factor Authentication - DCSS Web Dev</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .verify-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 450px;
+        padding: 40px;
+        text-align: center;
+      }
+
+      .verify-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+      }
+
+      .verify-title {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .verify-subtitle {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .phone-display {
+        background: #f5f5f5;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+        color: #333;
+        font-weight: 500;
+      }
+
+      .code-inputs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .code-input {
+        width: 50px;
+        height: 60px;
+        font-size: 2rem;
+        text-align: center;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .code-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .code-input.filled {
+        border-color: #667eea;
+        background: #f0f4ff;
+      }
+
+      .code-input.error {
+        border-color: #f44336;
+        background: #ffebee;
+      }
+
+      .timer-display {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 0.95rem;
+      }
+
+      .timer-display.warning {
+        color: #ff9800;
+        font-weight: 600;
+      }
+
+      .timer-display.expired {
+        color: #f44336;
+        font-weight: 600;
+      }
+
+      .verify-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .verify-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .verify-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .resend-section {
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid #e5e5e5;
+      }
+
+      .resend-text {
+        color: #666;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+      }
+
+      .resend-btn {
+        background: transparent;
+        color: #667eea;
+        border: 2px solid #667eea;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .resend-btn:hover:not(:disabled) {
+        background: #667eea;
+        color: white;
+      }
+
+      .resend-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .trust-device {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .trust-device input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .message {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+        display: none;
+      }
+
+      .message.show {
+        display: block;
+      }
+
+      .message.error {
+        background: #ffebee;
+        color: #c62828;
+        border: 1px solid #ef9a9a;
+      }
+
+      .message.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #a5d6a7;
+      }
+
+      .message.info {
+        background: #e3f2fd;
+        color: #1565c0;
+        border: 1px solid #90caf9;
+      }
+
+      .back-link {
+        margin-top: 20px;
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.95rem;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      .loading-spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-left: 10px;
+        display: none;
+      }
+
+      .loading-spinner.show {
+        display: inline-block;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .verify-container {
+          padding: 30px 20px;
+        }
+
+        .code-input {
+          width: 45px;
+          height: 55px;
+          font-size: 1.8rem;
+        }
+
+        .code-inputs {
+          gap: 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="verify-container">
+      <div class="verify-icon">📱</div>
+      <h1 class="verify-title">Two-Factor Authentication</h1>
+      <p class="verify-subtitle">
+        We've sent a verification code to your phone
+      </p>
+
+      <div class="phone-display" id="phoneDisplay">+1 (***) ***-****</div>
+
+      <div id="messageBox" class="message"></div>
+
+      <form id="verifyForm">
+        <div class="code-inputs">
+          <input
+            type="text"
+            class="code-input"
+            maxlength="1"
+            id="code1"
+            pattern="[0-9]"
+            inputmode="numeric"
+            autocomplete="off"
+          />
+          <input
+            type="text"
+            class="code-input"
+            maxlength="1"
+            id="code2"
+            pattern="[0-9]"
+            inputmode="numeric"
+            autocomplete="off"
+          />
+          <input
+            type="text"
+            class="code-input"
+            maxlength="1"
+            id="code3"
+            pattern="[0-9]"
+            inputmode="numeric"
+            autocomplete="off"
+          />
+          <input
+            type="text"
+            class="code-input"
+            maxlength="1"
+            id="code4"
+            pattern="[0-9]"
+            inputmode="numeric"
+            autocomplete="off"
+          />
+          <input
+            type="text"
+            class="code-input"
+            maxlength="1"
+            id="code5"
+            pattern="[0-9]"
+            inputmode="numeric"
+            autocomplete="off"
+          />
+          <input
+            type="text"
+            class="code-input"
+            maxlength="1"
+            id="code6"
+            pattern="[0-9]"
+            inputmode="numeric"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="timer-display" id="timerDisplay">
+          Code expires in: <span id="countdown">5:00</span>
+        </div>
+
+        <button type="submit" class="verify-btn" id="verifyBtn">
+          Verify Code
+          <span class="loading-spinner" id="verifySpinner"></span>
+        </button>
+
+        <div class="trust-device">
+          <input type="checkbox" id="trustDevice" />
+          <label for="trustDevice">Trust this device for 30 days</label>
+        </div>
+      </form>
+
+      <div class="resend-section">
+        <p class="resend-text">Didn't receive the code?</p>
+        <button class="resend-btn" id="resendBtn">
+          Resend Code
+          <span id="resendCountdown"></span>
+          <span class="loading-spinner" id="resendSpinner"></span>
+        </button>
+      </div>
+
+      <a href="personal.html" class="back-link">← Back to Login</a>
+    </div>
+
+    <script>
+      // Get user data from session storage (set during login)
+      const tempAuthData = JSON.parse(
+        sessionStorage.getItem("tempAuthData") || "{}"
+      );
+
+      if (!tempAuthData.userId || !tempAuthData.phoneNumber) {
+        window.location.href = "personal.html";
+      }
+
+      // Display masked phone number
+      document.getElementById("phoneDisplay").textContent =
+        tempAuthData.maskedPhone || "+1 (***) ***-****";
+
+      // Code input handling
+      const codeInputs = document.querySelectorAll(".code-input");
+      const messageBox = document.getElementById("messageBox");
+      const verifyForm = document.getElementById("verifyForm");
+      const verifyBtn = document.getElementById("verifyBtn");
+      const verifySpinner = document.getElementById("verifySpinner");
+      const resendBtn = document.getElementById("resendBtn");
+      const resendSpinner = document.getElementById("resendSpinner");
+      const resendCountdown = document.getElementById("resendCountdown");
+      const timerDisplay = document.getElementById("timerDisplay");
+      const countdownSpan = document.getElementById("countdown");
+
+      let resendCooldown = 60;
+      let codeExpiry = 300; // 5 minutes
+
+      // Auto-focus and navigation for code inputs
+      codeInputs.forEach((input, index) => {
+        input.addEventListener("input", (e) => {
+          const value = e.target.value;
+
+          // Only allow numbers
+          if (!/^\d$/.test(value)) {
+            e.target.value = "";
+            return;
+          }
+
+          // Add filled class
+          if (value) {
+            e.target.classList.add("filled");
+            // Move to next input
+            if (index < codeInputs.length - 1) {
+              codeInputs[index + 1].focus();
+            }
+          } else {
+            e.target.classList.remove("filled");
+          }
+
+          // Clear error state
+          codeInputs.forEach((inp) => inp.classList.remove("error"));
+
+          // Auto-submit if all filled
+          if (index === codeInputs.length - 1 && value) {
+            const allFilled = Array.from(codeInputs).every((inp) => inp.value);
+            if (allFilled) {
+              setTimeout(() => verifyForm.requestSubmit(), 100);
+            }
+          }
+        });
+
+        input.addEventListener("keydown", (e) => {
+          // Backspace handling
+          if (e.key === "Backspace" && !e.target.value && index > 0) {
+            codeInputs[index - 1].focus();
+            codeInputs[index - 1].value = "";
+            codeInputs[index - 1].classList.remove("filled");
+          }
+
+          // Arrow key navigation
+          if (e.key === "ArrowLeft" && index > 0) {
+            codeInputs[index - 1].focus();
+          }
+          if (e.key === "ArrowRight" && index < codeInputs.length - 1) {
+            codeInputs[index + 1].focus();
+          }
+        });
+
+        // Paste handling
+        input.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const pasteData = e.clipboardData.getData("text").replace(/\D/g, "");
+
+          if (pasteData.length === 6) {
+            codeInputs.forEach((inp, i) => {
+              inp.value = pasteData[i] || "";
+              if (pasteData[i]) {
+                inp.classList.add("filled");
+              }
+            });
+            codeInputs[5].focus();
+            setTimeout(() => verifyForm.requestSubmit(), 100);
+          }
+        });
+      });
+
+      // Focus first input on load
+      codeInputs[0].focus();
+
+      // Message handling
+      function showMessage(text, type) {
+        messageBox.textContent = text;
+        messageBox.className = `message ${type} show`;
+      }
+
+      function clearMessage() {
+        messageBox.className = "message";
+      }
+
+      // Countdown timer for code expiry
+      function startExpiryCountdown() {
+        const interval = setInterval(() => {
+          codeExpiry--;
+
+          const minutes = Math.floor(codeExpiry / 60);
+          const seconds = codeExpiry % 60;
+          countdownSpan.textContent = `${minutes}:${seconds
+            .toString()
+            .padStart(2, "0")}`;
+
+          if (codeExpiry <= 60) {
+            timerDisplay.classList.add("warning");
+          }
+
+          if (codeExpiry <= 0) {
+            clearInterval(interval);
+            timerDisplay.classList.add("expired");
+            timerDisplay.classList.remove("warning");
+            countdownSpan.textContent = "EXPIRED";
+            showMessage("Code has expired. Please request a new one.", "error");
+            verifyBtn.disabled = true;
+          }
+        }, 1000);
+      }
+
+      // Resend cooldown timer
+      function startResendCooldown() {
+        resendBtn.disabled = true;
+        const interval = setInterval(() => {
+          resendCooldown--;
+          resendCountdown.textContent = `(${resendCooldown}s)`;
+
+          if (resendCooldown <= 0) {
+            clearInterval(interval);
+            resendBtn.disabled = false;
+            resendCountdown.textContent = "";
+            resendCooldown = 60;
+          }
+        }, 1000);
+      }
+
+      // Start timers
+      startExpiryCountdown();
+      startResendCooldown();
+
+      // Verify code submission
+      verifyForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearMessage();
+
+        const code = Array.from(codeInputs)
+          .map((inp) => inp.value)
+          .join("");
+
+        if (code.length !== 6) {
+          showMessage("Please enter all 6 digits", "error");
+          codeInputs.forEach((inp) => inp.classList.add("error"));
+          return;
+        }
+
+        const trustDevice = document.getElementById("trustDevice").checked;
+
+        verifyBtn.disabled = true;
+        verifySpinner.classList.add("show");
+
+        try {
+          const response = await fetch("/api/auth/verify-2fa", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: tempAuthData.userId,
+              code: code,
+              trustDevice: trustDevice,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showMessage("Verification successful! Redirecting...", "success");
+
+            // Store auth token
+            localStorage.setItem("authToken", data.token);
+            if (tempAuthData.rememberMe) {
+              localStorage.setItem("rememberMe", "true");
+            }
+
+            // Clear temp data
+            sessionStorage.removeItem("tempAuthData");
+
+            // Redirect to dashboard
+            setTimeout(() => {
+              window.location.href = "personal-dashboard.html";
+            }, 1000);
+          } else {
+            showMessage(data.error || "Invalid verification code", "error");
+            codeInputs.forEach((inp) => {
+              inp.classList.add("error");
+              inp.value = "";
+              inp.classList.remove("filled");
+            });
+            codeInputs[0].focus();
+          }
+        } catch (error) {
+          console.error("Verification error:", error);
+          showMessage("Connection error. Please try again.", "error");
+        } finally {
+          verifyBtn.disabled = false;
+          verifySpinner.classList.remove("show");
+        }
+      });
+
+      // Resend code
+      resendBtn.addEventListener("click", async () => {
+        clearMessage();
+        resendBtn.disabled = true;
+        resendSpinner.classList.add("show");
+
+        try {
+          const response = await fetch("/api/auth/resend-2fa", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: tempAuthData.userId,
+              phoneNumber: tempAuthData.phoneNumber,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showMessage("New code sent successfully!", "success");
+            // Reset expiry timer
+            codeExpiry = 300;
+            timerDisplay.classList.remove("warning", "expired");
+            verifyBtn.disabled = false;
+            // Clear inputs
+            codeInputs.forEach((inp) => {
+              inp.value = "";
+              inp.classList.remove("filled", "error");
+            });
+            codeInputs[0].focus();
+            startResendCooldown();
+          } else {
+            showMessage(data.error || "Failed to resend code", "error");
+          }
+        } catch (error) {
+          console.error("Resend error:", error);
+          showMessage("Connection error. Please try again.", "error");
+        } finally {
+          resendSpinner.classList.remove("show");
+        }
+      });
+
+      // Prevent going back
+      history.pushState(null, null, location.href);
+      window.onpopstate = function () {
+        history.go(1);
+      };
+    </script>
+  </body>
+</html>
