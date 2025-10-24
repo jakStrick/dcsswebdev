@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Twilio Setup Instructions for 2FA</title>
+    <style>
+      @media print {
+        body {
+          margin: 0;
+          padding: 20px;
+        }
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        background: #f5f5f5;
+        color: #333;
+      }
+
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #1e40af;
+        border-bottom: 3px solid #3b82f6;
+        padding-bottom: 10px;
+        margin-bottom: 30px;
+      }
+
+      h2 {
+        color: #2563eb;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        border-left: 4px solid #3b82f6;
+        padding-left: 15px;
+      }
+
+      h3 {
+        color: #3b82f6;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+
+      .step-number {
+        display: inline-block;
+        background: #3b82f6;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 28px;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      ul {
+        margin-left: 20px;
+        margin-bottom: 15px;
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
+
+      .code-block {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-left: 4px solid #3b82f6;
+        padding: 15px;
+        margin: 15px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        overflow-x: auto;
+      }
+
+      .variable {
+        background: #e0f2fe;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        color: #0c4a6e;
+      }
+
+      .important {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 4px;
+      }
+
+      .note {
+        background: #dbeafe;
+        border-left: 4px solid #3b82f6;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 4px;
+      }
+
+      a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .link-box {
+        background: #f0f9ff;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        border: 1px solid #bae6fd;
+      }
+
+      .print-button {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-bottom: 20px;
+        display: inline-block;
+      }
+
+      .print-button:hover {
+        background: #2563eb;
+      }
+
+      @media print {
+        .print-button {
+          display: none;
+        }
+
+        body {
+          background: white;
+        }
+
+        .container {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <button class="print-button" onclick="window.print()">
+        📄 Save as PDF
+      </button>
+
+      <h1>Twilio Setup Instructions for 2FA</h1>
+
+      <div class="note">
+        <strong>📝 Note:</strong> This guide will help you set up Twilio SMS for
+        two-factor authentication on your DCSS LLC website.
+      </div>
+
+      <h2>1️⃣ Twilio Account Setup</h2>
+
+      <h3><span class="step-number">1</span>Sign up for Twilio</h3>
+      <ul>
+        <li>
+          Visit:
+          <div class="link-box">
+            <a href="https://www.twilio.com/try-twilio" target="_blank"
+              >https://www.twilio.com/try-twilio</a
+            >
+          </div>
+        </li>
+        <li>
+          Create a free account (includes <strong>$15.50 trial credit</strong>)
+        </li>
+        <li>Verify your email address and phone number</li>
+      </ul>
+
+      <h3><span class="step-number">2</span>Get Your Credentials</h3>
+      <ul>
+        <li>
+          Login to Twilio Console:
+          <div class="link-box">
+            <a href="https://console.twilio.com/" target="_blank"
+              >https://console.twilio.com/</a
+            >
+          </div>
+        </li>
+        <li>Copy your <strong>Account SID</strong> (starts with 'AC...')</li>
+        <li>
+          Copy your <strong>Auth Token</strong> (click the eye icon to reveal)
+        </li>
+      </ul>
+
+      <div class="important">
+        <strong>⚠️ Important:</strong> Keep these credentials secure! Never
+        commit them to GitHub or share them publicly.
+      </div>
+
+      <h3><span class="step-number">3</span>Get a Phone Number</h3>
+      <ul>
+        <li>
+          In Twilio Console, go to:
+          <strong>Phone Numbers → Manage → Buy a number</strong>
+        </li>
+        <li>
+          Select a number with <strong>SMS capabilities</strong> (~$1/month)
+        </li>
+        <li>Verify the number can send SMS messages</li>
+        <li>
+          Copy your Twilio phone number (format:
+          <span class="variable">+12345678901</span>)
+        </li>
+      </ul>
+
+      <h2>2️⃣ Cloudflare Pages Configuration</h2>
+
+      <h3><span class="step-number">1</span>Navigate to Pages Settings</h3>
+      <ul>
+        <li>Go to your <strong>Cloudflare Dashboard</strong></li>
+        <li>
+          Select your Pages project: <span class="variable">dcsswebdev</span>
+        </li>
+        <li>Go to: <strong>Settings → Environment variables</strong></li>
+      </ul>
+
+      <h3><span class="step-number">2</span>Add Twilio Credentials</h3>
+      <p>Add the following three environment variables:</p>
+
+      <div class="code-block">
+        <strong>Variable 1:</strong>
+        Name: TWILIO_ACCOUNT_SID Value: [Your Account SID from step 1.2]
+        Environment: ✓ Production and Preview
+
+        <strong>Variable 2:</strong>
+        Name: TWILIO_AUTH_TOKEN Value: [Your Auth Token from step 1.2]
+        Environment: ✓ Production and Preview
+
+        <strong>Variable 3:</strong>
+        Name: TWILIO_PHONE_NUMBER Value: [Your Twilio phone number from step
+        1.3] Environment: ✓ Production and Preview
+      </div>
+
+      <h3>
+        <span class="step-number">3</span>Add JWT Secret (if not already set)
+      </h3>
+      <div class="code-block">
+        Name: JWT_SECRET Value: [Random secure string - see note below]
+        Environment: ✓ Production and Preview
+      </div>
+
+      <div class="note">
+        <strong>💡 Generate JWT Secret:</strong> You can generate a secure
+        random string by running this command in PowerShell:
+        <div class="code-block">
+          node -e
+          "console.log(require('crypto').randomBytes(32).toString('hex'))"
+        </div>
+      </div>
+
+      <h3><span class="step-number">4</span>Save and Redeploy</h3>
+      <ul>
+        <li>Click <strong>"Save"</strong> button in Cloudflare</li>
+        <li>
+          Trigger a new deployment:
+          <ul>
+            <li>Either push changes to your GitHub repository, or</li>
+            <li>Use "Retry deployment" in Cloudflare Pages</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2>3️⃣ Database Migration</h2>
+
+      <p>Run the 2FA schema migration to add necessary database tables:</p>
+
+      <div class="code-block">
+        npx wrangler d1 execute DB --file=./schema-2fa.sql --remote
+      </div>
+
+      <p>This command adds:</p>
+      <ul>
+        <li>
+          <span class="variable">phone_number</span>,
+          <span class="variable">phone_verified</span>,
+          <span class="variable">two_factor_enabled</span>,
+          <span class="variable">backup_codes</span> columns to users table
+        </li>
+        <li>
+          <span class="variable">verification_codes</span> table for SMS codes
+        </li>
+        <li>
+          <span class="variable">trusted_devices</span> table for device
+          fingerprints
+        </li>
+      </ul>
+
+      <h2>✅ Verification</h2>
+
+      <p>To verify everything is working:</p>
+      <ol>
+        <li>Visit your personal login page</li>
+        <li>Try creating a new account with 2FA enabled</li>
+        <li>You should receive an SMS with a 6-digit code</li>
+        <li>Enter the code to complete authentication</li>
+      </ol>
+
+      <div class="important">
+        <strong>📱 Trial Account Limitation:</strong> Twilio trial accounts can
+        only send SMS to verified phone numbers. You'll need to verify test
+        numbers in the Twilio Console first, or upgrade to a paid account for
+        unrestricted sending.
+      </div>
+
+      <h2>💰 Costs</h2>
+
+      <ul>
+        <li><strong>Phone Number:</strong> ~$1.00/month</li>
+        <li><strong>SMS Messages (US):</strong> $0.0079 per message</li>
+        <li>
+          <strong>Free Trial Credit:</strong> $15.50 (enough for ~1,900
+          messages)
+        </li>
+      </ul>
+
+      <h2>🔧 Troubleshooting</h2>
+
+      <div class="note">
+        <strong>If SMS messages aren't being received:</strong>
+        <ol>
+          <li>Check Twilio account has sufficient credit</li>
+          <li>Verify phone number is in correct format (+12345678901)</li>
+          <li>For trial accounts, verify recipient number in Twilio Console</li>
+          <li>Check Twilio Console → Logs for delivery status</li>
+          <li>Verify environment variables are set correctly in Cloudflare</li>
+        </ol>
+      </div>
+
+      <hr style="margin: 40px 0; border: none; border-top: 2px solid #e5e7eb" />
+
+      <p style="text-align: center; color: #6b7280; font-size: 14px">
+        <strong>DCSS LLC</strong> | Two-Factor Authentication Setup<br />
+        Generated: October 24, 2025
+      </p>
+    </div>
+
+    <script>
+      // Auto-print hint
+      console.log(
+        '💡 Tip: Click the "Save as PDF" button or press Ctrl+P to save this as a PDF file!'
+      );
+    </script>
+  </body>
+</html>
