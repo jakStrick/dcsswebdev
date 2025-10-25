@@ -74,10 +74,10 @@
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: 120%;
   left: 0;
   background: white;
-  min-width: 160px;
+  min-width: 300px;
   border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   opacity: 0;
@@ -85,7 +85,7 @@
   transform: translateY(-10px);
   transition: all 0.3s ease;
   z-index: 1001;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .dropdown.active .dropdown-menu,
@@ -208,6 +208,8 @@
     transition: 0.3s;
     box-shadow: 0 10px 27px rgba(0, 0, 0, 0.05);
     padding: 20px 0;
+    max-height: calc(100vh - 70px);
+    overflow-y: auto;
   }
 
   .nav-menu.active {

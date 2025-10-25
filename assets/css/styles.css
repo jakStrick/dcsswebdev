@@ -7,12 +7,22 @@
   padding: 0;
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: auto;
+}
+
 body {
   font-family: var(--font-family-system);
   line-height: 1.6;
   overflow-x: hidden;
+  overflow-y: hidden;
   background: var(--gradient-primary);
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 .separation-bar {
@@ -358,6 +368,96 @@ body {
   max-width: 37.5rem;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Social Media Icons */
+.social-media-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 3rem;
+  padding: 0 0 3rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 3rem;
+}
+
+/* Social icons in CTA section (white on gradient) */
+.cta-section .social-media-container {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cta-section .social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--text-white);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cta-section .social-icon:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-8px) scale(1.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Social icons on regular pages (colored on white/light background) */
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.15);
+}
+
+.social-icon:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-8px) scale(1.1);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* General container styling on non-CTA pages */
+body:not(.cta-section) .social-media-container {
+  border-top: 1px solid rgba(59, 130, 246, 0.2);
+  margin-bottom: 0;
+}
+
+.social-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+@media (max-width: 768px) {
+  .social-media-container {
+    gap: 1.5rem;
+  }
+
+  .social-icon {
+    width: 45px;
+    height: 45px;
+  }
+
+  .social-icon svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 /* ===== INDEX SECTION ===== */
@@ -968,8 +1068,7 @@ body {
 .project-thumbnail:hover {
   transform: translateY(-8px) scale(1.05);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3),
-    0 2px 0 rgba(255, 255, 255, 0.4) inset,
-    0 0 25px rgba(255, 255, 255, 0.2);
+    0 2px 0 rgba(255, 255, 255, 0.4) inset, 0 0 25px rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.25);
   border-color: rgba(255, 255, 255, 0.5);
 }
@@ -1042,7 +1141,8 @@ body {
   display: flex;
   justify-content: center;
   background: var(--bg-white);
-  padding: var(--spacing-3xl) var(--spacing-xl);
+  padding: var(--spacing-3xl) var(--spacing-xl) var(--spacing-md)
+    var(--spacing-xl);
 }
 
 .contact-container {
@@ -1951,5 +2051,52 @@ li {
   .space-placeholder-styles {
     width: 10rem;
     height: 10rem;
+  }
+}
+
+/* ===== COPYRIGHT FOOTER ===== */
+.copyright-footer {
+  width: 100%;
+  padding: 2rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0rem;
+}
+
+.copyright-container {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem 3rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.copyright-container:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-4px);
+}
+
+.copyright-container p {
+  margin: 0;
+  color: var(--color-text-default);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+  .copyright-container {
+    padding: 1rem 2rem;
+  }
+
+  .copyright-container p {
+    font-size: var(--font-size-xs);
   }
 }
