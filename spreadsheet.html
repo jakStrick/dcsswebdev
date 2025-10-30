@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Spreadsheet - DCSS Web Dev</title>
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: Arial, sans-serif;
+				font-size: 10px;
+				background: #f5f5f5;
+				overflow: hidden;
+			}
+
+			.spreadsheet-container {
+				display: flex;
+				flex-direction: column;
+				height: 100vh;
+			}
+
+			/* Toolbar */
+			.toolbar {
+				background: #fff;
+				border-bottom: 1px solid #ccc;
+				padding: 10px;
+				display: flex;
+				gap: 10px;
+				align-items: center;
+				flex-wrap: wrap;
+			}
+
+			.toolbar-section {
+				display: flex;
+				gap: 5px;
+				align-items: center;
+				border-right: 1px solid #ddd;
+				padding-right: 10px;
+			}
+
+			.toolbar-section:last-child {
+				border-right: none;
+			}
+
+			.toolbar button {
+				padding: 5px 10px;
+				border: 1px solid #ccc;
+				background: #fff;
+				cursor: pointer;
+				font-size: 11px;
+				border-radius: 3px;
+			}
+
+			.toolbar button:hover {
+				background: #f0f0f0;
+			}
+
+			.color-btn {
+				width: 30px;
+				height: 25px;
+				border: 1px solid #999;
+				cursor: pointer;
+				border-radius: 3px;
+				padding: 0;
+			}
+
+			.color-btn.color-yellow {
+				background: #ffeb3b !important;
+			}
+			.color-btn.color-blue {
+				background: #2196f3 !important;
+			}
+			.color-btn.color-green {
+				background: #4caf50 !important;
+			}
+			.color-btn.color-orange {
+				background: #ff9800 !important;
+			}
+			.color-btn.color-purple {
+				background: #9c27b0 !important;
+			}
+
+			.formula-bar {
+				background: #fff;
+				border-bottom: 1px solid #ccc;
+				padding: 5px 10px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.cell-reference {
+				font-weight: bold;
+				min-width: 50px;
+				font-size: 11px;
+			}
+
+			.formula-input {
+				flex: 1;
+				padding: 5px;
+				border: 1px solid #ccc;
+				font-family: Arial, sans-serif;
+				font-size: 10px;
+			}
+
+			/* Spreadsheet Grid */
+			.spreadsheet-wrapper {
+				flex: 1;
+				overflow: auto;
+				background: #fff;
+			}
+
+			.spreadsheet {
+				display: grid;
+				grid-template-columns: 50px repeat(26, 100px);
+				border-left: 1px solid #ddd;
+				border-top: 1px solid #ddd;
+			}
+
+			.cell {
+				border-right: 1px solid #ddd;
+				border-bottom: 1px solid #ddd;
+				padding: 4px;
+				min-height: 21px;
+				font-family: Arial, sans-serif;
+				font-size: 10px;
+				background: #fff;
+				cursor: cell;
+			}
+
+			.cell:focus {
+				outline: 2px solid #1a73e8;
+				outline-offset: -2px;
+			}
+
+			.row-header,
+			.col-header {
+				background: #f8f9fa;
+				font-weight: bold;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-right: 1px solid #ddd;
+				border-bottom: 1px solid #ddd;
+				font-size: 10px;
+				user-select: none;
+			}
+
+			.corner-cell {
+				background: #f8f9fa;
+				border-right: 1px solid #ddd;
+				border-bottom: 1px solid #ddd;
+			}
+
+			.selected {
+				background: #e3f2fd !important;
+				position: relative;
+			}
+
+			.cell.in-selection {
+				background: #e3f2fd !important;
+				border: 1px solid #1a73e8 !important;
+			}
+
+			/* Fill handle for drag-to-copy - only show on primary selected cell */
+			.selected:not(.in-selection)::after,
+			.selected.in-selection:last-of-type::after {
+				content: "";
+				position: absolute;
+				bottom: -1px;
+				right: -1px;
+				width: 6px;
+				height: 6px;
+				background: #1a73e8;
+				border: 1px solid #fff;
+				cursor: crosshair;
+				z-index: 10;
+			}
+
+			.cell.drag-over {
+				background: #c5e1f5 !important;
+			}
+
+			.cell.being-moved {
+				opacity: 0.5;
+				background: #f0f0f0 !important;
+			}
+
+			.cell.drop-target {
+				background: #c8e6c9 !important;
+				border: 2px dashed #4caf50 !important;
+			}
+
+			/* Highlight colors - must come after selection to override */
+			.cell.highlight-yellow,
+			.cell.in-selection.highlight-yellow {
+				background: #ffeb3b !important;
+			}
+			.cell.highlight-blue,
+			.cell.in-selection.highlight-blue {
+				background: #2196f3 !important;
+				color: #fff;
+			}
+			.cell.highlight-green,
+			.cell.in-selection.highlight-green {
+				background: #4caf50 !important;
+				color: #fff;
+			}
+			.cell.highlight-orange,
+			.cell.in-selection.highlight-orange {
+				background: #ff9800 !important;
+				color: #fff;
+			}
+			.cell.highlight-purple,
+			.cell.in-selection.highlight-purple {
+				background: #9c27b0 !important;
+				color: #fff;
+			}
+
+			/* Border styles */
+			.cell.border-light {
+				border: 1px solid #000 !important;
+			}
+
+			.cell.border-heavy {
+				border: 2px solid #000 !important;
+			}
+
+			.status-bar {
+				background: #f8f9fa;
+				border-top: 1px solid #ccc;
+				padding: 5px 10px;
+				font-size: 10px;
+				display: flex;
+				gap: 20px;
+			}
+
+			/* Sheet Tabs */
+			.sheet-tabs-container {
+				background: #f8f9fa;
+				border-top: 1px solid #ccc;
+				display: flex;
+				align-items: center;
+				padding: 5px 10px;
+				gap: 5px;
+				overflow-x: auto;
+				min-height: 35px;
+			}
+
+			.sheet-tab {
+				padding: 5px 15px;
+				background: #fff;
+				border: 1px solid #ccc;
+				border-bottom: none;
+				cursor: pointer;
+				font-size: 11px;
+				white-space: nowrap;
+				border-radius: 3px 3px 0 0;
+				user-select: none;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.sheet-tab:hover {
+				background: #e8e8e8;
+			}
+
+			.sheet-tab.active {
+				background: #fff;
+				border-bottom: 2px solid #1a73e8;
+				font-weight: bold;
+			}
+
+			.sheet-tab-name {
+				display: inline-block;
+			}
+
+			.sheet-tab-close {
+				color: #999;
+				cursor: pointer;
+				font-size: 14px;
+				line-height: 1;
+			}
+
+			.sheet-tab-close:hover {
+				color: #d32f2f;
+			}
+
+			.add-sheet-btn {
+				padding: 5px 10px;
+				background: #fff;
+				border: 1px solid #ccc;
+				cursor: pointer;
+				font-size: 16px;
+				border-radius: 3px;
+				line-height: 1;
+			}
+
+			.add-sheet-btn:hover {
+				background: #f0f0f0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="spreadsheet-container">
+			<!-- Toolbar -->
+			<div class="toolbar">
+				<div class="toolbar-section">
+					<button onclick="clearCell()">Clear</button>
+					<button onclick="clearAll()">Clear All</button>
+				</div>
+				<div class="toolbar-section">
+					<span style="font-size: 11px">Highlight:</span>
+					<button
+						class="color-btn color-yellow"
+						onclick="highlightCell('yellow')"
+						title="Yellow"></button>
+					<button
+						class="color-btn color-blue"
+						onclick="highlightCell('blue')"
+						title="Blue"></button>
+					<button
+						class="color-btn color-green"
+						onclick="highlightCell('green')"
+						title="Green"></button>
+					<button
+						class="color-btn color-orange"
+						onclick="highlightCell('orange')"
+						title="Orange"></button>
+					<button
+						class="color-btn color-purple"
+						onclick="highlightCell('purple')"
+						title="Purple"></button>
+					<button onclick="removeHighlight()">No Color</button>
+				</div>
+				<div class="toolbar-section">
+					<span style="font-size: 11px">Border:</span>
+					<button onclick="applyBorder('light')" title="Cell Border">
+						Cell
+					</button>
+					<button onclick="applyBorder('heavy')" title="Group Border">
+						Group
+					</button>
+					<button onclick="removeBorder()" title="No Border">
+						No Border
+					</button>
+				</div>
+				<div class="toolbar-section">
+					<button onclick="insertFormula('SUM')">Σ SUM</button>
+					<button onclick="insertFormula('+')">+</button>
+					<button onclick="insertFormula('-')">−</button>
+					<button onclick="insertFormula('*')">×</button>
+					<button onclick="insertFormula('/')">÷</button>
+				</div>
+			</div>
+
+			<!-- Formula Bar -->
+			<div class="formula-bar">
+				<div class="cell-reference" id="cellReference">A1</div>
+				<input
+					type="text"
+					class="formula-input"
+					id="formulaInput"
+					placeholder="Enter value or formula (e.g., =A1+B1)" />
+			</div>
+
+			<!-- Spreadsheet Grid -->
+			<div class="spreadsheet-wrapper">
+				<div class="spreadsheet" id="spreadsheet"></div>
+			</div>
+
+			<!-- Status Bar -->
+			<div class="status-bar">
+				<span>Ready</span>
+				<span id="sumDisplay"></span>
+			</div>
+
+			<!-- Sheet Tabs -->
+			<div class="sheet-tabs-container" id="sheetTabs">
+				<!-- Tabs will be dynamically added here -->
+			</div>
+		</div>
+
+		<script>
+			const ROWS = 100;
+			const COLS = 26;
+			let currentCell = null;
+			let currentSheet = "Sheet1";
+			let sheets = {
+				Sheet1: {
+					data: {},
+					formulas: {},
+					styles: {},
+				},
+			};
+
+			// Drag-to-copy variables
+			let isDraggingFill = false;
+			let dragStartCell = null;
+			let draggedCells = [];
+
+			// Drag-to-select variables
+			let isSelecting = false;
+			let selectionStart = null;
+			let selectedCells = [];
+
+			// Drag-and-drop move variables
+			let isDraggingMove = false;
+			let dragMoveSource = []; // Cells being moved
+			let dragMoveData = {}; // {ref: {value, formula, style}}
+
+			// LocalStorage keys
+			const STORAGE_KEY_SHEETS = "spreadsheet_sheets";
+			const STORAGE_KEY_CURRENT = "spreadsheet_current_sheet";
+
+			// Load data from localStorage
+			function loadFromStorage() {
+				try {
+					const savedSheets = localStorage.getItem(STORAGE_KEY_SHEETS);
+					const savedCurrent = localStorage.getItem(STORAGE_KEY_CURRENT);
+
+					if (savedSheets) {
+						sheets = JSON.parse(savedSheets);
+					}
+					if (savedCurrent && sheets[savedCurrent]) {
+						currentSheet = savedCurrent;
+					}
+				} catch (error) {
+					console.error("Error loading from localStorage:", error);
+				}
+			}
+
+			// Save data to localStorage
+			function saveToStorage() {
+				try {
+					localStorage.setItem(STORAGE_KEY_SHEETS, JSON.stringify(sheets));
+					localStorage.setItem(STORAGE_KEY_CURRENT, currentSheet);
+				} catch (error) {
+					console.error("Error saving to localStorage:", error);
+				}
+			}
+
+			// Get current sheet data
+			function getCurrentData() {
+				return sheets[currentSheet].data;
+			}
+
+			function getCurrentFormulas() {
+				return sheets[currentSheet].formulas;
+			}
+
+			function getCurrentStyles() {
+				return sheets[currentSheet].styles;
+			}
+
+			// Initialize spreadsheet
+			function initSpreadsheet() {
+				// Load saved data first
+				loadFromStorage();
+
+				renderSpreadsheet();
+				renderSheetTabs();
+			}
+
+			// Render the spreadsheet grid
+			function renderSpreadsheet() {
+				const spreadsheet = document.getElementById("spreadsheet");
+				spreadsheet.innerHTML = "";
+
+				const cellData = getCurrentData();
+				const cellStyles = getCurrentStyles();
+
+				// Corner cell
+				const corner = document.createElement("div");
+				corner.className = "corner-cell";
+				spreadsheet.appendChild(corner);
+
+				// Column headers (A-Z)
+				for (let col = 0; col < COLS; col++) {
+					const header = document.createElement("div");
+					header.className = "col-header";
+					header.textContent = String.fromCharCode(65 + col);
+					spreadsheet.appendChild(header);
+				}
+
+				// Rows
+				for (let row = 1; row <= ROWS; row++) {
+					// Row header
+					const rowHeader = document.createElement("div");
+					rowHeader.className = "row-header";
+					rowHeader.textContent = row;
+					spreadsheet.appendChild(rowHeader);
+
+					// Cells
+					for (let col = 0; col < COLS; col++) {
+						const cell = document.createElement("div");
+						const ref = getCellRef(row, col);
+
+						cell.className = "cell";
+						cell.contentEditable = true;
+						cell.dataset.row = row;
+						cell.dataset.col = col;
+						cell.dataset.ref = ref;
+
+						// Restore saved data
+						if (cellData[ref]) {
+							cell.textContent = cellData[ref];
+						}
+
+						// Restore saved styles
+						if (cellStyles[ref]) {
+							cell.className = `cell ${cellStyles[ref]}`;
+						}
+
+						cell.addEventListener("focus", handleCellFocus);
+						cell.addEventListener("blur", handleCellBlur);
+						cell.addEventListener("input", handleCellInput);
+						cell.addEventListener("keydown", handleKeyDown);
+						cell.addEventListener("paste", handleCellPaste);
+						cell.addEventListener("mousedown", handleCellMouseDown);
+						cell.addEventListener("mouseenter", handleCellMouseEnter);
+						cell.addEventListener("mouseup", handleCellMouseUp);
+
+						spreadsheet.appendChild(cell);
+					}
+				}
+			}
+
+			// Render sheet tabs
+			function renderSheetTabs() {
+				const container = document.getElementById("sheetTabs");
+				container.innerHTML = "";
+
+				// Create tab for each sheet
+				Object.keys(sheets).forEach((sheetName) => {
+					const tab = document.createElement("div");
+					tab.className = `sheet-tab ${
+						sheetName === currentSheet ? "active" : ""
+					}`;
+
+					const nameSpan = document.createElement("span");
+					nameSpan.className = "sheet-tab-name";
+					nameSpan.textContent = sheetName;
+					nameSpan.ondblclick = () => renameSheet(sheetName);
+
+					const closeBtn = document.createElement("span");
+					closeBtn.className = "sheet-tab-close";
+					closeBtn.textContent = "×";
+					closeBtn.onclick = (e) => {
+						e.stopPropagation();
+						deleteSheet(sheetName);
+					};
+
+					tab.appendChild(nameSpan);
+					if (Object.keys(sheets).length > 1) {
+						tab.appendChild(closeBtn);
+					}
+
+					tab.onclick = () => switchSheet(sheetName);
+					container.appendChild(tab);
+				});
+
+				// Add new sheet button
+				const addBtn = document.createElement("button");
+				addBtn.className = "add-sheet-btn";
+				addBtn.textContent = "+";
+				addBtn.onclick = addNewSheet;
+				container.appendChild(addBtn);
+			}
+
+			// Switch to a different sheet
+			function switchSheet(sheetName) {
+				if (sheetName === currentSheet) return;
+
+				currentSheet = sheetName;
+				renderSpreadsheet();
+				renderSheetTabs();
+				saveToStorage();
+
+				// Clear current cell selection
+				currentCell = null;
+				document.getElementById("cellReference").textContent = "";
+				document.getElementById("formulaInput").value = "";
+			}
+
+			// Add new sheet
+			function addNewSheet() {
+				let newSheetNum = Object.keys(sheets).length + 1;
+				let newSheetName = `Sheet${newSheetNum}`;
+
+				// Find unique name
+				while (sheets[newSheetName]) {
+					newSheetNum++;
+					newSheetName = `Sheet${newSheetNum}`;
+				}
+
+				sheets[newSheetName] = {
+					data: {},
+					formulas: {},
+					styles: {},
+				};
+
+				currentSheet = newSheetName;
+				renderSpreadsheet();
+				renderSheetTabs();
+				saveToStorage();
+			}
+
+			// Rename sheet
+			function renameSheet(oldName) {
+				const newName = prompt(`Rename sheet "${oldName}" to:`, oldName);
+
+				if (!newName || newName === oldName) return;
+
+				if (sheets[newName]) {
+					alert("A sheet with that name already exists!");
+					return;
+				}
+
+				sheets[newName] = sheets[oldName];
+				delete sheets[oldName];
+
+				if (currentSheet === oldName) {
+					currentSheet = newName;
+				}
+
+				renderSheetTabs();
+				saveToStorage();
+			}
+
+			// Delete sheet
+			function deleteSheet(sheetName) {
+				if (Object.keys(sheets).length === 1) {
+					alert("Cannot delete the last sheet!");
+					return;
+				}
+
+				if (!confirm(`Delete sheet "${sheetName}"?`)) return;
+
+				delete sheets[sheetName];
+
+				// Switch to first available sheet if deleting current
+				if (currentSheet === sheetName) {
+					currentSheet = Object.keys(sheets)[0];
+					renderSpreadsheet();
+				}
+
+				renderSheetTabs();
+				saveToStorage();
+			}
+
+			function getCellRef(row, col) {
+				return String.fromCharCode(65 + col) + row;
+			}
+
+			function handleCellFocus(e) {
+				if (currentCell) {
+					currentCell.classList.remove("selected");
+				}
+				currentCell = e.target;
+				currentCell.classList.add("selected");
+
+				const ref = currentCell.dataset.ref;
+				document.getElementById("cellReference").textContent = ref;
+
+				// Show formula if exists, otherwise show value
+				const cellFormulas = getCurrentFormulas();
+				const formula = cellFormulas[ref] || currentCell.textContent;
+				document.getElementById("formulaInput").value = formula;
+			}
+
+			function handleCellBlur(e) {
+				const ref = e.target.dataset.ref;
+				const cellData = getCurrentData();
+				cellData[ref] = e.target.textContent;
+				saveToStorage();
+			}
+
+			function handleCellInput(e) {
+				const ref = e.target.dataset.ref;
+				const value = e.target.textContent;
+				const cellData = getCurrentData();
+				cellData[ref] = value;
+				saveToStorage();
+			}
+
+			function handleCellPaste(e) {
+				e.preventDefault();
+
+				// Get all available clipboard data formats
+				const html = (e.clipboardData || window.clipboardData).getData(
+					"text/html"
+				);
+				const pastedText = (
+					e.clipboardData || window.clipboardData
+				).getData("text");
+
+				// Try to get Excel-specific formats that might contain formulas
+				let excelFormulas = null;
+				try {
+					// Excel sometimes provides formula data in these formats
+					excelFormulas = (
+						e.clipboardData || window.clipboardData
+					).getData("application/x-vnd.ms-excel");
+					if (!excelFormulas) {
+						excelFormulas = (
+							e.clipboardData || window.clipboardData
+						).getData("text/rtf");
+					}
+				} catch (err) {
+					// Format not available
+				}
+
+				if (!pastedText) return;
+
+				// Get starting cell position
+				const startRow = parseInt(e.target.dataset.row);
+				const startCol = parseInt(e.target.dataset.col);
+
+				const cellData = getCurrentData();
+				const cellFormulas = getCurrentFormulas();
+				const cellStyles = getCurrentStyles();
+
+				let data = [];
+				let formulas = [];
+				let formatting = [];
+
+				// If HTML is available (from Excel), parse it for formatting and formulas
+				if (html) {
+					const parser = new DOMParser();
+					const doc = parser.parseFromString(html, "text/html");
+					const table = doc.querySelector("table");
+
+					if (table) {
+						const rows = table.querySelectorAll("tr");
+						rows.forEach((row) => {
+							const rowData = [];
+							const rowFormulas = [];
+							const rowFormatting = [];
+							const cells = row.querySelectorAll("td, th");
+
+							cells.forEach((cell) => {
+								// Check for formula in data-formula attribute or x:fmla
+								let formula =
+									cell.getAttribute("data-formula") ||
+									cell.getAttribute("x:fmla") ||
+									cell.getAttribute("formula");
+
+								// Get cell value
+								let value = cell.textContent.trim();
+
+								// Check if value looks like it might be from a formula
+								// (numbers, dates, or specific patterns)
+								if (
+									!formula &&
+									value &&
+									!isNaN(value) &&
+									value.length > 0
+								) {
+									// This might be a calculated value, but we can't recover the formula
+									formula = null;
+								}
+
+								// Get background color
+								let highlightClass = "";
+								const bgColor =
+									cell.style.backgroundColor ||
+									window.getComputedStyle(cell).backgroundColor;
+
+								if (
+									bgColor &&
+									bgColor !== "transparent" &&
+									bgColor !== "rgba(0, 0, 0, 0)"
+								) {
+									highlightClass = getClosestHighlightColor(bgColor);
+								}
+
+								rowData.push(value);
+								rowFormulas.push(formula);
+								rowFormatting.push(highlightClass);
+							});
+
+							data.push(rowData);
+							formulas.push(rowFormulas);
+							formatting.push(rowFormatting);
+						});
+					}
+				}
+
+				// Fallback to plain text if no HTML table found
+				if (data.length === 0) {
+					const rows = pastedText
+						.split(/\r?\n/)
+						.filter((row) => row.length > 0);
+					data = rows.map((row) => row.split("\t"));
+					// No formatting or formula data available
+					formulas = data.map((row) => row.map(() => null));
+					formatting = data.map((row) => row.map(() => ""));
+				}
+
+				// Paste data starting from the current cell
+				data.forEach((rowData, rowOffset) => {
+					rowData.forEach((cellValue, colOffset) => {
+						const targetRow = startRow + rowOffset;
+						const targetCol = startCol + colOffset;
+
+						// Check if target cell is within bounds
+						if (targetRow <= ROWS && targetCol < COLS) {
+							const targetRef = getCellRef(targetRow, targetCol);
+							const targetCell = document.querySelector(
+								`[data-row="${targetRow}"][data-col="${targetCol}"]`
+							);
+
+							if (targetCell) {
+								// Check if we have a formula for this cell from Excel
+								const cellFormula =
+									formulas[rowOffset] &&
+									formulas[rowOffset][colOffset];
+
+								// Priority: 1) Excel formula attribute, 2) value starting with =, 3) plain value
+								if (cellFormula) {
+									// Use formula from Excel metadata
+									const adjustedFormula = adjustExcelFormula(
+										cellFormula,
+										rowOffset,
+										colOffset,
+										startRow,
+										startCol
+									);
+									cellFormulas[targetRef] = adjustedFormula;
+									evaluateFormula(targetCell, adjustedFormula);
+								} else if (cellValue.startsWith("=")) {
+									// Direct formula paste
+									cellFormulas[targetRef] = cellValue;
+									evaluateFormula(targetCell, cellValue);
+								} else {
+									// Plain value
+									targetCell.textContent = cellValue;
+									cellData[targetRef] = cellValue;
+									// Remove formula if it existed
+									delete cellFormulas[targetRef];
+								}
+
+								// Apply formatting if available
+								const format =
+									formatting[rowOffset] &&
+									formatting[rowOffset][colOffset];
+								if (format) {
+									// Get existing classes (borders)
+									const classes = targetCell.className
+										.split(" ")
+										.filter(
+											(c) => c === "cell" || c.startsWith("border-")
+										);
+
+									// Add highlight class
+									classes.push(format);
+									targetCell.className = classes.join(" ");
+
+									// Update styles storage
+									const existingStyle = cellStyles[targetRef] || "";
+									const borderClass = existingStyle
+										.replace(/highlight-\w+/, "")
+										.trim();
+									cellStyles[targetRef] = borderClass
+										? `${format} ${borderClass}`
+										: format;
+								}
+							}
+						}
+					});
+				});
+
+				saveToStorage();
+
+				// Update the formula bar if still on the starting cell
+				if (currentCell === e.target) {
+					const ref = e.target.dataset.ref;
+					const formula = cellFormulas[ref] || e.target.textContent;
+					document.getElementById("formulaInput").value = formula;
+				}
+			}
+
+			function adjustExcelFormula(
+				excelFormula,
+				rowOffset,
+				colOffset,
+				startRow,
+				startCol
+			) {
+				// Excel formulas need to be adjusted for the new position
+				// This function converts Excel-style formulas and adjusts cell references
+
+				if (!excelFormula) return excelFormula;
+
+				// Ensure formula starts with =
+				let formula = excelFormula.startsWith("=")
+					? excelFormula
+					: "=" + excelFormula;
+
+				// Convert Excel cell references if needed (they should already be compatible)
+				// Excel uses A1, B2, etc. which matches our format
+
+				// Note: This is a simplified version. Full Excel formula conversion would be complex
+				// For now, we'll use formulas as-is if they're provided
+				return formula;
+			}
+
+			function getClosestHighlightColor(rgbString) {
+				// Parse RGB string
+				const match = rgbString.match(/\d+/g);
+				if (!match || match.length < 3) return "";
+
+				const r = parseInt(match[0]);
+				const g = parseInt(match[1]);
+				const b = parseInt(match[2]);
+
+				// Define our highlight colors in RGB
+				const colors = {
+					"highlight-yellow": { r: 255, g: 235, b: 59 },
+					"highlight-blue": { r: 33, g: 150, b: 243 },
+					"highlight-green": { r: 76, g: 175, b: 80 },
+					"highlight-orange": { r: 255, g: 152, b: 0 },
+					"highlight-purple": { r: 156, g: 39, b: 176 },
+				};
+
+				// Find closest color by Euclidean distance
+				let minDistance = Infinity;
+				let closestColor = "";
+
+				for (const [name, color] of Object.entries(colors)) {
+					const distance = Math.sqrt(
+						Math.pow(r - color.r, 2) +
+							Math.pow(g - color.g, 2) +
+							Math.pow(b - color.b, 2)
+					);
+
+					if (distance < minDistance) {
+						minDistance = distance;
+						closestColor = name;
+					}
+				}
+
+				// Only return a color if it's reasonably close (not white/default)
+				return minDistance < 200 ? closestColor : "";
+			}
+
+			function handleKeyDown(e) {
+				if (e.key === "Enter" && !e.shiftKey) {
+					e.preventDefault();
+					const formulaInput = document.getElementById("formulaInput");
+					const formula = formulaInput.value;
+					const cellFormulas = getCurrentFormulas();
+					const cellData = getCurrentData();
+
+					if (formula.startsWith("=")) {
+						cellFormulas[currentCell.dataset.ref] = formula;
+						evaluateFormula(currentCell, formula);
+					} else {
+						currentCell.textContent = formula;
+						cellData[currentCell.dataset.ref] = formula;
+					}
+
+					saveToStorage();
+
+					// Move to next row
+					moveCell("down");
+				} else if (e.key === "Tab") {
+					e.preventDefault();
+					moveCell(e.shiftKey ? "left" : "right");
+				} else if (e.key === "ArrowUp") {
+					e.preventDefault();
+					moveCell("up");
+				} else if (e.key === "ArrowDown") {
+					e.preventDefault();
+					moveCell("down");
+				} else if (e.key === "ArrowLeft" && e.target.textContent === "") {
+					e.preventDefault();
+					moveCell("left");
+				} else if (e.key === "ArrowRight" && e.target.textContent === "") {
+					e.preventDefault();
+					moveCell("right");
+				}
+			}
+
+			function moveCell(direction) {
+				if (!currentCell) return;
+
+				let row = parseInt(currentCell.dataset.row);
+				let col = parseInt(currentCell.dataset.col);
+
+				switch (direction) {
+					case "up":
+						row = Math.max(1, row - 1);
+						break;
+					case "down":
+						row = Math.min(ROWS, row + 1);
+						break;
+					case "left":
+						col = Math.max(0, col - 1);
+						break;
+					case "right":
+						col = Math.min(COLS - 1, col + 1);
+						break;
+				}
+
+				const nextCell = document.querySelector(
+					`[data-row="${row}"][data-col="${col}"]`
+				);
+				if (nextCell) {
+					nextCell.focus();
+				}
+			}
+
+			// Drag handlers
+			function handleCellMouseDown(e) {
+				const cell = e.target;
+
+				// Only proceed if it's actually a cell
+				if (!cell.classList.contains("cell") || !cell.dataset.ref) return;
+
+				const rect = cell.getBoundingClientRect();
+				const isOnFillHandle =
+					e.clientX > rect.right - 8 && e.clientY > rect.bottom - 8;
+
+				if (
+					isOnFillHandle &&
+					(cell.classList.contains("selected") ||
+						cell.classList.contains("in-selection"))
+				) {
+					// Fill handle drag (copy)
+					e.preventDefault();
+					e.stopPropagation();
+					isDraggingFill = true;
+
+					// If multiple cells selected, use the last one as source
+					dragStartCell =
+						selectedCells.length > 0
+							? selectedCells[selectedCells.length - 1]
+							: cell;
+					draggedCells = [dragStartCell];
+				} else if (
+					(cell.classList.contains("selected") ||
+						cell.classList.contains("in-selection")) &&
+					selectedCells.length > 0
+				) {
+					// Start drag-and-drop move if clicking on already selected cells
+					// Use Ctrl key to indicate move operation
+					if (e.ctrlKey || e.metaKey) {
+						e.preventDefault();
+						isDraggingMove = true;
+
+						// Store data from all selected cells
+						dragMoveSource = [...selectedCells];
+						dragMoveData = {};
+
+						const cellData = getCurrentData();
+						const cellFormulas = getCurrentFormulas();
+						const cellStyles = getCurrentStyles();
+
+						dragMoveSource.forEach((c) => {
+							const ref = c.dataset.ref;
+							dragMoveData[ref] = {
+								value: c.textContent,
+								formula: cellFormulas[ref] || null,
+								style: cellStyles[ref] || null,
+							};
+							c.classList.add("being-moved");
+						});
+					} else {
+						// Regular selection drag
+						isSelecting = true;
+						selectionStart = cell;
+
+						// Clear previous selection
+						selectedCells.forEach((c) =>
+							c.classList.remove("in-selection")
+						);
+						selectedCells = [];
+					}
+				} else {
+					// Regular selection drag - but don't prevent default yet
+					// Wait a tiny bit to see if user is actually dragging
+					isSelecting = true;
+					selectionStart = cell;
+
+					// Clear previous selection
+					selectedCells.forEach((c) => c.classList.remove("in-selection"));
+					selectedCells = [];
+				}
+			}
+
+			function handleCellMouseEnter(e) {
+				const cell = e.target;
+				if (!cell.classList.contains("cell") || !cell.dataset.ref) return;
+
+				// Handle drag-and-drop move
+				if (isDraggingMove) {
+					// Remove previous drop target indicator
+					document.querySelectorAll(".drop-target").forEach((c) => {
+						c.classList.remove("drop-target");
+					});
+
+					// Show drop target (just the hovered cell as the top-left anchor)
+					if (!cell.classList.contains("being-moved")) {
+						cell.classList.add("drop-target");
+					}
+				}
+				// Handle fill drag (copy)
+				else if (isDraggingFill) {
+					// Remove drag-over from previous cells
+					draggedCells.forEach((c) => c.classList.remove("drag-over"));
+
+					// Calculate range
+					const startRow = parseInt(dragStartCell.dataset.row);
+					const startCol = parseInt(dragStartCell.dataset.col);
+					const endRow = parseInt(cell.dataset.row);
+					const endCol = parseInt(cell.dataset.col);
+
+					// Determine if dragging horizontally or vertically
+					const isHorizontal =
+						Math.abs(endCol - startCol) > Math.abs(endRow - startRow);
+
+					draggedCells = [dragStartCell];
+
+					if (isHorizontal) {
+						// Drag horizontally
+						const minCol = Math.min(startCol, endCol);
+						const maxCol = Math.max(startCol, endCol);
+						for (let col = minCol; col <= maxCol; col++) {
+							if (col !== startCol) {
+								const targetCell = document.querySelector(
+									`[data-row="${startRow}"][data-col="${col}"]`
+								);
+								if (targetCell) {
+									targetCell.classList.add("drag-over");
+									draggedCells.push(targetCell);
+								}
+							}
+						}
+					} else {
+						// Drag vertically
+						const minRow = Math.min(startRow, endRow);
+						const maxRow = Math.max(startRow, endRow);
+						for (let row = minRow; row <= maxRow; row++) {
+							if (row !== startRow) {
+								const targetCell = document.querySelector(
+									`[data-row="${row}"][data-col="${startCol}"]`
+								);
+								if (targetCell) {
+									targetCell.classList.add("drag-over");
+									draggedCells.push(targetCell);
+								}
+							}
+						}
+					}
+				}
+				// Handle selection drag
+				else if (isSelecting && selectionStart) {
+					// Only activate selection if moved to a different cell
+					if (cell !== selectionStart) {
+						// Clear previous selection styling
+						selectedCells.forEach((c) =>
+							c.classList.remove("in-selection")
+						);
+						selectedCells = [];
+
+						// Calculate rectangular selection
+						const startRow = parseInt(selectionStart.dataset.row);
+						const startCol = parseInt(selectionStart.dataset.col);
+						const endRow = parseInt(cell.dataset.row);
+						const endCol = parseInt(cell.dataset.col);
+
+						const minRow = Math.min(startRow, endRow);
+						const maxRow = Math.max(startRow, endRow);
+						const minCol = Math.min(startCol, endCol);
+						const maxCol = Math.max(startCol, endCol);
+
+						// Select all cells in rectangle
+						for (let row = minRow; row <= maxRow; row++) {
+							for (let col = minCol; col <= maxCol; col++) {
+								const targetCell = document.querySelector(
+									`[data-row="${row}"][data-col="${col}"]`
+								);
+								if (targetCell) {
+									targetCell.classList.add("in-selection");
+									selectedCells.push(targetCell);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			function handleCellMouseUp(e) {
+				// Handle drag-and-drop move operation
+				if (isDraggingMove) {
+					isDraggingMove = false;
+
+					const dropTarget = e.target;
+					if (
+						dropTarget &&
+						dropTarget.classList.contains("cell") &&
+						!dropTarget.classList.contains("being-moved")
+					) {
+						const cellData = getCurrentData();
+						const cellFormulas = getCurrentFormulas();
+						const cellStyles = getCurrentStyles();
+
+						// Calculate the offset from the first source cell
+						const firstSource = dragMoveSource[0];
+						const sourceStartRow = parseInt(firstSource.dataset.row);
+						const sourceStartCol = parseInt(firstSource.dataset.col);
+
+						const dropRow = parseInt(dropTarget.dataset.row);
+						const dropCol = parseInt(dropTarget.dataset.col);
+
+						const rowOffset = dropRow - sourceStartRow;
+						const colOffset = dropCol - sourceStartCol;
+
+						// Clear source cells first
+						dragMoveSource.forEach((sourceCell) => {
+							const ref = sourceCell.dataset.ref;
+							sourceCell.textContent = "";
+							delete cellData[ref];
+							delete cellFormulas[ref];
+							delete cellStyles[ref];
+							sourceCell.classList.remove("being-moved");
+
+							// Remove all styling except base cell class
+							sourceCell.className = "cell";
+						});
+
+						// Move data to new location
+						Object.keys(dragMoveData).forEach((sourceRef) => {
+							// Parse source ref to get row/col
+							const sourceMatch = sourceRef.match(/([A-Z]+)(\d+)/);
+							if (sourceMatch) {
+								const sourceCol = sourceMatch[1].charCodeAt(0) - 65;
+								const sourceRow = parseInt(sourceMatch[2]);
+
+								// Calculate new position
+								const newRow = sourceRow + rowOffset;
+								const newCol = sourceCol + colOffset;
+
+								// Check bounds
+								if (
+									newRow >= 1 &&
+									newRow <= ROWS &&
+									newCol >= 0 &&
+									newCol < COLS
+								) {
+									const newRef = getCellRef(newRow, newCol);
+									const targetCell = document.querySelector(
+										`[data-row="${newRow}"][data-col="${newCol}"]`
+									);
+
+									if (targetCell) {
+										const data = dragMoveData[sourceRef];
+
+										// Set value
+										targetCell.textContent = data.value;
+										cellData[newRef] = data.value;
+
+										// Set formula if exists
+										if (data.formula) {
+											cellFormulas[newRef] = data.formula;
+										}
+
+										// Set style if exists
+										if (data.style) {
+											targetCell.className = "cell " + data.style;
+											cellStyles[newRef] = data.style;
+										}
+									}
+								}
+							}
+						});
+
+						saveToStorage();
+					} else {
+						// Cancelled - restore appearance
+						dragMoveSource.forEach((c) =>
+							c.classList.remove("being-moved")
+						);
+					}
+
+					// Clean up
+					document.querySelectorAll(".drop-target").forEach((c) => {
+						c.classList.remove("drop-target");
+					});
+					dragMoveSource = [];
+					dragMoveData = {};
+				}
+				// Handle fill drag (copy operation)
+				else if (isDraggingFill) {
+					isDraggingFill = false;
+
+					// Copy value from start cell to all dragged cells
+					const cellData = getCurrentData();
+					const cellFormulas = getCurrentFormulas();
+					const cellStyles = getCurrentStyles();
+
+					const sourceRef = dragStartCell.dataset.ref;
+					const sourceValue = dragStartCell.textContent;
+					const sourceFormula = cellFormulas[sourceRef];
+					const sourceStyle = cellStyles[sourceRef];
+
+					draggedCells.forEach((cell) => {
+						if (cell === dragStartCell) return;
+
+						const ref = cell.dataset.ref;
+						cell.textContent = sourceValue;
+						cellData[ref] = sourceValue;
+
+						if (sourceFormula) {
+							cellFormulas[ref] = sourceFormula;
+						}
+
+						if (sourceStyle) {
+							// Preserve existing selection, add style
+							const baseClasses = cell.className
+								.split(" ")
+								.filter((c) => c !== "drag-over");
+							if (!baseClasses.includes(sourceStyle)) {
+								cell.className =
+									baseClasses.join(" ") + " " + sourceStyle;
+							}
+							cellStyles[ref] = sourceStyle;
+						}
+
+						cell.classList.remove("drag-over");
+					});
+
+					saveToStorage();
+					draggedCells = [];
+					dragStartCell = null;
+				}
+				// Handle selection drag
+				else if (isSelecting) {
+					// If no cells were selected (user just clicked), clear the flag
+					if (selectedCells.length === 0) {
+						isSelecting = false;
+						selectionStart = null;
+					} else {
+						// Keep selection active
+						isSelecting = false;
+						selectionStart = null;
+					}
+				}
+			}
+
+			// Add global mouseup to handle drag ending outside cells
+			document.addEventListener("mouseup", () => {
+				if (isDraggingMove) {
+					isDraggingMove = false;
+					dragMoveSource.forEach((c) => c.classList.remove("being-moved"));
+					document.querySelectorAll(".drop-target").forEach((c) => {
+						c.classList.remove("drop-target");
+					});
+					dragMoveSource = [];
+					dragMoveData = {};
+				}
+				if (isDraggingFill) {
+					isDraggingFill = false;
+					draggedCells.forEach((c) => c.classList.remove("drag-over"));
+					draggedCells = [];
+					dragStartCell = null;
+				}
+				if (isSelecting) {
+					isSelecting = false;
+					selectionStart = null;
+				}
+			});
+
+			function evaluateFormula(cell, formula) {
+				try {
+					const cellData = getCurrentData();
+
+					// Remove = sign
+					formula = formula.substring(1);
+
+					// Handle SUM function: =SUM(A1:A10)
+					if (formula.toUpperCase().includes("SUM")) {
+						const match = formula.match(
+							/SUM\(([A-Z]+\d+):([A-Z]+\d+)\)/i
+						);
+						if (match) {
+							const [_, start, end] = match;
+							const sum = calculateSum(start, end);
+							cell.textContent = sum;
+							cellData[cell.dataset.ref] = sum;
+							return;
+						}
+					}
+
+					// Replace cell references with values
+					let evalFormula = formula.replace(/([A-Z]+\d+)/g, (match) => {
+						const value = cellData[match] || "0";
+						return parseFloat(value) || 0;
+					});
+
+					// Evaluate the formula
+					const result = eval(evalFormula);
+					cell.textContent = result;
+					cellData[cell.dataset.ref] = result;
+					saveToStorage();
+				} catch (error) {
+					cell.textContent = "#ERROR";
+					console.error("Formula error:", error);
+				}
+			}
+
+			function calculateSum(startRef, endRef) {
+				const cellData = getCurrentData();
+				const startCol = startRef.charCodeAt(0) - 65;
+				const startRow = parseInt(startRef.substring(1));
+				const endCol = endRef.charCodeAt(0) - 65;
+				const endRow = parseInt(endRef.substring(1));
+
+				let sum = 0;
+
+				for (let row = startRow; row <= endRow; row++) {
+					for (let col = startCol; col <= endCol; col++) {
+						const ref = getCellRef(row, col);
+						const value = parseFloat(cellData[ref]) || 0;
+						sum += value;
+					}
+				}
+
+				return sum;
+			}
+
+			// Toolbar functions
+			function clearCell() {
+				const cellData = getCurrentData();
+				const cellFormulas = getCurrentFormulas();
+				const cellStyles = getCurrentStyles();
+
+				// Clear all selected cells or just the current cell
+				const cellsToClear =
+					selectedCells.length > 0
+						? selectedCells
+						: currentCell
+						? [currentCell]
+						: [];
+
+				cellsToClear.forEach((cell) => {
+					const ref = cell.dataset.ref;
+					cell.textContent = "";
+					cell.className = cell.classList.contains("in-selection")
+						? "cell in-selection"
+						: "cell";
+					delete cellData[ref];
+					delete cellFormulas[ref];
+					delete cellStyles[ref];
+				});
+
+				document.getElementById("formulaInput").value = "";
+				saveToStorage();
+			}
+
+			function clearAll() {
+				if (
+					confirm(
+						"Clear all cells in this sheet? This will delete all data permanently."
+					)
+				) {
+					document.querySelectorAll(".cell").forEach((cell) => {
+						cell.textContent = "";
+						cell.className = "cell";
+					});
+					sheets[currentSheet] = {
+						data: {},
+						formulas: {},
+						styles: {},
+					};
+					document.getElementById("formulaInput").value = "";
+					saveToStorage();
+				}
+			}
+
+			function highlightCell(color) {
+				const cellStyles = getCurrentStyles();
+
+				// Highlight all selected cells or just the current cell
+				const cellsToHighlight =
+					selectedCells.length > 0
+						? selectedCells
+						: currentCell
+						? [currentCell]
+						: [];
+
+				cellsToHighlight.forEach((cell) => {
+					const ref = cell.dataset.ref;
+					const baseClass = cell.classList.contains("in-selection")
+						? "cell in-selection"
+						: cell.classList.contains("selected")
+						? "cell selected"
+						: "cell";
+					cell.className = `${baseClass} highlight-${color}`;
+					cellStyles[ref] = `highlight-${color}`;
+				});
+
+				saveToStorage();
+			}
+
+			function removeHighlight() {
+				const cellStyles = getCurrentStyles();
+
+				// Remove highlight from all selected cells or just the current cell
+				const cellsToUnhighlight =
+					selectedCells.length > 0
+						? selectedCells
+						: currentCell
+						? [currentCell]
+						: [];
+
+				cellsToUnhighlight.forEach((cell) => {
+					const ref = cell.dataset.ref;
+					const baseClass = cell.classList.contains("in-selection")
+						? "cell in-selection"
+						: cell.classList.contains("selected")
+						? "cell selected"
+						: "cell";
+					cell.className = baseClass;
+					delete cellStyles[ref];
+				});
+
+				saveToStorage();
+			}
+
+			function applyBorder(type) {
+				const cellStyles = getCurrentStyles();
+
+				// Apply border to all selected cells or just the current cell
+				const cellsToBorder =
+					selectedCells.length > 0
+						? selectedCells
+						: currentCell
+						? [currentCell]
+						: [];
+
+				cellsToBorder.forEach((cell) => {
+					const ref = cell.dataset.ref;
+
+					// Get existing classes
+					const classes = cell.className
+						.split(" ")
+						.filter((c) => !c.startsWith("border-"));
+
+					// Add new border class
+					classes.push(`border-${type}`);
+					cell.className = classes.join(" ");
+
+					// Store border style - combine with existing highlight if present
+					const existingStyle = cellStyles[ref] || "";
+					const highlightClass = existingStyle
+						.replace(/border-\w+/, "")
+						.trim();
+					cellStyles[ref] = highlightClass
+						? `${highlightClass} border-${type}`
+						: `border-${type}`;
+				});
+
+				saveToStorage();
+			}
+
+			function removeBorder() {
+				const cellStyles = getCurrentStyles();
+
+				// Remove border from all selected cells or just the current cell
+				const cellsToUnborder =
+					selectedCells.length > 0
+						? selectedCells
+						: currentCell
+						? [currentCell]
+						: [];
+
+				cellsToUnborder.forEach((cell) => {
+					const ref = cell.dataset.ref;
+
+					// Remove border classes
+					const classes = cell.className
+						.split(" ")
+						.filter((c) => !c.startsWith("border-"));
+					cell.className = classes.join(" ");
+
+					// Update stored style - remove border but keep highlight
+					if (cellStyles[ref]) {
+						const styleWithoutBorder = cellStyles[ref]
+							.replace(/border-\w+/, "")
+							.trim();
+						if (styleWithoutBorder) {
+							cellStyles[ref] = styleWithoutBorder;
+						} else {
+							delete cellStyles[ref];
+						}
+					}
+				});
+
+				saveToStorage();
+			}
+
+			function insertFormula(type) {
+				const formulaInput = document.getElementById("formulaInput");
+
+				if (type === "SUM") {
+					formulaInput.value = "=SUM(A1:A10)";
+				} else {
+					const current = formulaInput.value;
+					if (current.startsWith("=")) {
+						formulaInput.value = current + type;
+					} else {
+						formulaInput.value = "=" + (current || "") + type;
+					}
+				}
+				formulaInput.focus();
+			}
+
+			// Formula input handling
+			document
+				.getElementById("formulaInput")
+				.addEventListener("keydown", (e) => {
+					if (e.key === "Enter") {
+						e.preventDefault();
+						if (currentCell) {
+							const formula = e.target.value;
+							const cellFormulas = getCurrentFormulas();
+							const cellData = getCurrentData();
+							if (formula.startsWith("=")) {
+								cellFormulas[currentCell.dataset.ref] = formula;
+								evaluateFormula(currentCell, formula);
+							} else {
+								currentCell.textContent = formula;
+								cellData[currentCell.dataset.ref] = formula;
+							}
+							saveToStorage();
+							currentCell.focus();
+						}
+					}
+				});
+
+			// Initialize on load
+			initSpreadsheet();
+		</script>
+	</body>
+</html>
