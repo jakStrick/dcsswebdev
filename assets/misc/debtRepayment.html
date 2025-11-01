@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Debt Elimination Schedule - Final Version</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				padding: 20px;
+				background-color: #f5f5f5;
+			}
+			.success {
+				background-color: #d4edda;
+				border: 1px solid #c3e6cb;
+				color: #155724;
+				padding: 15px;
+				border-radius: 5px;
+				margin-bottom: 20px;
+			}
+			.header {
+				background-color: #2c3e50;
+				color: white;
+				padding: 20px;
+				margin-bottom: 20px;
+				border-radius: 8px;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				background-color: white;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				margin-bottom: 30px;
+			}
+			th {
+				background-color: #34495e;
+				color: white;
+				padding: 12px;
+				text-align: left;
+				font-weight: bold;
+			}
+			td {
+				padding: 10px 12px;
+				border-bottom: 1px solid #ddd;
+			}
+			tr:hover {
+				background-color: #f8f9fa;
+			}
+			.special-month {
+				background-color: #fff3cd !important;
+			}
+			.rsu-month {
+				background-color: #d1ecf1 !important;
+			}
+			.debt-free {
+				background-color: #d4edda !important;
+				font-weight: bold;
+			}
+			.amount {
+				text-align: right;
+				font-family: "Courier New", monospace;
+			}
+			.paid-off {
+				color: #28a745;
+				font-weight: bold;
+			}
+			.summary-table {
+				max-width: 700px;
+			}
+			.note {
+				background-color: #e8f4f8;
+				padding: 15px;
+				border-radius: 5px;
+				margin-top: 20px;
+			}
+			.timeline-bar {
+				background-color: #e9ecef;
+				border-radius: 10px;
+				padding: 5px;
+				margin: 20px 0;
+			}
+			.timeline-progress {
+				background-color: #28a745;
+				border-radius: 8px;
+				padding: 10px;
+				color: white;
+				text-align: center;
+				width: 85%;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="success">
+			<h3>✅ CORRECTED NUMBERS - BETTER NEWS!</h3>
+			<p>
+				<strong>Monthly surplus: $2,049.18</strong> (You have $545 more per
+				month than previously calculated!)<br />
+				<strong>Total debt: $479,281.99</strong> (including $20k
+				brother-in-law loan)<br />
+				<strong>Timeline: ~21 months to complete freedom!</strong>
+			</p>
+		</div>
+
+		<div class="header">
+			<h1>Final Debt Elimination Schedule: January 2026 - September 2027</h1>
+			<h3>
+				Total Debt: $479,281.99 | Monthly Surplus: $2,049.18 | Rental
+				Income: $2,940
+			</h3>
+		</div>
+
+		<h2>Complete Debt Summary</h2>
+		<table class="summary-table">
+			<thead>
+				<tr>
+					<th>Debt Category</th>
+					<th>Balance</th>
+					<th>Monthly Payment</th>
+					<th>Interest Rate</th>
+					<th>Priority</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr style="background-color: #ffebee">
+					<td><strong>IRS Debt</strong></td>
+					<td class="amount">$4,000.00</td>
+					<td class="amount">-</td>
+					<td>Penalties accruing</td>
+					<td>🔴 FIRST</td>
+				</tr>
+				<tr>
+					<td>Credit Cards (Total)</td>
+					<td class="amount">$11,205.53</td>
+					<td class="amount">$649.21</td>
+					<td>18-29% (estimated)</td>
+					<td>2nd</td>
+				</tr>
+				<tr>
+					<td>Small Debts (Solar, School)</td>
+					<td class="amount">$2,364.55</td>
+					<td class="amount">$164.55</td>
+					<td>Various</td>
+					<td>3rd</td>
+				</tr>
+				<tr>
+					<td>Car Loan</td>
+					<td class="amount">$26,859.43</td>
+					<td class="amount">$587.91</td>
+					<td>~6-8%</td>
+					<td>4th</td>
+				</tr>
+				<tr>
+					<td>Achieve Loan #1</td>
+					<td class="amount">$35,801.26</td>
+					<td class="amount">$1,500.00</td>
+					<td>Consolidation rate</td>
+					<td>5th</td>
+				</tr>
+				<tr>
+					<td>Achieve Loan #2</td>
+					<td class="amount">(included above)</td>
+					<td class="amount">$507.00</td>
+					<td>Consolidation rate</td>
+					<td>5th</td>
+				</tr>
+				<tr>
+					<td>Brother-in-Law Loan</td>
+					<td class="amount">$20,000.00</td>
+					<td class="amount">Flexible</td>
+					<td>0%</td>
+					<td>LAST</td>
+				</tr>
+				<tr style="font-weight: bold; background-color: #f8f9fa">
+					<td>TOTAL (excl. mortgage)</td>
+					<td class="amount">$100,230.77</td>
+					<td class="amount">$3,908.67</td>
+					<td>-</td>
+					<td>-</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h2>Month-by-Month Payoff Schedule</h2>
+		<table id="payment-schedule">
+			<thead>
+				<tr>
+					<th>Month</th>
+					<th>Payment Power</th>
+					<th>Target & Result</th>
+					<th>Debt Remaining</th>
+					<th>Monthly Cash Flow</th>
+					<th>Key Notes</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>Jan 2026</strong></td>
+					<td class="amount">$5,347.00</td>
+					<td class="paid-off">IRS Paid ✓</td>
+					<td class="amount">$476,282</td>
+					<td class="amount">$2,049</td>
+					<td>ESPP ($3,298) + surplus</td>
+				</tr>
+				<tr>
+					<td><strong>Feb 2026</strong></td>
+					<td class="amount">$3,396.00</td>
+					<td class="paid-off">Mercury Credit ✓</td>
+					<td class="amount">$472,886</td>
+					<td class="amount">$2,081</td>
+					<td>+$31.55 freed</td>
+				</tr>
+				<tr class="special-month">
+					<td><strong>Mar 2026</strong></td>
+					<td class="amount">$7,234.00</td>
+					<td class="paid-off">3 Credit Cards ✓</td>
+					<td class="amount">$465,652</td>
+					<td class="amount">$2,507</td>
+					<td>🎉 3-PAYCHECK MONTH</td>
+				</tr>
+				<tr class="rsu-month">
+					<td><strong>Apr 2026</strong></td>
+					<td class="amount">$8,907.00</td>
+					<td class="paid-off">All CCs + Small Debts ✓</td>
+					<td class="amount">$456,745</td>
+					<td class="amount">$2,863</td>
+					<td>💰 RSU VESTING #1</td>
+				</tr>
+				<tr>
+					<td><strong>May 2026</strong></td>
+					<td class="amount">$2,863.00</td>
+					<td>Car Loan</td>
+					<td class="amount">$453,882</td>
+					<td class="amount">$2,863</td>
+					<td>Attacking principal</td>
+				</tr>
+				<tr>
+					<td><strong>Jun 2026</strong></td>
+					<td class="amount">$2,863.00</td>
+					<td>Car Loan</td>
+					<td class="amount">$451,019</td>
+					<td class="amount">$2,863</td>
+					<td>-</td>
+				</tr>
+				<tr>
+					<td><strong>Jul 2026</strong></td>
+					<td class="amount">$2,863.00</td>
+					<td>Car Loan</td>
+					<td class="amount">$448,156</td>
+					<td class="amount">$2,863</td>
+					<td>-</td>
+				</tr>
+				<tr class="special-month">
+					<td><strong>Aug 2026</strong></td>
+					<td class="amount">$7,172.00</td>
+					<td>Car Loan</td>
+					<td class="amount">$440,984</td>
+					<td class="amount">$2,863</td>
+					<td>🎉 3-PAYCHECK MONTH</td>
+				</tr>
+				<tr>
+					<td><strong>Sep-Dec 2026</strong></td>
+					<td class="amount">$11,452.00</td>
+					<td class="paid-off">Car PAID OFF! ✓</td>
+					<td class="amount">$429,532</td>
+					<td class="amount">$3,451</td>
+					<td>+$587.91 freed (Nov)</td>
+				</tr>
+				<tr class="special-month">
+					<td><strong>Dec 2026</strong></td>
+					<td class="amount">$7,760.00</td>
+					<td>Achieve Loans</td>
+					<td class="amount">$421,772</td>
+					<td class="amount">$3,451</td>
+					<td>🎉 3-PAYCHECK MONTH</td>
+				</tr>
+				<tr>
+					<td><strong>Jan-Mar 2027</strong></td>
+					<td class="amount">$10,353.00</td>
+					<td>Achieve Loans</td>
+					<td class="amount">$411,419</td>
+					<td class="amount">$3,451</td>
+					<td>Steady progress</td>
+				</tr>
+				<tr class="rsu-month">
+					<td><strong>Apr 2027</strong></td>
+					<td class="amount">$9,851.00</td>
+					<td class="paid-off">Achieve PAID OFF! ✓</td>
+					<td class="amount">$401,568</td>
+					<td class="amount">$5,458</td>
+					<td>💰 RSU #2 + HUGE freed cash!</td>
+				</tr>
+				<tr class="special-month">
+					<td><strong>May 2027</strong></td>
+					<td class="amount">$9,767.00</td>
+					<td>Brother-in-Law</td>
+					<td class="amount">$391,801</td>
+					<td class="amount">$5,458</td>
+					<td>🎉 3-PAYCHECK</td>
+				</tr>
+				<tr>
+					<td><strong>Jun-Aug 2027</strong></td>
+					<td class="amount">$16,374.00</td>
+					<td>Brother-in-Law</td>
+					<td class="amount">$375,427</td>
+					<td class="amount">$5,458</td>
+					<td>Almost there!</td>
+				</tr>
+				<tr class="debt-free">
+					<td><strong>Sep 2027</strong></td>
+					<td class="amount">$3,626.00</td>
+					<td class="paid-off">COMPLETELY DEBT FREE! 🎊</td>
+					<td class="amount">$383,933</td>
+					<td class="amount">$5,458</td>
+					<td>🏆 Only mortgage remains!</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="timeline-bar">
+			<div class="timeline-progress">
+				21 MONTHS TO COMPLETE FREEDOM (Sept 2027)
+			</div>
+		</div>
+
+		<h2>Cash Flow Liberation Schedule</h2>
+		<table class="summary-table">
+			<thead>
+				<tr>
+					<th>Milestone</th>
+					<th>Date</th>
+					<th>Monthly Payment Freed</th>
+					<th>New Monthly Surplus</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Starting Point</td>
+					<td>Jan 2026</td>
+					<td>-</td>
+					<td class="amount">$2,049.18</td>
+				</tr>
+				<tr>
+					<td>All Credit Cards Paid</td>
+					<td>Apr 2026</td>
+					<td class="amount">+$649.21</td>
+					<td class="amount">$2,863.00</td>
+				</tr>
+				<tr>
+					<td>Car Loan Paid</td>
+					<td>Nov 2026</td>
+					<td class="amount">+$587.91</td>
+					<td class="amount">$3,451.00</td>
+				</tr>
+				<tr style="background-color: #d1ecf1; font-weight: bold">
+					<td>Achieve Loans Paid</td>
+					<td>Apr 2027</td>
+					<td class="amount">+$2,007.00</td>
+					<td class="amount">$5,458.00</td>
+				</tr>
+				<tr class="debt-free">
+					<td>Brother-in-Law Paid</td>
+					<td>Sep 2027</td>
+					<td>Total Freedom</td>
+					<td class="amount">$5,458.00</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h2>Strategic Advantages</h2>
+		<div class="note" style="background-color: #d4edda">
+			<h3>💪 Your Strengths</h3>
+			<ul>
+				<li>
+					<strong>Strong rental income:</strong> $2,940/month provides
+					stability
+				</li>
+				<li>
+					<strong>Two high earners:</strong> Reduces risk if one income
+					drops
+				</li>
+				<li>
+					<strong>Three-paycheck months:</strong> 6 times during payoff
+					period = $25,856 extra
+				</li>
+				<li>
+					<strong>RSU vestings:</strong> $12,800 in guaranteed boosts at
+					perfect times
+				</li>
+				<li>
+					<strong>After April 2027:</strong> You'll have $5,458/month to
+					attack final $20k
+				</li>
+			</ul>
+		</div>
+
+		<h2>Alternative Strategies to Consider</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Strategy</th>
+					<th>Potential Impact</th>
+					<th>How to Execute</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><strong>Negotiate Achieve</strong></td>
+					<td>Save $5,000-10,000</td>
+					<td>Call and offer lump sum settlement for 70-80%</td>
+				</tr>
+				<tr>
+					<td><strong>Side Income</strong></td>
+					<td>Cut 3-4 months off timeline</td>
+					<td>Even $500/month extra makes huge difference</td>
+				</tr>
+				<tr>
+					<td><strong>Tax Refund 2025</strong></td>
+					<td>$3,000-5,000 boost</td>
+					<td>Apply 100% to debt in April 2026</td>
+				</tr>
+				<tr>
+					<td><strong>Sell Unused Items</strong></td>
+					<td>$2,000-5,000</td>
+					<td>Garage sale, Facebook Marketplace, etc.</td>
+				</tr>
+				<tr>
+					<td><strong>Balance Transfer</strong></td>
+					<td>Save on CC interest</td>
+					<td>0% APR card for remaining CC debt</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="note" style="background-color: #fff3cd">
+			<h3>⚠️ Critical Success Factors</h3>
+			<ol>
+				<li>
+					<strong>January 2026:</strong> Pay IRS immediately - this is
+					non-negotiable
+				</li>
+				<li>
+					<strong>Automate everything:</strong> Set up automatic extra
+					payments
+				</li>
+				<li>
+					<strong>Communication:</strong> Let brother-in-law know September
+					2027 target
+				</li>
+				<li>
+					<strong>No new debt:</strong> Freeze cards after paying them off
+				</li>
+				<li>
+					<strong>Track monthly:</strong> Check off each milestone as you
+					hit it
+				</li>
+				<li>
+					<strong>Celebrate wins:</strong> Each paid-off account deserves
+					recognition!
+				</li>
+			</ol>
+		</div>
+
+		<div class="success">
+			<h2 style="text-align: center">🎯 THE BOTTOM LINE 🎯</h2>
+			<h3 style="text-align: center">
+				21 months from today, you'll be COMPLETELY DEBT FREE<br />(except
+				mortgage)
+			</h3>
+			<p style="text-align: center; font-size: 18px">
+				<strong
+					>From $100k in debt to $5,458/month in free cash flow!</strong
+				>
+			</p>
+		</div>
+	</body>
+</html>
