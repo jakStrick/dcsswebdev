@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qorvo - Dispense Control System (Drag & Drop)</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+        font-family: Segoe UI, Roboto, Arial, sans-serif;
+        overflow-x: auto;
+      }
+      #container {
+        display: inline-block;
+      }
+      svg {
+        background: white;
+        border: 1px solid #ddd;
+        display: block;
+      }
+      .draggable {
+        cursor: move;
+      }
+      .draggable:hover rect {
+        stroke-width: 3;
+      }
+      .draggable:hover line {
+        stroke-width: 4;
+        opacity: 0.7;
+      }
+      .draggable text {
+        cursor: move;
+      }
+      .resize-handle {
+        fill: #4caf50;
+        cursor: nwse-resize;
+        opacity: 0;
+      }
+      .draggable:hover .resize-handle {
+        opacity: 0.6;
+      }
+      .line-handle {
+        fill: #2196f3;
+        cursor: pointer;
+        opacity: 0;
+      }
+      .draggable:hover .line-handle {
+        opacity: 0.8;
+      }
+      .rotate-handle {
+        fill: #ff9800;
+        cursor: crosshair;
+        opacity: 0;
+      }
+      .draggable:hover .rotate-handle {
+        opacity: 0.8;
+      }
+      .selected {
+        outline: 2px dashed #2196f3;
+        outline-offset: 3px;
+      }
+      .selection-rect {
+        fill: rgba(33, 150, 243, 0.1);
+        stroke: #2196f3;
+        stroke-width: 2;
+        stroke-dasharray: 5, 5;
+        pointer-events: none;
+      }
+      #controls {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        z-index: 1000;
+      }
+      #controls button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px;
+        cursor: pointer;
+      }
+      #controls button.active {
+        background: #4caf50;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <h3 style="margin-top: 0">Schematic Editor</h3>
+      <button id="selectBtn" onclick="toggleSelectMode()">
+        Toggle Select Mode
+      </button>
+      <button onclick="clearSelection()">Clear Selection</button>
+      <button onclick="toggleTextMode()">Toggle Text Edit Mode</button>
+      <button onclick="saveSchematic()">Save Changes</button>
+      <button onclick="resetView()">Reset View</button>
+    </div>
+    <div id="container">
+      <svg
+        id="schematic"
+        width="1400"
+        height="2380"
+        viewBox="0 0 1400 2380"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <!-- Paste SVG content here -->
+      </svg>
+    </div>
+
+    <script>
+      const svg = document.getElementById("schematic");
+      let textEditMode = false;
+      let selectMode = false;
+      let selectedElements = new Set();
+      let selectionRect = null;
+      let selectionStart = null;
+
+      const svgContent = `
+            <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto" markerUnits="strokeWidth">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#222222" />
+                </marker>
+                <style>
+                    .blk { fill: #fff; stroke: #222; stroke-width: 2; }
+                    .t { font-family: Segoe UI, Roboto, Arial; fill: #111; }
+                    .bold { font-weight: 600; }
+                    .p24 { stroke: #8a2be2; }
+                    .p5 { stroke: #c0392b; }
+                    .pg { stroke: #777777; }
+                    .sig { stroke: #222; }
+                    .rail { stroke-width: 2; }
+                    .term { fill: #eef6ff; stroke: #337ab7; stroke-width: 2; }
+                    .box { fill: #fcfcfc; stroke: #dddddd; stroke-width: 2; }
+                </style>
+            </defs>`;
+
+      svg.innerHTML = svgContent;
+
+      // Control functions
+      function toggleTextMode() {
+        textEditMode = !textEditMode;
+        alert(
+          textEditMode
+            ? "Text edit mode ON - Click any text to edit"
+            : "Text edit mode OFF - Drag mode enabled"
+        );
+      }
+
+      function saveSchematic() {
+        // Get the current SVG content
+        const svgContent = svg.innerHTML;
+
+        // Create a complete HTML document with the current state
+        const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qorvo - Dispense Control System (Drag & Drop)</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+        font-family: Segoe UI, Roboto, Arial, sans-serif;
+        overflow-x: auto;
+      }
+      #container {
+        display: inline-block;
+      }
+      svg {
+        background: white;
+        border: 1px solid #ddd;
+        display: block;
+      }
+      .draggable {
+        cursor: move;
+      }
+      .draggable:hover rect {
+        stroke-width: 3;
+      }
+      .draggable:hover line {
+        stroke-width: 4;
+        opacity: 0.7;
+      }
+      .draggable text {
+        cursor: move;
+      }
+      .resize-handle {
+        fill: #4caf50;
+        cursor: nwse-resize;
+        opacity: 0;
+      }
+      .draggable:hover .resize-handle {
+        opacity: 0.6;
+      }
+      .line-handle {
+        fill: #2196f3;
+        cursor: pointer;
+        opacity: 0;
+      }
+      .draggable:hover .line-handle {
+        opacity: 0.8;
+      }
+      .rotate-handle {
+        fill: #ff9800;
+        cursor: crosshair;
+        opacity: 0;
+      }
+      .draggable:hover .rotate-handle {
+        opacity: 0.8;
+      }
+      .selected {
+        outline: 2px dashed #2196f3;
+        outline-offset: 3px;
+      }
+      .selection-rect {
+        fill: rgba(33, 150, 243, 0.1);
+        stroke: #2196f3;
+        stroke-width: 2;
+        stroke-dasharray: 5, 5;
+        pointer-events: none;
+      }
+      #controls {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        z-index: 1000;
+      }
+      #controls button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px;
+        cursor: pointer;
+      }
+      #controls button.active {
+        background: #4caf50;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <h3 style="margin-top: 0">Schematic Editor</h3>
+      <button id="selectBtn" onclick="toggleSelectMode()">
+        Toggle Select Mode
+      </button>
+      <button onclick="clearSelection()">Clear Selection</button>
+      <button onclick="toggleTextMode()">Toggle Text Edit Mode</button>
+      <button onclick="saveSchematic()">Save Changes</button>
+      <button onclick="resetView()">Reset View</button>
+    </div>
+    <div id="container">
+      <svg
+        id="schematic"
+        width="1400"
+        height="2380"
+        viewBox="0 0 1400 2380"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        ${svgContent}
+      </svg>
+    </div>
+
+    <script>
+      ${document.querySelector("script").textContent}
+    <\/script>
+  </body>
+</html>`;
+
+        const blob = new Blob([htmlContent], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "NewKeyenceSchematicDraggable.html";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        alert(
+          "HTML file saved! Replace the original file with the downloaded version to make changes persistent."
+        );
+      }
+
+      function resetView() {
+        location.reload();
+      }
+
+      // Load the rest of the SVG from the original file
+      fetch("NewKeyenceSchmatic.html")
+        .then((response) => response.text())
+        .then((data) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data, "image/svg+xml");
+          const originalSvg = doc.querySelector("svg");
+
+          // Copy everything except defs
+          Array.from(originalSvg.children).forEach((child) => {
+            if (child.tagName !== "defs") {
+              svg.appendChild(child.cloneNode(true));
+            }
+          });
+
+          // Wrap components in draggable groups
+          wrapInDraggableGroups();
+        });
+
+      function wrapInDraggableGroups() {
+        // Make every text element individually draggable
+        const allTexts = Array.from(svg.querySelectorAll("text"));
+        allTexts.forEach((text, index) => {
+          if (!text.parentElement.classList.contains("draggable")) {
+            const group = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "g"
+            );
+            group.classList.add("draggable");
+            group.dataset.component = `text-${index}`;
+            text.parentNode.insertBefore(group, text);
+            group.appendChild(text);
+            makeTextEditable(group, text);
+            makeDraggable(group);
+          }
+        });
+
+        const components = [
+          { selector: "rect.blk", name: "component" },
+          { selector: "rect.term", name: "terminal" },
+          { selector: "rect.box", name: "info-box" },
+        ];
+
+        components.forEach((comp) => {
+          const elements = svg.querySelectorAll(comp.selector);
+          elements.forEach((el, index) => {
+            if (el.parentElement.classList.contains("draggable")) return;
+
+            const group = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "g"
+            );
+            group.classList.add("draggable");
+            group.dataset.component = `${comp.name}-${index}`;
+
+            el.parentNode.insertBefore(group, el);
+            group.appendChild(el);
+
+            // Add resize handle
+            addResizeHandle(group, el);
+            makeDraggable(group);
+            makeResizable(group, el);
+          });
+        });
+
+        // Make all lines adjustable and rotatable
+        const allLines = svg.querySelectorAll("line");
+        allLines.forEach((line, index) => {
+          if (!line.parentElement.classList.contains("draggable")) {
+            const group = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "g"
+            );
+            group.classList.add("draggable");
+            group.dataset.component = `line-${index}`;
+
+            line.parentNode.insertBefore(group, line);
+            group.appendChild(line);
+
+            // Add line handles for adjusting endpoints
+            addLineHandles(group, line);
+            makeDraggable(group);
+            makeLineAdjustable(group, line);
+          }
+        });
+      }
+
+      function makeTextEditable(group, textElement) {
+        textElement.addEventListener("dblclick", (evt) => {
+          if (textEditMode) {
+            evt.stopPropagation();
+            const currentText = textElement.textContent;
+            const newText = prompt("Edit text:", currentText);
+            if (newText !== null) {
+              textElement.textContent = newText;
+            }
+          }
+        });
+      }
+
+      function addResizeHandle(group, rectElement) {
+        const handle = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "circle"
+        );
+        handle.setAttribute("class", "resize-handle");
+        handle.setAttribute("r", "6");
+        const bbox = rectElement.getBBox();
+        handle.setAttribute("cx", bbox.x + bbox.width);
+        handle.setAttribute("cy", bbox.y + bbox.height);
+        group.appendChild(handle);
+      }
+
+      function makeResizable(group, rectElement) {
+        const handle = group.querySelector(".resize-handle");
+        if (!handle) return;
+
+        let isResizing = false;
+
+        handle.addEventListener("mousedown", (evt) => {
+          evt.stopPropagagation();
+          isResizing = true;
+
+          // Get the initial bbox and transform
+          const initialBBox = rectElement.getBBox();
+          const rectX =
+            parseFloat(rectElement.getAttribute("x")) || initialBBox.x;
+          const rectY =
+            parseFloat(rectElement.getAttribute("y")) || initialBBox.y;
+
+          // Get group's transform to account for dragging
+          const transforms = group.transform.baseVal;
+          let translateX = 0,
+            translateY = 0;
+          if (
+            transforms.length > 0 &&
+            transforms.getItem(0).type === SVGTransform.SVG_TRANSFORM_TRANSLATE
+          ) {
+            translateX = transforms.getItem(0).matrix.e;
+            translateY = transforms.getItem(0).matrix.f;
+          }
+
+          const moveHandler = (e) => {
+            if (!isResizing) return;
+            const pt = getMousePosition(e);
+
+            // Calculate new dimensions relative to the original rect position plus transform
+            const newWidth = Math.max(50, pt.x - rectX - translateX);
+            const newHeight = Math.max(30, pt.y - rectY - translateY);
+
+            rectElement.setAttribute("width", newWidth);
+            rectElement.setAttribute("height", newHeight);
+            handle.setAttribute("cx", rectX + newWidth);
+            handle.setAttribute("cy", rectY + newHeight);
+          };
+
+          const upHandler = () => {
+            isResizing = false;
+            svg.removeEventListener("mousemove", moveHandler);
+            svg.removeEventListener("mouseup", upHandler);
+          };
+
+          svg.addEventListener("mousemove", moveHandler);
+          svg.addEventListener("mouseup", upHandler);
+        });
+      }
+
+      function addLineHandles(group, lineElement) {
+        const handle1 = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "circle"
+        );
+        const handle2 = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "circle"
+        );
+        handle1.setAttribute("class", "line-handle");
+        handle2.setAttribute("class", "line-handle");
+        handle1.setAttribute("r", "5");
+        handle2.setAttribute("r", "5");
+        handle1.setAttribute("cx", lineElement.getAttribute("x1"));
+        handle1.setAttribute("cy", lineElement.getAttribute("y1"));
+        handle2.setAttribute("cx", lineElement.getAttribute("x2"));
+        handle2.setAttribute("cy", lineElement.getAttribute("y2"));
+        handle1.dataset.point = "1";
+        handle2.dataset.point = "2";
+        group.appendChild(handle1);
+        group.appendChild(handle2);
+      }
+
+      function makeLineAdjustable(group, lineElement) {
+        const handles = group.querySelectorAll(".line-handle");
+
+        handles.forEach((handle) => {
+          let isDragging = false;
+
+          handle.addEventListener("mousedown", (evt) => {
+            evt.stopPropagation();
+            isDragging = true;
+            const point = handle.dataset.point;
+
+            const moveHandler = (e) => {
+              if (!isDragging) return;
+              const pt = getMousePosition(e);
+              handle.setAttribute("cx", pt.x);
+              handle.setAttribute("cy", pt.y);
+              lineElement.setAttribute(`x${point}`, pt.x);
+              lineElement.setAttribute(`y${point}`, pt.y);
+            };
+
+            const upHandler = () => {
+              isDragging = false;
+              svg.removeEventListener("mousemove", moveHandler);
+              svg.removeEventListener("mouseup", upHandler);
+            };
+
+            svg.addEventListener("mousemove", moveHandler);
+            svg.addEventListener("mouseup", upHandler);
+          });
+        });
+      }
+
+      function makeDraggable(element) {
+        let selectedElement, offset, transform;
+        let groupOffsets = new Map();
+
+        element.addEventListener("mousedown", startDrag);
+        element.addEventListener("touchstart", startDrag);
+
+        function startDrag(evt) {
+          if (
+            evt.target.tagName === "text" ||
+            evt.target.tagName === "rect" ||
+            evt.target.tagName === "line"
+          ) {
+            selectedElement = element;
+
+            offset = getMousePosition(evt);
+
+            // If this element is selected and we're dragging a selected element
+            if (selectedElements.has(selectedElement)) {
+              // Prepare all selected elements for dragging
+              groupOffsets.clear();
+              selectedElements.forEach((el) => {
+                const transforms = el.transform.baseVal;
+
+                if (
+                  transforms.length === 0 ||
+                  transforms.getItem(0).type !==
+                    SVGTransform.SVG_TRANSFORM_TRANSLATE
+                ) {
+                  const translate = svg.createSVGTransform();
+                  translate.setTranslate(0, 0);
+                  transforms.insertItemBefore(translate, 0);
+                }
+
+                const elTransform = transforms.getItem(0);
+                groupOffsets.set(el, {
+                  transform: elTransform,
+                  offsetX: offset.x - elTransform.matrix.e,
+                  offsetY: offset.y - elTransform.matrix.f,
+                });
+              });
+            } else {
+              // Single element dragging
+              const transforms = selectedElement.transform.baseVal;
+
+              if (
+                transforms.length === 0 ||
+                transforms.getItem(0).type !==
+                  SVGTransform.SVG_TRANSFORM_TRANSLATE
+              ) {
+                const translate = svg.createSVGTransform();
+                translate.setTranslate(0, 0);
+                transforms.insertItemBefore(translate, 0);
+              }
+
+              transform = transforms.getItem(0);
+              offset.x -= transform.matrix.e;
+              offset.y -= transform.matrix.f;
+            }
+          }
+        }
+
+        function drag(evt) {
+          if (selectedElement) {
+            evt.preventDefault();
+            const coord = getMousePosition(evt);
+
+            if (groupOffsets.size > 0) {
+              // Group drag - move all selected elements
+              groupOffsets.forEach((data, el) => {
+                data.transform.setTranslate(
+                  coord.x - data.offsetX,
+                  coord.y - data.offsetY
+                );
+              });
+            } else {
+              // Single element drag
+              transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+            }
+          }
+        }
+
+        function endDrag(evt) {
+          selectedElement = null;
+          groupOffsets.clear();
+        }
+
+        svg.addEventListener("mousemove", drag);
+        svg.addEventListener("touchmove", drag);
+        svg.addEventListener("mouseup", endDrag);
+        svg.addEventListener("touchend", endDrag);
+        svg.addEventListener("mouseleave", endDrag);
+      }
+
+      function getMousePosition(evt) {
+        const CTM = svg.getScreenCTM();
+        if (evt.touches) {
+          evt = evt.touches[0];
+        }
+        return {
+          x: (evt.clientX - CTM.e) / CTM.a,
+          y: (evt.clientY - CTM.f) / CTM.d,
+        };
+      }
+
+      // Selection functions
+      function toggleSelectMode() {
+        selectMode = !selectMode;
+        document.getElementById("selectBtn").classList.toggle("active");
+        if (!selectMode) {
+          clearSelection();
+        }
+      }
+
+      function toggleSelection(element) {
+        if (selectedElements.has(element)) {
+          selectedElements.delete(element);
+          element.classList.remove("selected");
+        } else {
+          selectedElements.add(element);
+          element.classList.add("selected");
+        }
+      }
+
+      function clearSelection() {
+        selectedElements.forEach((el) => el.classList.remove("selected"));
+        selectedElements.clear();
+      }
+
+      // Add click handler to SVG for element selection
+      svg.addEventListener("click", function (evt) {
+        if (selectMode) {
+          evt.stopPropagation();
+          let target = evt.target;
+
+          // Find the draggable group parent
+          while (target && !target.classList.contains("draggable")) {
+            target = target.parentElement;
+          }
+
+          if (target && target.classList.contains("draggable")) {
+            if (evt.ctrlKey || evt.metaKey) {
+              // Ctrl+click for multi-select
+              toggleSelection(target);
+            } else {
+              // Single click - clear others and select this one
+              if (!selectedElements.has(target)) {
+                clearSelection();
+                toggleSelection(target);
+              }
+            }
+          } else {
+            // Clicked on background - clear selection
+            clearSelection();
+          }
+        }
+      });
+
+      // Marquee selection
+      svg.addEventListener("mousedown", function (evt) {
+        if (selectMode && evt.target === svg) {
+          selectionStart = getMousePosition(evt);
+
+          selectionRect = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "rect"
+          );
+          selectionRect.classList.add("selection-rect");
+          selectionRect.setAttribute("x", selectionStart.x);
+          selectionRect.setAttribute("y", selectionStart.y);
+          selectionRect.setAttribute("width", 0);
+          selectionRect.setAttribute("height", 0);
+          svg.appendChild(selectionRect);
+
+          const moveHandler = (e) => {
+            if (!selectionRect) return;
+            const current = getMousePosition(e);
+            const x = Math.min(selectionStart.x, current.x);
+            const y = Math.min(selectionStart.y, current.y);
+            const width = Math.abs(current.x - selectionStart.x);
+            const height = Math.abs(current.y - selectionStart.y);
+
+            selectionRect.setAttribute("x", x);
+            selectionRect.setAttribute("y", y);
+            selectionRect.setAttribute("width", width);
+            selectionRect.setAttribute("height", height);
+          };
+
+          const upHandler = (e) => {
+            if (selectionRect) {
+              const rectBBox = selectionRect.getBBox();
+
+              // Find all draggable elements within selection rectangle
+              const draggables = svg.querySelectorAll(".draggable");
+              draggables.forEach((el) => {
+                const elBBox = el.getBBox();
+                // Check if bounding boxes intersect
+                if (
+                  rectBBox.x < elBBox.x + elBBox.width &&
+                  rectBBox.x + rectBBox.width > elBBox.x &&
+                  rectBBox.y < elBBox.y + elBBox.height &&
+                  rectBBox.y + rectBBox.height > elBBox.y
+                ) {
+                  if (e.ctrlKey || e.metaKey) {
+                    toggleSelection(el);
+                  } else {
+                    selectedElements.add(el);
+                    el.classList.add("selected");
+                  }
+                }
+              });
+
+              selectionRect.remove();
+              selectionRect = null;
+              selectionStart = null;
+            }
+
+            svg.removeEventListener("mousemove", moveHandler);
+            svg.removeEventListener("mouseup", upHandler);
+          };
+
+          svg.addEventListener("mousemove", moveHandler);
+          svg.addEventListener("mouseup", upHandler);
+        }
+      });
+    </script>
+  </body>
+</html>
