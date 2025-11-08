@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qorvo - Dispense Control System (Interactive)</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+        font-family: Segoe UI, Roboto, Arial, sans-serif;
+      }
+      svg {
+        background: white;
+        border: 1px solid #ddd;
+        cursor: default;
+      }
+      .draggable {
+        cursor: move;
+      }
+      .draggable:hover {
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <svg
+      id="schematic"
+      width="1400"
+      height="1100"
+      viewBox="0 0 1400 1100"
+      xmlns="http://www.w3.org/2000/svg"
+    ></svg>
+
+    <script src="NewKeyenceSchmatic.html"></script>
+    <script>
+      // Drag and drop functionality
+      let selectedElement = null;
+      let offset = { x: 0, y: 0 };
+
+      const svg = document.getElementById("schematic");
+
+      // Load the SVG content
+      fetch("NewKeyenceSchmatic.html")
+        .then((response) => response.text())
+        .then((data) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data, "image/svg+xml");
+          const svgContent = doc.querySelector("svg");
+
+          // Copy all children from loaded SVG to our SVG
+          Array.from(svgContent.children).forEach((child) => {
+            svg.appendChild(child.cloneNode(true));
+          });
+
+          // Make component groups draggable
+          makeComponentsDraggable();
+        });
+
+      function makeComponentsDraggable() {
+        // Find all major component blocks
+        const blocks = svg.querySelectorAll("rect.blk, rect.term, rect.box");
+
+        blocks.forEach((block) => {
+          // Create a group for each block and its associated elements
+          const group = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "g"
+          );
+          group.classList.add("draggable");
+
+          // Move the block into the group
+          const parent = block.parentNode;
+          parent.insertBefore(group, block);
+          group.appendChild(block);
+
+          // Find associated text elements (within proximity)
+          const bbox = block.getBBox();
+          const texts = svg.querySelectorAll("text");
+          texts.forEach((text) => {
+            const textBbox = text.getBBox();
+            if (
+              textBbox.x >= bbox.x - 50 &&
+              textBbox.x <= bbox.x + bbox.width + 50 &&
+              textBbox.y >= bbox.y - 20 &&
+              textBbox.y <= bbox.y + bbox.height + 20
+            ) {
+              if (text.parentNode === svg) {
+                group.appendChild(text);
+              }
+            }
+          });
+
+          // Add drag event listeners
+          group.addEventListener("mousedown", startDrag);
+        });
+      }
+
+      function startDrag(evt) {
+        selectedElement = evt.currentTarget;
+
+        const transform = selectedElement.transform.baseVal;
+        if (
+          transform.length === 0 ||
+          transform.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE
+        ) {
+          const translate = svg.createSVGTransform();
+          translate.setTranslate(0, 0);
+          selectedElement.transform.baseVal.insertItemBefore(translate, 0);
+        }
+
+        const matrix = transform.getItem(0).matrix;
+        offset.x = evt.clientX - matrix.e;
+        offset.y = evt.clientY - matrix.f;
+
+        document.addEventListener("mousemove", drag);
+        document.addEventListener("mouseup", endDrag);
+      }
+
+      function drag(evt) {
+        if (selectedElement) {
+          evt.preventDefault();
+          const coord = {
+            x: evt.clientX - offset.x,
+            y: evt.clientY - offset.y,
+          };
+          selectedElement.transform.baseVal
+            .getItem(0)
+            .setTranslate(coord.x, coord.y);
+        }
+      }
+
+      function endDrag(evt) {
+        selectedElement = null;
+        document.removeEventListener("mousemove", drag);
+        document.removeEventListener("mouseup", endDrag);
+      }
+    </script>
+  </body>
+</html>

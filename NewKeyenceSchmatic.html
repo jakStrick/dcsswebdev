@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1400"
+  height="1100"
+  viewBox="0 0 1400 1100"
+>
+  <defs>
+    <marker
+      id="arrow"
+      markerWidth="10"
+      markerHeight="7"
+      refX="10"
+      refY="3.5"
+      orient="auto"
+      markerUnits="strokeWidth"
+    >
+      <polygon points="0 0, 10 3.5, 0 7" fill="#222222" />
+    </marker>
+    <style>
+      .blk {
+        fill: #fff;
+        stroke: #222;
+        stroke-width: 2;
+      }
+      .t {
+        font-family: Segoe UI, Roboto, Arial;
+        fill: #111;
+      }
+      .bold {
+        font-weight: 600;
+      }
+      .p24 {
+        stroke: #8a2be2;
+      }
+      .p5 {
+        stroke: #c0392b;
+      }
+      .pg {
+        stroke: #777777;
+      }
+      .sig {
+        stroke: #222;
+      }
+      .rail {
+        stroke-width: 2;
+      }
+      .term {
+        fill: #eef6ff;
+        stroke: #337ab7;
+        stroke-width: 2;
+      }
+      .box {
+        fill: #fcfcfc;
+        stroke: #dddddd;
+        stroke-width: 2;
+      }
+    </style>
+  </defs>
+
+  <!-- Title Block -->
+  <rect
+    x="20"
+    y="20"
+    width="1340"
+    height="90"
+    rx="6"
+    fill="#f7f7f7"
+    stroke="#cccccc"
+    stroke-width="2"
+  />
+  <rect
+    x="24"
+    y="24"
+    width="120"
+    height="82"
+    rx="4"
+    fill="#ffffff"
+    stroke="#bbbbbb"
+    stroke-width="2"
+  />
+  <text
+    x="84"
+    y="65"
+    class="t bold"
+    font-size="16"
+    text-anchor="middle"
+    fill="#999999"
+  >
+    LOGO
+  </text>
+  <text x="40" y="55" class="t bold" font-size="24">
+    Qorvo – Dispense Control System
+  </text>
+  <text x="40" y="85" class="t" font-size="14">
+    PLC • Solenoid • Output Device • Optocoupler • Pump Controller
+  </text>
+  <text x="1040" y="55" class="t" font-size="14">
+    Drawn by: David Strickland
+  </text>
+  <text x="1040" y="80" class="t" font-size="14">Date: 2025-10-31</text>
+
+  <!-- Power Rails -->
+  <text x="40" y="236" class="t" font-size="12" fill="#8a2be2">
+    +24V (purple)
+  </text>
+  <line x1="160" y1="232" x2="1360" y2="232" class="p24 rail" />
+  <text x="40" y="170" class="t" font-size="12" fill="#c0392b">
+    +5V (red) local to Pump/Opto side
+  </text>
+  <line x1="280" y1="166" x2="1360" y2="166" class="p5 rail" />
+  <text x="40" y="1026" class="t" font-size="12" fill="#777777">
+    0V / GND (gray)
+  </text>
+  <line x1="160" y1="1022" x2="1360" y2="1022" class="pg rail" />
+
+  <!-- Blocks -->
+  <!-- Solenoid -->
+  <rect x="60" y="220" width="240" height="120" class="blk" />
+  <text x="72" y="244" class="t bold" font-size="16">Solenoid Valve (24V)</text>
+  <text x="72" y="268" class="t" font-size="14">
+    24V ON = Closed (No dispense)
+  </text>
+  <text x="72" y="288" class="t" font-size="14">24V OFF = Open (Dispense)</text>
+  <!-- Solenoid wiring to rails -->
+  <line x1="180" y1="136" x2="180" y2="136" class="p24" stroke-width="2" />
+  <line x1="180" y1="136" x2="180" y2="220" class="p24" stroke-width="2" />
+  <line x1="180" y1="340" x2="180" y2="926" class="pg" stroke-width="2" />
+  <text x="188" y="164" class="t" font-size="12" fill="#8a2be2">+24V</text>
+  <text x="188" y="332" class="t" font-size="12" fill="#777777">0V</text>
+
+  <!-- Flow Sensor -->
+  <rect x="60" y="380" width="240" height="100" class="blk" />
+  <text x="72" y="404" class="t bold" font-size="16">Flow Sensor</text>
+  <text x="72" y="428" class="t" font-size="14">Pulse/Status → PLC DI</text>
+
+  <!-- PLC -->
+  <rect x="380" y="340" width="240" height="170" class="blk" />
+  <text x="392" y="364" class="t bold" font-size="18">PLC</text>
+  <text x="392" y="388" class="t" font-size="14">
+    Monitors 24V (solenoid state)
+  </text>
+  <text x="392" y="408" class="t" font-size="14">Monitors Flow Sensor</text>
+  <text x="392" y="428" class="t" font-size="14">Drives Error Output</text>
+
+  <!-- Output Device -->
+  <rect x="660" y="360" width="220" height="130" class="blk" />
+  <text x="672" y="384" class="t bold" font-size="16">Output Device</text>
+  <text x="672" y="408" class="t" font-size="14">(24V Error Driver)</text>
+
+  <!-- Optocoupler Board -->
+  <rect x="940" y="240" width="260" height="180" class="blk" />
+  <text x="952" y="264" class="t bold" font-size="16">Optocoupler Board</text>
+  <text x="952" y="288" class="t" font-size="14">IN+ / IN- (24V domain)</text>
+  <text x="952" y="308" class="t" font-size="14">
+    OUT (open-collector, 5V domain)
+  </text>
+
+  <!-- Terminals TB1 & TB2 -->
+  <!-- TB1: IN+, IN- -->
+  <rect x="954" y="496" width="90" height="60" class="term" rx="4" />
+  <text x="958" y="512" class="t bold" font-size="12">TB1</text>
+  <text x="958" y="530" class="t" font-size="12">1: IN+</text>
+  <text x="958" y="548" class="t" font-size="12">2: IN-</text>
+
+  <!-- TB2: OUT, GND, +5V -->
+  <rect x="1100" y="500" width="100" height="76" class="term" rx="4" />
+  <text x="1104" y="516" class="t bold" font-size="12">TB2</text>
+  <text x="1104" y="534" class="t" font-size="12">1: OUT</text>
+  <text x="1104" y="550" class="t" font-size="12">2: GND</text>
+  <text x="1104" y="566" class="t" font-size="12">3: +5V</text>
+
+  <!-- Pull-up 1.4kΩ from OUT to +5V -->
+  <line x1="1180" y1="530" x2="1180" y2="510" class="sig" stroke-width="2" />
+  <rect
+    x="1162"
+    y="488"
+    width="36"
+    height="22"
+    rx="3"
+    fill="#ffffff"
+    stroke="#222222"
+    stroke-width="2"
+  />
+  <text x="1180" y="503" class="t" font-size="10" text-anchor="middle">
+    1.4kΩ
+  </text>
+  <line x1="1180" y1="488" x2="1180" y2="166" class="p5" stroke-width="2" />
+  <text x="1148" y="530" class="t" font-size="10">Pull-up to +5V</text>
+
+  <!-- Pump Controller with TB3 -->
+  <rect x="1260" y="500" width="140" height="80" class="blk" />
+  <text x="1270" y="524" class="t bold" font-size="16">Pump Controller</text>
+  <text x="1270" y="544" class="t" font-size="14">5V logic input</text>
+  <rect x="1260" y="590" width="120" height="80" class="term" rx="4" />
+  <text x="1264" y="606" class="t bold" font-size="12">TB3</text>
+  <text x="1264" y="624" class="t" font-size="12">1: IN</text>
+  <text x="1264" y="642" class="t" font-size="12">2: GND</text>
+  <text x="1264" y="660" class="t" font-size="12">3: +5V</text>
+
+  <!-- Interconnections -->
+  <!-- Flow Sensor -> PLC -->
+  <line
+    x1="300"
+    y1="430"
+    x2="380"
+    y2="410"
+    class="sig"
+    stroke-width="2"
+    marker-end="url(#arrow)"
+  />
+  <text x="372" y="402" class="t" font-size="12" text-anchor="end">
+    Flow pulses / status
+  </text>
+
+  <!-- PLC -> Output Device (error command) -->
+  <line
+    x1="620"
+    y1="540"
+    x2="660"
+    y2="512"
+    class="sig"
+    stroke-width="2"
+    marker-end="url(#arrow)"
+  />
+  <text x="626" y="530" class="t" font-size="12">PLC error signal</text>
+
+  <!-- Output Device 24V to Opto IN+ -->
+  <line x1="880" y1="530" x2="954" y2="520" class="p24" stroke-width="3" />
+  <text x="920" y="512" class="t" font-size="12">24V signal → TB1-1 (IN+)</text>
+  <!-- Opto IN- to 0V -->
+  <line x1="954" y1="538" x2="954" y2="926" class="pg" stroke-width="2" />
+  <text x="962" y="538" class="t" font-size="12">TB1-2 (IN-) → 0V</text>
+
+  <!-- Opto OUT to Pump IN -->
+  <line
+    x1="1180"
+    y1="530"
+    x2="1260"
+    y2="624"
+    class="sig"
+    stroke-width="2"
+    marker-end="url(#arrow)"
+  />
+  <text x="1200" y="570" class="t" font-size="11">OUT → Pump IN (TB3-1)</text>
+
+  <!-- TB2-2 GND to GND -->
+  <line x1="1140" y1="550" x2="1140" y2="926" class="pg" stroke-width="2" />
+  <text x="1148" y="550" class="t" font-size="11">TB2-2 (GND) → 0V</text>
+
+  <!-- TB2-3 +5V to +5V rail -->
+  <line x1="1160" y1="566" x2="1160" y2="166" class="p5" stroke-width="2" />
+  <text x="1168" y="566" class="t" font-size="11" fill="#c0392b">
+    TB2-3 (+5V) → +5V
+  </text>
+
+  <!-- Pump TB3 GND/+5V to rails -->
+  <line x1="1300" y1="642" x2="1300" y2="926" class="pg" stroke-width="2" />
+  <text x="1308" y="642" class="t" font-size="11">TB3-2 (GND) → 0V</text>
+  <line x1="1340" y1="660" x2="1340" y2="166" class="p5" stroke-width="2" />
+  <text x="1348" y="660" class="t" font-size="11" fill="#c0392b">
+    TB3-3 (+5V) → +5V
+  </text>
+
+  <!-- Common ground jumper note -->
+  <text x="960" y="632" class="t" font-size="11">
+    Enable common-GND jumper if Pump +5V and Opto +5V are same supply
+  </text>
+
+  <!-- Logic Flow -->
+  <rect x="60" y="668" width="580" height="170" class="box" rx="6" />
+  <text x="80" y="694" class="t bold" font-size="16">Logic Flow</text>
+  <text x="92" y="722" class="t" font-size="13">
+    1) Solenoid OFF → 24V LOW → PLC starts monitoring flow.
+  </text>
+  <text x="92" y="744" class="t" font-size="13">
+    2) Missing flow → PLC asserts error → Output drives 24V HIGH.
+  </text>
+  <text x="92" y="766" class="t" font-size="13">
+    3) 24V HIGH → Opto ON → OUT pulled LOW → Pump sees ERROR.
+  </text>
+  <text x="92" y="788" class="t" font-size="13">
+    4) No error → 24V LOW → Opto OFF → OUT held HIGH (NORMAL).
+  </text>
+
+  <!-- Truth Table -->
+  <rect x="60" y="858" width="580" height="160" class="box" rx="6" />
+  <text x="80" y="884" class="t bold" font-size="16">Truth / State Table</text>
+  <text x="80" y="908" class="t bold" font-size="13">Condition</text>
+  <text x="260" y="908" class="t bold" font-size="13">Output 24V</text>
+  <text x="420" y="908" class="t bold" font-size="13">Opto OUT</text>
+  <text x="540" y="908" class="t bold" font-size="13">Pump Input</text>
+  <text x="80" y="930" class="t" font-size="13">ERROR (no flow)</text>
+  <text x="260" y="930" class="t" font-size="13">HIGH (~24V)</text>
+  <text x="420" y="930" class="t" font-size="13">LOW (~0V)</text>
+  <text x="540" y="930" class="t" font-size="13">ERROR</text>
+  <text x="80" y="954" class="t" font-size="13">NORMAL</text>
+  <text x="260" y="954" class="t" font-size="13">LOW (~0V)</text>
+  <text x="420" y="954" class="t" font-size="13">HIGH (~5V)</text>
+  <text x="540" y="954" class="t" font-size="13">NORMAL</text>
+
+  <!-- Notes -->
+  <rect x="700" y="668" width="660" height="350" class="box" rx="6" />
+  <text x="720" y="694" class="t bold" font-size="16">Notes</text>
+  <text x="720" y="722" class="t" font-size="13">
+    • Use generic screw terminals for TB1 (IN+/IN-), TB2 (OUT/GND/+5V), TB3
+    (IN/GND/+5V).
+  </text>
+  <text x="720" y="744" class="t" font-size="13">
+    • Pull-up resistor is 1.4kΩ to +5V (faster edges, ~3.6 mA at 5V).
+  </text>
+  <text x="720" y="766" class="t" font-size="13">
+    • OUT (open-collector) pulls LOW on error; Pump sees LOW = ERROR, HIGH =
+    NORMAL.
+  </text>
+  <text x="720" y="788" class="t" font-size="13">
+    • TB1-2 (IN-) and TB2-2 (GND) tie to 0V in their domains; optocoupler
+    provides isolation.
+  </text>
+  <text x="720" y="810" class="t" font-size="13">
+    • If Pump +5V and Opto +5V share the same supply, enable common-GND jumper
+    on the opto board.
+  </text>
+  <text x="720" y="832" class="t" font-size="13">
+    • Ensure PLC inputs reference the proper 0V when sensing 24V lines.
+  </text>
+</svg>
