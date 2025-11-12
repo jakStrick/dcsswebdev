@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+<!-- Background with subtle gradient -->
+<defs>
+<linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+</linearGradient>
+<linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+</linearGradient>
+<linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+<stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+</linearGradient>
+<!-- Drop shadow filter -->
+<filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+<feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+</filter>
+</defs>
+
+<!-- Background -->
+<rect width="400" height="400" rx="12" fill="white" stroke="#cbd5e1" stroke-width="1"/>
+
+<!-- Logo group for animation targeting -->
+<g id="logoGroup">
+<!-- Icon: Abstract code brackets with modern twist -->
+<g transform="translate(175, 150)" filter="url(#dropShadow)">
+<!-- Left bracket with animation-ready design -->
+<path d="M15 10 L5 10 Q0 10 0 15 L0 55 Q0 60 5 60 L15 60"
+stroke="url(#iconGradient)"
+stroke-width="4"
+fill="url(#iconGradient)"
+fill-opacity="0.05"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+<!-- Right bracket -->
+<path d="M35 10 L45 10 Q50 10 50 15 L50 55 Q50 60 45 60 L35 60"
+stroke="url(#iconGradient)"
+stroke-width="4"
+fill="url(#iconGradient)"
+fill-opacity="0.05"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+<!-- Central geometric elements representing web structure -->
+<circle cx="25" cy="25" r="3" fill="url(#iconGradient)" opacity="0.8"/>
+<circle cx="18" cy="35" r="2" fill="url(#iconGradient)" opacity="0.6"/>
+<circle cx="32" cy="35" r="2" fill="url(#iconGradient)" opacity="0.6"/>
+<circle cx="25" cy="45" r="3" fill="url(#iconGradient)" opacity="0.8"/>
+
+<!-- Connecting lines -->
+<line x1="25" y1="28" x2="18" y2="33" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+<line x1="25" y1="28" x2="32" y2="33" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+<line x1="18" y1="37" x2="25" y2="42" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+<line x1="32" y1="37" x2="25" y2="42" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+</g>
+
+<!-- Company Name -->
+<text x="200" y="264"
+font-family="Arial, Helvetica, sans-serif"
+font-size="32"
+font-weight="bold"
+fill="url(#textGradient)"
+filter="url(#dropShadow)"
+text-anchor="middle">DCSS LLC</text>
+
+<!-- Tagline -->
+<text x="200" y="289"
+font-family="Arial, Helvetica, sans-serif"
+font-size="14"
+font-weight="300"
+fill="#475569"
+letter-spacing="1px"
+text-anchor="middle">WEB DEVELOPMENT</text>
+
+<!-- Subtle accent line -->
+<line x1="120" y1="299" x2="280" y2="299" stroke="url(#iconGradient)" stroke-width="2" opacity="0.5"/>
+
+<!-- Small decorative elements -->
+<circle cx="130" cy="319" r="2" fill="url(#iconGradient)" opacity="0.4"/>
+<circle cx="200" cy="329" r="1.5" fill="url(#iconGradient)" opacity="0.3"/>
+<circle cx="270" cy="319" r="1" fill="url(#iconGradient)" opacity="0.5"/>
+</g>
+
+<script type="text/javascript">
+<![CDATA[
+  (function() {
+    const svg = document.querySelector('svg');
+    const logoGroup = document.getElementById('logoGroup');
+    const particles = [];
+    let animationFrame = 0;
+    const cycleDuration = 240; // frames for complete cycle
+
+    class Particle {
+      constructor(x, y, color, size) {
+        this.homeX = x;
+        this.homeY = y;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = size;
+
+        // Random properties for dispersion
+        this.velocityX = (Math.random() - 0.5) * 4;
+        this.velocityY = Math.random() * 3 + 2;
+        this.gravity = 0.15;
+        this.drag = 0.98;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+
+        // Create SVG rect element for particle
+        this.element = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        this.element.setAttribute('width', this.size);
+        this.element.setAttribute('height', this.size);
+        this.element.setAttribute('fill', this.color);
+        this.element.setAttribute('x', this.x - this.size / 2);
+        this.element.setAttribute('y', this.y - this.size / 2);
+        this.element.style.opacity = '0';
+        svg.appendChild(this.element);
+      }
+
+      update(progress) {
+        if (progress < 0.4) {
+          // Disintegration phase
+          const disintegrateProgress = progress / 0.4;
+          this.velocityY += this.gravity;
+          this.velocityX *= this.drag;
+          this.velocityY *= this.drag;
+
+          this.x += this.velocityX * disintegrateProgress * 2;
+          this.y += this.velocityY * disintegrateProgress * 2;
+          this.rotation += this.rotationSpeed;
+          
+          this.element.style.opacity = '1';
+        } else if (progress < 0.5) {
+          // Pause at dispersed state
+          this.element.style.opacity = '1';
+        } else {
+          // Recombination phase
+          const recombineProgress = (progress - 0.5) / 0.5;
+          const easeProgress = this.easeInOutCubic(recombineProgress);
+
+          this.x = this.x + (this.homeX - this.x) * easeProgress * 0.15;
+          this.y = this.y + (this.homeY - this.y) * easeProgress * 0.15;
+          this.rotation += this.rotationSpeed * (1 - easeProgress);
+          
+          // Fade out as returning
+          this.element.style.opacity = (1 - recombineProgress);
+        }
+
+        // Update element position
+        this.element.setAttribute('x', this.x - this.size / 2);
+        this.element.setAttribute('y', this.y - this.size / 2);
+        this.element.setAttribute('transform', `rotate(${this.rotation * 180 / Math.PI} ${this.x} ${this.y})`);
+      }
+
+      easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+    }
+
+    // Sample pixels from logo elements
+    function samplePixels() {
+      if (!logoGroup) {
+        console.error('Logo group not found!');
+        return;
+      }
+      
+      const logoElements = logoGroup.querySelectorAll('path, circle, line, text');
+      console.log('Found logo elements:', logoElements.length);
+
+      logoElements.forEach(element => {
+        try {
+          // Get the element's transform from its parent chain
+          let currentElement = element;
+          let transformX = 0;
+          let transformY = 0;
+          
+          while (currentElement && currentElement !== logoGroup) {
+            const transform = currentElement.getAttribute('transform');
+            if (transform) {
+              const translateMatch = transform.match(/translate\(([\d.]+)[,\s]+([\d.]+)\)/);
+              if (translateMatch) {
+                transformX += parseFloat(translateMatch[1]);
+                transformY += parseFloat(translateMatch[2]);
+              }
+            }
+            currentElement = currentElement.parentElement;
+          }
+          
+          const computedStyle = window.getComputedStyle(element);
+          const fill = computedStyle.fill || computedStyle.stroke || 'rgb(59, 130, 246)';
+          
+          let count = 0;
+          
+          // Regular bounding box sampling for all elements
+          const bbox = element.getBBox();
+          const samplingRate = 2;
+          
+          for (let y = bbox.y; y < bbox.y + bbox.height; y += samplingRate) {
+            for (let x = bbox.x; x < bbox.x + bbox.width; x += samplingRate) {
+              const globalX = x + transformX;
+              const globalY = y + transformY;
+              
+              const size = Math.random() * 2.5 + 1.5;
+              particles.push(new Particle(globalX, globalY, fill, size));
+              count++;
+            }
+          }
+          console.log('Created', count, 'particles for', element.tagName);
+        } catch (e) {
+          console.warn('Error sampling element:', e);
+        }
+      });
+      
+      console.log('Total particles created:', particles.length);
+    }
+
+    function animate() {
+      const progress = Math.min(animationFrame / cycleDuration, 1);
+
+      // Hide logo during animation, show at end
+      if (progress < 0.05) {
+        logoGroup.style.opacity = '1';
+      } else if (progress < 0.4) {
+        logoGroup.style.opacity = '0';
+      } else if (progress > 0.95) {
+        logoGroup.style.opacity = '1';
+      }
+
+      particles.forEach((particle) => {
+        particle.update(progress);
+      });
+
+      animationFrame++;
+
+      // Only continue animation until cycle is complete
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Clean up particles
+        particles.forEach(p => {
+          if (p.element && p.element.parentNode) {
+            p.element.parentNode.removeChild(p.element);
+          }
+        });
+      }
+    }
+
+    // Initialize animation on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        samplePixels();
+        animate();
+      }, 100);
+    });
+  })();
+]]>
+</script>
+</svg>

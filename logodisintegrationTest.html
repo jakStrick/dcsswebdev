@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DCSS Logo Sand Effect</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        overflow: hidden;
+      }
+
+      canvas {
+        max-width: 100%;
+        max-height: 100vh;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = 1000;
+      canvas.height = 800;
+
+      const particles = [];
+      let animationFrame = 0;
+      const cycleDuration = 240; // frames for complete cycle
+
+      class Particle {
+        constructor(x, y, color) {
+          this.homeX = x;
+          this.homeY = y;
+          this.x = x;
+          this.y = y;
+          this.color = color;
+          this.size = Math.random() * 2.5 + 1.5;
+
+          // Random properties for dispersion
+          this.velocityX = (Math.random() - 0.5) * 4;
+          this.velocityY = Math.random() * 3 + 2;
+          this.gravity = 0.15;
+          this.drag = 0.98;
+          this.rotation = Math.random() * Math.PI * 2;
+          this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+        }
+
+        update(progress) {
+          if (progress < 0.4) {
+            // Disintegration phase
+            const disintegrateProgress = progress / 0.4;
+            this.velocityY += this.gravity;
+            this.velocityX *= this.drag;
+            this.velocityY *= this.drag;
+
+            this.x += this.velocityX * disintegrateProgress * 2;
+            this.y += this.velocityY * disintegrateProgress * 2;
+            this.rotation += this.rotationSpeed;
+          } else if (progress < 0.5) {
+            // Pause at dispersed state
+          } else {
+            // Recombination phase
+            const recombineProgress = (progress - 0.5) / 0.5;
+            const easeProgress = this.easeInOutCubic(recombineProgress);
+
+            this.x = this.x + (this.homeX - this.x) * easeProgress * 0.15;
+            this.y = this.y + (this.homeY - this.y) * easeProgress * 0.15;
+            this.rotation += this.rotationSpeed * (1 - easeProgress);
+          }
+        }
+
+        easeInOutCubic(t) {
+          return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        draw() {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.rotation);
+
+          ctx.fillStyle = this.color;
+          ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+
+          ctx.restore();
+        }
+
+        reset() {
+          this.x = this.homeX;
+          this.y = this.homeY;
+          this.velocityX = (Math.random() - 0.5) * 4;
+          this.velocityY = Math.random() * 3 + 2;
+          this.rotation = Math.random() * Math.PI * 2;
+        }
+      }
+
+      // Create the logo using the actual DCSS SVG
+      function createLogo() {
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = 800;
+        tempCanvas.height = 800;
+        const tempCtx = tempCanvas.getContext("2d");
+
+        // Create SVG string with actual DCSS logo
+        const svgString = `
+          <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" width="800" height="800">
+            <defs>
+              <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+              </linearGradient>
+              <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+              </linearGradient>
+              <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+              </linearGradient>
+              <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+              </filter>
+            </defs>
+            
+            <rect width="400" height="400" rx="12" fill="url(#bgGradient)" stroke="#cbd5e1" stroke-width="1"/>
+            
+            <g transform="translate(175, 150)" filter="url(#dropShadow)">
+              <path d="M15 10 L5 10 Q0 10 0 15 L0 55 Q0 60 5 60 L15 60"
+                stroke="url(#iconGradient)"
+                stroke-width="4"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+              
+              <path d="M35 10 L45 10 Q50 10 50 15 L50 55 Q50 60 45 60 L35 60"
+                stroke="url(#iconGradient)"
+                stroke-width="4"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+              
+              <circle cx="25" cy="25" r="3" fill="url(#iconGradient)" opacity="0.8"/>
+              <circle cx="18" cy="35" r="2" fill="url(#iconGradient)" opacity="0.6"/>
+              <circle cx="32" cy="35" r="2" fill="url(#iconGradient)" opacity="0.6"/>
+              <circle cx="25" cy="45" r="3" fill="url(#iconGradient)" opacity="0.8"/>
+              
+              <line x1="25" y1="28" x2="18" y2="33" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+              <line x1="25" y1="28" x2="32" y2="33" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+              <line x1="18" y1="37" x2="25" y2="42" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+              <line x1="32" y1="37" x2="25" y2="42" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+            </g>
+            
+            <text x="200" y="264"
+              font-family="Arial, Helvetica, sans-serif"
+              font-size="32"
+              font-weight="bold"
+              fill="url(#textGradient)"
+              filter="url(#dropShadow)"
+              text-anchor="middle">DCSS LLC</text>
+            
+            <text x="200" y="289"
+              font-family="Arial, Helvetica, sans-serif"
+              font-size="14"
+              font-weight="300"
+              fill="#475569"
+              letter-spacing="1px"
+              text-anchor="middle">WEB DEVELOPMENT</text>
+            
+            <line x1="120" y1="299" x2="280" y2="299" stroke="url(#iconGradient)" stroke-width="2" opacity="0.5"/>
+            
+            <circle cx="130" cy="319" r="2" fill="url(#iconGradient)" opacity="0.4"/>
+            <circle cx="200" cy="329" r="1.5" fill="url(#iconGradient)" opacity="0.3"/>
+            <circle cx="270" cy="319" r="1" fill="url(#iconGradient)" opacity="0.5"/>
+          </svg>
+        `;
+
+        // Convert SVG to image and draw on canvas
+        const img = new Image();
+        const svgBlob = new Blob([svgString], {
+          type: "image/svg+xml;charset=utf-8",
+        });
+        const url = URL.createObjectURL(svgBlob);
+
+        return new Promise((resolve) => {
+          img.onload = () => {
+            tempCtx.drawImage(img, 0, 0, 800, 800);
+            URL.revokeObjectURL(url);
+            resolve(tempCanvas);
+          };
+          img.src = url;
+        });
+      }
+
+      // Sample pixels from logo
+      async function samplePixels() {
+        const logoCanvas = await createLogo();
+        const logoCtx = logoCanvas.getContext("2d");
+        const imageData = logoCtx.getImageData(
+          0,
+          0,
+          logoCanvas.width,
+          logoCanvas.height
+        );
+        const data = imageData.data;
+
+        const samplingRate = 3; // Sample every N pixels
+
+        for (let y = 0; y < logoCanvas.height; y += samplingRate) {
+          for (let x = 0; x < logoCanvas.width; x += samplingRate) {
+            const index = (y * logoCanvas.width + x) * 4;
+            const r = data[index];
+            const g = data[index + 1];
+            const b = data[index + 2];
+            const a = data[index + 3];
+
+            // Only create particles for non-background pixels
+            if (a > 128 && !(r > 200 && g > 200 && b > 200)) {
+              const px = x + (canvas.width - logoCanvas.width) / 2;
+              const py = y + (canvas.height - logoCanvas.height) / 2;
+              particles.push(
+                new Particle(px, py, `rgba(${r},${g},${b},${a / 255})`)
+              );
+            }
+          }
+        }
+      }
+
+      function animate() {
+        ctx.fillStyle = "rgba(102, 126, 234, 0.1)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const progress = Math.min(animationFrame / cycleDuration, 1);
+
+        particles.forEach((particle) => {
+          particle.update(progress);
+          particle.draw();
+        });
+
+        animationFrame++;
+
+        // Only continue animation until cycle is complete
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      }
+
+      // Initialize
+      (async () => {
+        await samplePixels();
+        animate();
+      })();
+
+      // Handle window resize
+      window.addEventListener("resize", () => {
+        const scale = Math.min(
+          window.innerWidth / 1000,
+          window.innerHeight / 800
+        );
+        canvas.style.transform = `scale(${scale})`;
+      });
+
+      window.dispatchEvent(new Event("resize"));
+    </script>
+  </body>
+</html>
