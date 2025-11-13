@@ -1,286 +1,534 @@
 <!-- Home Page Banner Section -->
 <section class="banner-section">
-	<div class="banner-container">
-		<svg
-			class="banner-svg"
-			width="1080"
-			height="268"
-			viewBox="0 0 1080 268"
-			xmlns="http://www.w3.org/2000/svg"
-			preserveAspectRatio="xMidYMid meet">
-			<!-- Home Page Banner - Logo and Satisfaction Badge -->
+  <div class="banner-container">
+    <svg
+      class="banner-svg"
+      id="bannerSvg"
+      width="1080"
+      height="268"
+      viewBox="0 0 1080 268"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <!-- Home Page Banner - Logo and Satisfaction Badge -->
 
-			<defs>
-				<linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-					<stop offset="0%" style="stop-color: #1e40af; stop-opacity: 1" />
-					<stop
-						offset="100%"
-						style="stop-color: #7c3aed; stop-opacity: 1" />
-				</linearGradient>
-				<linearGradient
-					id="iconGradient"
-					x1="0%"
-					y1="0%"
-					x2="100%"
-					y2="100%">
-					<stop offset="0%" style="stop-color: #3b82f6; stop-opacity: 1" />
-					<stop
-						offset="50%"
-						style="stop-color: #8b5cf6; stop-opacity: 1" />
-					<stop
-						offset="100%"
-						style="stop-color: #ef4444; stop-opacity: 1" />
-				</linearGradient>
+      <defs>
+        <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color: #1e40af; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #7c3aed; stop-opacity: 1" />
+        </linearGradient>
+        <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color: #3b82f6; stop-opacity: 1" />
+          <stop offset="50%" style="stop-color: #8b5cf6; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #ef4444; stop-opacity: 1" />
+        </linearGradient>
 
-				<!-- Gradients for satisfaction badge -->
-				<radialGradient id="outerGrad" cx="50%" cy="50%" r="50%">
-					<stop offset="0%" style="stop-color: #ffffff; stop-opacity: 1" />
-					<stop
-						offset="60%"
-						style="stop-color: #8b5cf6; stop-opacity: 1" />
-					<stop
-						offset="100%"
-						style="stop-color: #6366f1; stop-opacity: 1" />
-				</radialGradient>
+        <!-- Gradients for satisfaction badge -->
+        <radialGradient id="outerGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color: #ffffff; stop-opacity: 1" />
+          <stop offset="60%" style="stop-color: #8b5cf6; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #6366f1; stop-opacity: 1" />
+        </radialGradient>
 
-				<!-- Drop shadow filter -->
-				<filter
-					id="dropShadow"
-					x="-50%"
-					y="-50%"
-					width="200%"
-					height="200%">
-					<feDropShadow
-						dx="2"
-						dy="4"
-						stdDeviation="3"
-						flood-opacity="0.3" />
-				</filter>
-			</defs>
+        <!-- Drop shadow filter -->
+        <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.3" />
+        </filter>
+      </defs>
 
-			<!-- Logo section on the left -->
-			<g transform="translate(16, 5.4) scale(0.96)">
-				<!-- Background for logo -->
-				<rect
-					width="268"
-					height="268"
-					rx="12"
-					fill="white"
-					stroke="#cbd5e1"
-					stroke-width="1" />
+      <!-- Logo section on the left -->
+      <g id="logoSection" transform="translate(16, 5.4) scale(0.96)">
+        <!-- Background for logo -->
+        <rect
+          id="logoBackground"
+          width="268"
+          height="268"
+          rx="12"
+          fill="white"
+          stroke="#cbd5e1"
+          stroke-width="1"
+        />
 
-				<!-- Icon: Abstract code brackets with modern twist -->
-				<g transform="translate(109, 60)" filter="url(#dropShadow)">
-					<!-- Left bracket -->
-					<path
-						d="M15 10 L5 10 Q0 10 0 15 L0 55 Q0 60 5 60 L15 60"
-						stroke="url(#iconGradient)"
-						stroke-width="4"
-						fill="none"
-						stroke-linecap="round"
-						stroke-linejoin="round" />
-					<!-- Right bracket -->
-					<path
-						d="M35 10 L45 10 Q50 10 50 15 L50 55 Q50 60 45 60 L35 60"
-						stroke="url(#iconGradient)"
-						stroke-width="4"
-						fill="none"
-						stroke-linecap="round"
-						stroke-linejoin="round" />
-					<!-- Central geometric elements -->
-					<circle
-						cx="25"
-						cy="25"
-						r="3"
-						fill="url(#iconGradient)"
-						opacity="0.8" />
-					<circle
-						cx="18"
-						cy="35"
-						r="2"
-						fill="url(#iconGradient)"
-						opacity="0.6" />
-					<circle
-						cx="32"
-						cy="35"
-						r="2"
-						fill="url(#iconGradient)"
-						opacity="0.6" />
-					<circle
-						cx="25"
-						cy="45"
-						r="3"
-						fill="url(#iconGradient)"
-						opacity="0.8" />
-					<!-- Connecting lines -->
-					<line
-						x1="25"
-						y1="28"
-						x2="18"
-						y2="33"
-						stroke="url(#iconGradient)"
-						stroke-width="2"
-						opacity="0.7" />
-					<line
-						x1="25"
-						y1="28"
-						x2="32"
-						y2="33"
-						stroke="url(#iconGradient)"
-						stroke-width="2"
-						opacity="0.7" />
-					<line
-						x1="18"
-						y1="37"
-						x2="25"
-						y2="42"
-						stroke="url(#iconGradient)"
-						stroke-width="2"
-						opacity="0.7" />
-					<line
-						x1="32"
-						y1="37"
-						x2="25"
-						y2="42"
-						stroke="url(#iconGradient)"
-						stroke-width="2"
-						opacity="0.7" />
-				</g>
+        <!-- Icon: Abstract code brackets with modern twist -->
+        <g
+          id="logoIcon"
+          transform="translate(109, 60)"
+          filter="url(#dropShadow)"
+        >
+          <!-- Left bracket -->
+          <path
+            id="leftBracket"
+            d="M15 10 L5 10 Q0 10 0 15 L0 55 Q0 60 5 60 L15 60"
+            stroke="url(#iconGradient)"
+            stroke-width="4"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <!-- Right bracket -->
+          <path
+            d="M35 10 L45 10 Q50 10 50 15 L50 55 Q50 60 45 60 L35 60"
+            stroke="url(#iconGradient)"
+            stroke-width="4"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <!-- Central geometric elements -->
+          <circle
+            cx="25"
+            cy="25"
+            r="3"
+            fill="url(#iconGradient)"
+            opacity="0.8"
+          />
+          <circle
+            cx="18"
+            cy="35"
+            r="2"
+            fill="url(#iconGradient)"
+            opacity="0.6"
+          />
+          <circle
+            cx="32"
+            cy="35"
+            r="2"
+            fill="url(#iconGradient)"
+            opacity="0.6"
+          />
+          <circle
+            cx="25"
+            cy="45"
+            r="3"
+            fill="url(#iconGradient)"
+            opacity="0.8"
+          />
+          <!-- Connecting lines -->
+          <line
+            x1="25"
+            y1="28"
+            x2="18"
+            y2="33"
+            stroke="url(#iconGradient)"
+            stroke-width="2"
+            opacity="0.7"
+          />
+          <line
+            x1="25"
+            y1="28"
+            x2="32"
+            y2="33"
+            stroke="url(#iconGradient)"
+            stroke-width="2"
+            opacity="0.7"
+          />
+          <line
+            x1="18"
+            y1="37"
+            x2="25"
+            y2="42"
+            stroke="url(#iconGradient)"
+            stroke-width="2"
+            opacity="0.7"
+          />
+          <line
+            x1="32"
+            y1="37"
+            x2="25"
+            y2="42"
+            stroke="url(#iconGradient)"
+            stroke-width="2"
+            opacity="0.7"
+          />
+        </g>
 
-				<!-- Company Name -->
-				<text
-					x="134"
-					y="174"
-					font-family="Arial, Helvetica, sans-serif"
-					font-size="32"
-					font-weight="bold"
-					fill="url(#textGradient)"
-					filter="url(#dropShadow)"
-					text-anchor="middle">
-					DCSS LLC
-				</text>
+        <!-- Company Name -->
+        <text
+          x="134"
+          y="174"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="32"
+          font-weight="bold"
+          fill="url(#textGradient)"
+          filter="url(#dropShadow)"
+          text-anchor="middle"
+        >
+          DCSS LLC
+        </text>
 
-				<!-- Tagline -->
-				<text
-					x="134"
-					y="199"
-					font-family="Arial, Helvetica, sans-serif"
-					font-size="14"
-					font-weight="300"
-					fill="#475569"
-					letter-spacing="1px"
-					text-anchor="middle">
-					WEB DEVELOPMENT
-				</text>
+        <!-- Tagline -->
+        <text
+          x="134"
+          y="199"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="14"
+          font-weight="300"
+          fill="#475569"
+          letter-spacing="1px"
+          text-anchor="middle"
+        >
+          WEB DEVELOPMENT
+        </text>
 
-				<!-- Accent line -->
-				<line
-					x1="54"
-					y1="209"
-					x2="214"
-					y2="209"
-					stroke="url(#iconGradient)"
-					stroke-width="2"
-					opacity="0.5" />
-			</g>
+        <!-- Accent line -->
+        <line
+          x1="54"
+          y1="209"
+          x2="214"
+          y2="209"
+          stroke="url(#iconGradient)"
+          stroke-width="2"
+          opacity="0.5"
+        />
+      </g>
 
-			<!-- 100% Satisfaction section on the right -->
-			<g transform="translate(756, 0) scale(0.9)">
-				<!-- Outer circle with gradient -->
-				<circle cx="150" cy="150" r="140" fill="url(#outerGrad)" />
+      <!-- 100% Satisfaction section on the right -->
+      <g transform="translate(756, 0) scale(0.9)">
+        <!-- Outer circle with gradient -->
+        <circle cx="150" cy="150" r="140" fill="url(#outerGrad)" />
 
-				<!-- Decorative border -->
-				<circle
-					cx="150"
-					cy="150"
-					r="135"
-					fill="none"
-					stroke="#FFD700"
-					stroke-width="3" />
-				<circle
-					cx="150"
-					cy="150"
-					r="125"
-					fill="none"
-					stroke="#FFD700"
-					stroke-width="1" />
+        <!-- Decorative border -->
+        <circle
+          cx="150"
+          cy="150"
+          r="135"
+          fill="none"
+          stroke="#FFD700"
+          stroke-width="3"
+        />
+        <circle
+          cx="150"
+          cy="150"
+          r="125"
+          fill="none"
+          stroke="#FFD700"
+          stroke-width="1"
+        />
 
-				<!-- Inner circle -->
-				<circle cx="150" cy="150" r="120" fill="white" />
+        <!-- Inner circle -->
+        <circle cx="150" cy="150" r="120" fill="white" />
 
-				<!-- Stars decoration -->
-				<g>
-					<!-- Top star -->
-					<polygon
-						points="150,40 155,55 170,55 158,65 163,80 150,70 137,80 142,65 130,55 145,55"
-						fill="#5B21B6" />
-					<!-- Bottom star -->
-					<polygon
-						points="150,260 155,245 170,245 158,235 163,220 150,230 137,220 142,235 130,245 145,245"
-						fill="#7C3AED" />
-					<!-- Left star -->
-					<polygon
-						points="40,150 55,155 55,170 65,158 80,163 70,150 80,137 65,142 55,130 55,145"
-						fill="#6D28D9" />
-					<!-- Right star -->
-					<polygon
-						points="260,150 245,155 245,170 235,158 220,163 230,150 220,137 235,142 245,130 245,145"
-						fill="#4C1D95" />
-				</g>
+        <!-- Stars decoration -->
+        <g>
+          <!-- Top star -->
+          <polygon
+            points="150,40 155,55 170,55 158,65 163,80 150,70 137,80 142,65 130,55 145,55"
+            fill="#5B21B6"
+          />
+          <!-- Bottom star -->
+          <polygon
+            points="150,260 155,245 170,245 158,235 163,220 150,230 137,220 142,235 130,245 145,245"
+            fill="#7C3AED"
+          />
+          <!-- Left star -->
+          <polygon
+            points="40,150 55,155 55,170 65,158 80,163 70,150 80,137 65,142 55,130 55,145"
+            fill="#6D28D9"
+          />
+          <!-- Right star -->
+          <polygon
+            points="260,150 245,155 245,170 235,158 220,163 230,150 220,137 235,142 245,130 245,145"
+            fill="#4C1D95"
+          />
+        </g>
 
-				<!-- Main text -->
-				<text
-					x="150"
-					y="120"
-					font-family="Arial, sans-serif"
-					font-size="28"
-					font-weight="bold"
-					text-anchor="middle"
-					fill="#4C1D95">
-					100%
-				</text>
+        <!-- Main text -->
+        <text
+          x="150"
+          y="120"
+          font-family="Arial, sans-serif"
+          font-size="28"
+          font-weight="bold"
+          text-anchor="middle"
+          fill="#4C1D95"
+        >
+          100%
+        </text>
 
-				<!-- Satisfaction text -->
-				<text
-					x="150"
-					y="150"
-					font-family="Arial, sans-serif"
-					font-size="18"
-					font-weight="bold"
-					text-anchor="middle"
-					fill="#4C1D95">
-					SATISFACTION
-				</text>
+        <!-- Satisfaction text -->
+        <text
+          x="150"
+          y="150"
+          font-family="Arial, sans-serif"
+          font-size="18"
+          font-weight="bold"
+          text-anchor="middle"
+          fill="#4C1D95"
+        >
+          SATISFACTION
+        </text>
 
-				<!-- Guaranteed text -->
-				<text
-					x="150"
-					y="175"
-					font-family="Arial, sans-serif"
-					font-size="18"
-					font-weight="bold"
-					text-anchor="middle"
-					fill="#4C1D95">
-					GUARANTEED
-				</text>
+        <!-- Guaranteed text -->
+        <text
+          x="150"
+          y="175"
+          font-family="Arial, sans-serif"
+          font-size="18"
+          font-weight="bold"
+          text-anchor="middle"
+          fill="#4C1D95"
+        >
+          GUARANTEED
+        </text>
 
-				<!-- Checkmark icon -->
-				<g transform="translate(150, 200)">
-					<circle
-						r="20"
-						fill="white"
-						opacity="0.9"
-						stroke="#8B5CF6"
-						stroke-width="2" />
-					<path
-						d="M-8,0 L-2,6 L8,-6"
-						stroke="#6366F1"
-						stroke-width="4"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						fill="none" />
-				</g>
-			</g>
-		</svg>
-	</div>
+        <!-- Checkmark icon -->
+        <g transform="translate(150, 200)">
+          <circle
+            r="20"
+            fill="white"
+            opacity="0.9"
+            stroke="#8B5CF6"
+            stroke-width="2"
+          />
+          <path
+            d="M-8,0 L-2,6 L8,-6"
+            stroke="#6366F1"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+        </g>
+      </g>
+    </svg>
+  </div>
 </section>
+
+<script>
+  (function () {
+    console.log("Sand animation script loaded");
+
+    // Wait for DOM to be ready
+    function initAnimation() {
+      console.log("Initializing animation...");
+
+      // Sand particle disintegration and reconstruction animation
+      const svg = document.getElementById("bannerSvg");
+      const logoSection = document.getElementById("logoSection");
+
+      console.log("SVG found:", !!svg);
+      console.log("Logo section found:", !!logoSection);
+
+      if (!svg || !logoSection) {
+        console.error("SVG or logoSection not found!");
+        return;
+      }
+
+      // Create a group for particles
+      const particleGroup = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "g"
+      );
+      particleGroup.setAttribute("id", "particleGroup");
+      svg.insertBefore(particleGroup, logoSection);
+
+      // Configuration
+      const config = {
+        particleCount: 800,
+        disintegrationDuration: 2000,
+        reconstructionDelay: 500,
+        reconstructionDuration: 1500,
+        fallDistance: 400,
+      };
+
+      // Store original elements
+      const elements = Array.from(
+        logoSection.querySelectorAll("rect, path, text, line, circle")
+      );
+      const particles = [];
+
+      console.log("Found elements:", elements.length);
+
+      // Create particles from elements
+      function createParticles() {
+        console.log("Creating particles...");
+        elements.forEach((element) => {
+          try {
+            const bbox = element.getBBox();
+            const transform = logoSection.getAttribute("transform");
+
+            // Parse transform to get translation and scale
+            const translateMatch = transform.match(
+              /translate\(([-\d.]+),\s*([-\d.]+)\)/
+            );
+            const scaleMatch = transform.match(/scale\(([-\d.]+)\)/);
+            const tx = translateMatch ? parseFloat(translateMatch[1]) : 0;
+            const ty = translateMatch ? parseFloat(translateMatch[2]) : 0;
+            const scale = scaleMatch ? parseFloat(scaleMatch[1]) : 1;
+
+            // Calculate actual position
+            const actualX = bbox.x * scale + tx;
+            const actualY = bbox.y * scale + ty;
+            const actualWidth = bbox.width * scale;
+            const actualHeight = bbox.height * scale;
+
+            // Number of particles based on element size
+            const area = actualWidth * actualHeight;
+            const numParticles = Math.max(
+              10,
+              Math.min(100, Math.floor(area / 50))
+            );
+
+            // Get element color
+            let color =
+              element.getAttribute("fill") ||
+              element.getAttribute("stroke") ||
+              "#4C1D95";
+            if (color.includes("url")) {
+              color = "#6366f1"; // Default gradient color
+            }
+
+            for (let i = 0; i < numParticles; i++) {
+              const x = actualX + Math.random() * actualWidth;
+              const y = actualY + Math.random() * actualHeight;
+
+              const particle = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "circle"
+              );
+              particle.setAttribute("cx", x);
+              particle.setAttribute("cy", y);
+              particle.setAttribute("r", Math.random() * 1.5 + 0.5);
+              particle.setAttribute("fill", color);
+              particle.setAttribute("opacity", "0");
+
+              particleGroup.appendChild(particle);
+
+              particles.push({
+                element: particle,
+                startX: x,
+                startY: y,
+                targetX: x + (Math.random() - 0.5) * 200 * (x < 150 ? -1 : 1),
+                targetY: y + config.fallDistance + Math.random() * 200,
+                delay: Math.random() * 500,
+                speed: 0.5 + Math.random() * 0.5,
+              });
+            }
+          } catch (e) {
+            console.warn("Error processing element:", e);
+          }
+        });
+        console.log("Total particles created:", particles.length);
+      }
+
+      // Disintegration animation
+      function disintegrate() {
+        console.log("Starting disintegration...");
+
+        // Fade out original logo
+        logoSection.style.transition = "opacity 800ms ease-out";
+        logoSection.style.opacity = "0";
+
+        particles.forEach((particle) => {
+          setTimeout(() => {
+            particle.element.setAttribute("opacity", "1");
+
+            const duration = config.disintegrationDuration * particle.speed;
+            const startTime = Date.now();
+
+            function animate() {
+              const elapsed = Date.now() - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+
+              // Easing function for natural fall
+              const eased = 1 - Math.pow(1 - progress, 3);
+
+              const currentX =
+                particle.startX + (particle.targetX - particle.startX) * eased;
+              const currentY =
+                particle.startY + (particle.targetY - particle.startY) * eased;
+
+              particle.element.setAttribute("cx", currentX);
+              particle.element.setAttribute("cy", currentY);
+
+              // Fade out as they fall
+              const opacity = 1 - progress * 0.5;
+              particle.element.setAttribute("opacity", opacity);
+
+              if (progress < 1) {
+                requestAnimationFrame(animate);
+              }
+            }
+
+            animate();
+          }, particle.delay);
+        });
+      }
+
+      // Reconstruction animation
+      function reconstruct() {
+        console.log("Starting reconstruction...");
+        particles.forEach((particle) => {
+          particle.element.setAttribute("opacity", "1");
+
+          const duration = config.reconstructionDuration * particle.speed;
+          const startTime = Date.now();
+
+          // Get current position
+          const currentX = parseFloat(particle.element.getAttribute("cx"));
+          const currentY = parseFloat(particle.element.getAttribute("cy"));
+
+          function animate() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Easing function for reconstruction
+            const eased =
+              progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+            const x = currentX + (particle.startX - currentX) * eased;
+            const y = currentY + (particle.startY - currentY) * eased;
+
+            particle.element.setAttribute("cx", x);
+            particle.element.setAttribute("cy", y);
+            particle.element.setAttribute("opacity", 1 - progress);
+
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              particle.element.setAttribute("opacity", "0");
+            }
+          }
+
+          animate();
+        });
+
+        // Fade in original logo
+        setTimeout(() => {
+          logoSection.style.transition = "opacity 800ms ease-in";
+          logoSection.style.opacity = "1";
+          console.log("Animation complete!");
+        }, config.reconstructionDuration - 600);
+      }
+
+      // Start animation sequence
+      function startAnimation() {
+        console.log("Starting animation sequence...");
+        createParticles();
+
+        // Wait a moment before starting
+        setTimeout(() => {
+          disintegrate();
+
+          // Start reconstruction after disintegration
+          setTimeout(() => {
+            reconstruct();
+          }, config.disintegrationDuration + config.reconstructionDelay);
+        }, 500);
+      }
+
+      // Start immediately since we're already in the callback
+      startAnimation();
+    }
+
+    // Run animation on page load
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initAnimation);
+    } else {
+      // DOM already loaded, run immediately
+      initAnimation();
+    }
+  })();
+</script>
