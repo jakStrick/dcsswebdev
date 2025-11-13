@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Excel Data Viewer</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+					Oxygen, Ubuntu, Cantarell, sans-serif;
+				background-color: #f3f4f6;
+				min-height: 100vh;
+				padding: 1.5rem;
+			}
+
+			.container {
+				max-width: 1400px;
+				margin: 0 auto;
+			}
+
+			.header-card {
+				background: white;
+				border-radius: 0.5rem;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+				padding: 1.5rem;
+				margin-bottom: 1.5rem;
+			}
+
+			h1 {
+				font-size: 1.5rem;
+				font-weight: bold;
+				color: #1f2937;
+				margin-bottom: 0.5rem;
+			}
+
+			.file-name {
+				color: #6b7280;
+				margin-bottom: 1rem;
+			}
+
+			.file-input-wrapper {
+				margin-bottom: 1rem;
+			}
+
+			.file-input-label {
+				display: block;
+				font-size: 0.875rem;
+				font-weight: 500;
+				color: #374151;
+				margin-bottom: 0.5rem;
+			}
+
+			input[type="file"] {
+				display: block;
+				width: 100%;
+				padding: 0.5rem;
+				border: 1px solid #d1d5db;
+				border-radius: 0.375rem;
+				font-size: 0.875rem;
+			}
+
+			.sheet-selector {
+				margin-bottom: 1rem;
+			}
+
+			.sheet-selector label {
+				display: block;
+				font-size: 0.875rem;
+				font-weight: 500;
+				color: #374151;
+				margin-bottom: 0.5rem;
+			}
+
+			select {
+				border: 1px solid #d1d5db;
+				border-radius: 0.375rem;
+				padding: 0.5rem 0.75rem;
+				font-size: 0.875rem;
+				background-color: white;
+				cursor: pointer;
+			}
+
+			select:focus {
+				outline: none;
+				border-color: #3b82f6;
+				box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+			}
+
+			.stats-row {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.stats {
+				font-size: 0.875rem;
+				color: #6b7280;
+			}
+
+			.refresh-btn {
+				background-color: #3b82f6;
+				color: white;
+				padding: 0.5rem 1rem;
+				border: none;
+				border-radius: 0.375rem;
+				font-size: 0.875rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: background-color 0.2s;
+			}
+
+			.refresh-btn:hover {
+				background-color: #2563eb;
+			}
+
+			.table-card {
+				background: white;
+				border-radius: 0.5rem;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+				overflow: hidden;
+			}
+
+			.table-wrapper {
+				overflow-x: auto;
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+
+			thead {
+				background-color: #f9fafb;
+			}
+
+			th {
+				padding: 0.75rem 1rem;
+				text-align: left;
+				font-size: 0.75rem;
+				font-weight: 500;
+				color: #6b7280;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				border-bottom: 1px solid #e5e7eb;
+			}
+
+			th:first-child {
+				position: sticky;
+				left: 0;
+				background-color: #f3f4f6;
+				z-index: 10;
+			}
+
+			tbody tr {
+				border-bottom: 1px solid #e5e7eb;
+			}
+
+			tbody tr:hover {
+				background-color: #f9fafb;
+			}
+
+			td {
+				padding: 0.75rem 1rem;
+				font-size: 0.875rem;
+				color: #111827;
+				white-space: nowrap;
+			}
+
+			td:first-child {
+				position: sticky;
+				left: 0;
+				background-color: #f9fafb;
+				font-weight: 500;
+				color: #6b7280;
+				z-index: 5;
+			}
+
+			tbody tr:hover td:first-child {
+				background-color: #f3f4f6;
+			}
+
+			.loading,
+			.error,
+			.empty {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 400px;
+				text-align: center;
+			}
+
+			.spinner {
+				border: 3px solid #e5e7eb;
+				border-top: 3px solid #3b82f6;
+				border-radius: 50%;
+				width: 3rem;
+				height: 3rem;
+				animation: spin 1s linear infinite;
+				margin: 0 auto 1rem;
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.error-box {
+				background-color: #fef2f2;
+				border: 1px solid #fecaca;
+				border-radius: 0.5rem;
+				padding: 1.5rem;
+				max-width: 500px;
+			}
+
+			.error-box h2 {
+				color: #991b1b;
+				font-size: 1.125rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.error-box p {
+				color: #dc2626;
+				margin-bottom: 1rem;
+			}
+
+			.error-box .note {
+				font-size: 0.875rem;
+				color: #6b7280;
+			}
+
+			.empty-box {
+				background-color: #fefce8;
+				border: 1px solid #fde68a;
+				border-radius: 0.5rem;
+				padding: 1.5rem;
+				margin-top: 1.5rem;
+			}
+
+			.empty-box p {
+				color: #92400e;
+			}
+
+			.hidden {
+				display: none;
+			}
+
+			/* View Toggle Buttons */
+			.view-toggle {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+			}
+
+			.view-toggle button {
+				padding: 0.5rem 1rem;
+				border: 2px solid #e5e7eb;
+				background: white;
+				border-radius: 0.375rem;
+				cursor: pointer;
+				font-weight: 500;
+				transition: all 0.2s;
+			}
+
+			.view-toggle button.active {
+				background: #3b82f6;
+				color: white;
+				border-color: #3b82f6;
+			}
+
+			.view-toggle button:hover:not(.active) {
+				border-color: #3b82f6;
+				background: #eff6ff;
+			}
+
+			/* Pressure Visualization Styles */
+			#pressureView {
+				width: 100%;
+			}
+
+			.month-buttons {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+				flex-wrap: wrap;
+			}
+
+			.month-btn {
+				padding: 0.5rem 1rem;
+				border: none;
+				border-radius: 0.5rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all 0.2s;
+			}
+
+			.month-btn.active-all {
+				background: #3b82f6;
+				color: white;
+			}
+
+			.month-btn.active-08 {
+				background: #8884d8;
+				color: white;
+			}
+
+			.month-btn.active-09 {
+				background: #82ca9d;
+				color: white;
+			}
+
+			.month-btn.active-10 {
+				background: #ffc658;
+				color: white;
+			}
+
+			.month-btn.active-11 {
+				background: #ff7c7c;
+				color: white;
+			}
+
+			.month-btn:not([class*="active"]) {
+				background: #e5e7eb;
+				color: #374151;
+			}
+
+			.month-btn:not([class*="active"]):hover {
+				background: #d1d5db;
+			}
+
+			.chart-container {
+				position: relative;
+				height: 500px;
+				background: white;
+				padding: 1rem;
+				border-radius: 0.5rem;
+				margin-bottom: 1rem;
+			}
+
+			.stats-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 1rem;
+				margin-bottom: 1rem;
+			}
+
+			.stat-card {
+				background: white;
+				border-radius: 0.5rem;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+				padding: 1rem;
+			}
+
+			.stat-card h3 {
+				font-size: 1.125rem;
+				font-weight: bold;
+				margin-bottom: 0.5rem;
+			}
+
+			.stat-values {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 0.5rem;
+				font-size: 0.875rem;
+			}
+
+			.stat-value p:first-child {
+				color: #6b7280;
+			}
+
+			.stat-value p:last-child {
+				font-weight: 600;
+			}
+
+			.observation-box {
+				background: #eff6ff;
+				border: 1px solid #bfdbfe;
+				border-radius: 0.5rem;
+				padding: 1rem;
+			}
+
+			.observation-box h3 {
+				color: #1e3a8a;
+				font-weight: 600;
+				margin-bottom: 0.5rem;
+			}
+
+			.observation-box ul {
+				color: #1e40af;
+				font-size: 0.875rem;
+				list-style: none;
+				padding-left: 0;
+			}
+
+			.observation-box li {
+				margin-bottom: 0.25rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div id="loadingView" class="loading hidden">
+				<div>
+					<div class="spinner"></div>
+					<p style="color: #6b7280">Loading Excel file...</p>
+				</div>
+			</div>
+
+			<div id="errorView" class="error hidden">
+				<div class="error-box">
+					<h2>Error Loading File</h2>
+					<p id="errorMessage"></p>
+					<p class="note">
+						Please select a valid Excel file (.xlsx, .xls)
+					</p>
+				</div>
+			</div>
+
+			<div id="mainView">
+				<div class="header-card">
+					<h1>Excel Data Viewer</h1>
+
+					<div class="view-toggle">
+						<button id="tableViewBtn" class="active">Table View</button>
+						<button id="pressureViewBtn">Pressure Visualization</button>
+					</div>
+
+					<p class="file-name" id="fileName">No file selected</p>
+
+					<div class="file-input-wrapper">
+						<label class="file-input-label" for="fileInput">
+							Select Excel File:
+						</label>
+						<input type="file" id="fileInput" accept=".xlsx,.xls" />
+					</div>
+
+					<div id="sheetSelectorWrapper" class="sheet-selector hidden">
+						<label for="sheetSelector">Select Sheet:</label>
+						<select id="sheetSelector"></select>
+					</div>
+
+					<div class="stats-row">
+						<p class="stats" id="stats">0 rows × 0 columns</p>
+						<button class="refresh-btn" id="refreshBtn" disabled>
+							Refresh
+						</button>
+					</div>
+				</div>
+
+				<!-- Table View -->
+				<div id="tableViewContent">
+					<div class="table-card">
+						<div class="table-wrapper">
+							<table id="dataTable">
+								<thead id="tableHead"></thead>
+								<tbody id="tableBody"></tbody>
+							</table>
+						</div>
+					</div>
+
+					<div id="emptyView" class="empty-box hidden">
+						<p>
+							No data found in the selected sheet. The sheet may be
+							empty.
+						</p>
+					</div>
+				</div>
+
+				<!-- Pressure Visualization View -->
+				<div id="pressureView" class="hidden">
+					<div class="header-card">
+						<h2 style="font-size: 1.875rem; margin-bottom: 0.5rem">
+							Pressure Data Analysis (Aug-Nov 2025)
+						</h2>
+						<p class="file-name">
+							Tracking pressure fluctuations across process states
+						</p>
+
+						<div class="month-buttons">
+							<button class="month-btn active-all" data-month="all">
+								All Months
+							</button>
+							<button class="month-btn" data-month="08">August</button>
+							<button class="month-btn" data-month="09">
+								September
+							</button>
+							<button class="month-btn" data-month="10">October</button>
+							<button class="month-btn" data-month="11">November</button>
+						</div>
+					</div>
+
+					<div class="chart-container">
+						<canvas id="pressureChart"></canvas>
+					</div>
+
+					<div class="stats-grid" id="monthStats"></div>
+
+					<div class="observation-box">
+						<h3>Key Observations:</h3>
+						<ul>
+							<li>
+								• Pressure starts high (~755-760 Torr) during WAFER
+								WARMUP phase
+							</li>
+							<li>
+								• Sharp drops occur during DEHYDRATION process (down to
+								~11-15 Torr)
+							</li>
+							<li>
+								• Pressure gradually recovers after dehydration cycles
+							</li>
+							<li>
+								• Pattern repeats consistently across all four months
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			let workbook = null;
+			let currentData = [];
+			let currentHeaders = [];
+			let currentSheetIndex = 0;
+
+			const fileInput = document.getElementById("fileInput");
+			const sheetSelector = document.getElementById("sheetSelector");
+			const sheetSelectorWrapper = document.getElementById(
+				"sheetSelectorWrapper"
+			);
+			const refreshBtn = document.getElementById("refreshBtn");
+			const fileName = document.getElementById("fileName");
+			const stats = document.getElementById("stats");
+			const tableHead = document.getElementById("tableHead");
+			const tableBody = document.getElementById("tableBody");
+			const loadingView = document.getElementById("loadingView");
+			const errorView = document.getElementById("errorView");
+			const mainView = document.getElementById("mainView");
+			const emptyView = document.getElementById("emptyView");
+			const errorMessage = document.getElementById("errorMessage");
+
+			fileInput.addEventListener("change", handleFileSelect);
+			sheetSelector.addEventListener("change", handleSheetChange);
+			refreshBtn.addEventListener("click", () => {
+				if (workbook) {
+					loadSheetData(currentSheetIndex);
+				}
+			});
+
+			function handleFileSelect(e) {
+				const file = e.target.files[0];
+				if (!file) return;
+
+				showLoading();
+
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					try {
+						const data = new Uint8Array(e.target.result);
+						workbook = XLSX.read(data, { type: "array" });
+
+						fileName.textContent = `File: ${file.name}`;
+						refreshBtn.disabled = false;
+
+						// Populate sheet selector
+						populateSheetSelector();
+
+						// Load first sheet
+						loadSheetData(0);
+
+						hideLoading();
+					} catch (err) {
+						showError(err.message);
+					}
+				};
+
+				reader.onerror = function () {
+					showError("Failed to read file");
+				};
+
+				reader.readAsArrayBuffer(file);
+			}
+
+			function populateSheetSelector() {
+				sheetSelector.innerHTML = "";
+				workbook.SheetNames.forEach((name, idx) => {
+					const option = document.createElement("option");
+					option.value = idx;
+					option.textContent = name;
+					sheetSelector.appendChild(option);
+				});
+
+				if (workbook.SheetNames.length > 1) {
+					sheetSelectorWrapper.classList.remove("hidden");
+				} else {
+					sheetSelectorWrapper.classList.add("hidden");
+				}
+			}
+
+			function handleSheetChange(e) {
+				currentSheetIndex = parseInt(e.target.value);
+				loadSheetData(currentSheetIndex);
+			}
+
+			function loadSheetData(sheetIndex) {
+				try {
+					const sheetName = workbook.SheetNames[sheetIndex];
+					const worksheet = workbook.Sheets[sheetName];
+
+					// Convert to JSON
+					const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+						header: 1,
+					});
+
+					if (jsonData.length > 0) {
+						currentHeaders = jsonData[0];
+						currentData = jsonData.slice(1);
+					} else {
+						currentHeaders = [];
+						currentData = [];
+					}
+
+					renderTable();
+					updateStats();
+
+					if (currentData.length === 0) {
+						emptyView.classList.remove("hidden");
+					} else {
+						emptyView.classList.add("hidden");
+					}
+				} catch (err) {
+					showError(err.message);
+				}
+			}
+
+			function renderTable() {
+				// Render headers
+				tableHead.innerHTML = "";
+				const headerRow = document.createElement("tr");
+
+				// Row number header
+				const thRowNum = document.createElement("th");
+				thRowNum.textContent = "#";
+				headerRow.appendChild(thRowNum);
+
+				// Data headers
+				currentHeaders.forEach((header, idx) => {
+					const th = document.createElement("th");
+					th.textContent = header || `Column ${idx + 1}`;
+					headerRow.appendChild(th);
+				});
+
+				tableHead.appendChild(headerRow);
+
+				// Render body
+				tableBody.innerHTML = "";
+				currentData.forEach((row, rowIdx) => {
+					const tr = document.createElement("tr");
+
+					// Row number
+					const tdRowNum = document.createElement("td");
+					tdRowNum.textContent = rowIdx + 1;
+					tr.appendChild(tdRowNum);
+
+					// Data cells
+					currentHeaders.forEach((_, colIdx) => {
+						const td = document.createElement("td");
+						const value = row[colIdx];
+						td.textContent =
+							value !== undefined && value !== null
+								? String(value)
+								: "-";
+						tr.appendChild(td);
+					});
+
+					tableBody.appendChild(tr);
+				});
+			}
+
+			function updateStats() {
+				stats.textContent = `${currentData.length} rows × ${currentHeaders.length} columns`;
+			}
+
+			function showLoading() {
+				mainView.classList.add("hidden");
+				errorView.classList.add("hidden");
+				loadingView.classList.remove("hidden");
+			}
+
+			function hideLoading() {
+				loadingView.classList.add("hidden");
+				mainView.classList.remove("hidden");
+			}
+
+			function showError(message) {
+				loadingView.classList.add("hidden");
+				mainView.classList.add("hidden");
+				errorMessage.textContent = message;
+				errorView.classList.remove("hidden");
+			}
+
+			// Pressure Visualization functionality
+			let pressureChart = null;
+			let pressureData = { "08": [], "09": [], 10: [], 11: [] };
+			let selectedMonth = "all";
+
+			const tableViewBtn = document.getElementById("tableViewBtn");
+			const pressureViewBtn = document.getElementById("pressureViewBtn");
+			const tableViewContent = document.getElementById("tableViewContent");
+			const pressureView = document.getElementById("pressureView");
+			const monthButtons = document.querySelectorAll(".month-btn");
+
+			// View toggle handlers
+			tableViewBtn.addEventListener("click", () => {
+				tableViewBtn.classList.add("active");
+				pressureViewBtn.classList.remove("active");
+				tableViewContent.classList.remove("hidden");
+				pressureView.classList.add("hidden");
+			});
+
+			pressureViewBtn.addEventListener("click", () => {
+				pressureViewBtn.classList.add("active");
+				tableViewBtn.classList.remove("active");
+				pressureView.classList.remove("hidden");
+				tableViewContent.classList.add("hidden");
+
+				// Process data for pressure visualization
+				if (workbook && currentData.length > 0) {
+					processPressureData();
+					renderPressureChart();
+					renderMonthStats();
+				}
+			});
+
+			// Month button handlers
+			monthButtons.forEach((btn) => {
+				btn.addEventListener("click", () => {
+					selectedMonth = btn.dataset.month;
+
+					// Update active state
+					monthButtons.forEach((b) => {
+						b.className = "month-btn";
+					});
+					btn.classList.add(`active-${selectedMonth}`);
+
+					renderPressureChart();
+				});
+			});
+
+			function processPressureData() {
+				pressureData = { "08": [], "09": [], 10: [], 11: [] };
+
+				// Find columns for each month
+				const monthColumns = {
+					"08": { dt: -1, pressure: -1, state: -1 },
+					"09": { dt: -1, pressure: -1, state: -1 },
+					10: { dt: -1, pressure: -1, state: -1 },
+					11: { dt: -1, pressure: -1, state: -1 },
+				};
+
+				// Find column indices
+				currentHeaders.forEach((header, idx) => {
+					for (let month of ["08", "09", "10", "11"]) {
+						if (header.includes(`${month}_DateTime`)) {
+							monthColumns[month].dt = idx;
+						} else if (header.includes(`${month}_Pressure`)) {
+							monthColumns[month].pressure = idx;
+						} else if (header.includes(`${month}_ProcessState`)) {
+							monthColumns[month].state = idx;
+						}
+					}
+				});
+
+				// Process each row
+				currentData.forEach((row, rowIdx) => {
+					for (let month of ["08", "09", "10", "11"]) {
+						const cols = monthColumns[month];
+						if (cols.dt !== -1 && cols.pressure !== -1) {
+							const datetime = row[cols.dt];
+							const pressure = parseFloat(row[cols.pressure]);
+							const state = cols.state !== -1 ? row[cols.state] : "";
+
+							if (datetime && !isNaN(pressure)) {
+								pressureData[month].push({
+									datetime,
+									pressure,
+									state,
+									sequence: pressureData[month].length,
+								});
+							}
+						}
+					}
+				});
+			}
+
+			function renderPressureChart() {
+				const canvas = document.getElementById("pressureChart");
+				const ctx = canvas.getContext("2d");
+
+				// Destroy existing chart
+				if (pressureChart) {
+					pressureChart.destroy();
+				}
+
+				let datasets = [];
+				let labels = [];
+
+				const monthColors = {
+					"08": "#8884d8",
+					"09": "#82ca9d",
+					10: "#ffc658",
+					11: "#ff7c7c",
+				};
+
+				if (selectedMonth === "all") {
+					// Show all months
+					let offset = 0;
+					for (let month of ["08", "09", "10", "11"]) {
+						const data = pressureData[month];
+						const monthName =
+							month === "08"
+								? "August"
+								: month === "09"
+								? "September"
+								: month === "10"
+								? "October"
+								: "November";
+
+						// Extend labels
+						for (let i = 0; i < data.length; i++) {
+							labels.push(offset + i);
+						}
+
+						// Create dataset for this month
+						const fullData = new Array(labels.length).fill(null);
+						data.forEach((point, idx) => {
+							fullData[offset + idx] = point.pressure;
+						});
+
+						datasets.push({
+							label: monthName,
+							data: fullData,
+							borderColor: monthColors[month],
+							backgroundColor: monthColors[month] + "20",
+							borderWidth: 2,
+							pointRadius: 0,
+							tension: 0,
+						});
+
+						offset += data.length;
+					}
+				} else {
+					// Show single month
+					const data = pressureData[selectedMonth];
+					const monthName =
+						selectedMonth === "08"
+							? "August"
+							: selectedMonth === "09"
+							? "September"
+							: selectedMonth === "10"
+							? "October"
+							: "November";
+
+					labels = data.map((_, idx) => idx);
+					datasets.push({
+						label: "Pressure (Torr)",
+						data: data.map((d) => d.pressure),
+						borderColor: "#8884d8",
+						backgroundColor: "#8884d820",
+						borderWidth: 2,
+						pointRadius: 0,
+						tension: 0,
+					});
+				}
+
+				pressureChart = new Chart(ctx, {
+					type: "line",
+					data: {
+						labels: labels,
+						datasets: datasets,
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								display: true,
+								position: "top",
+							},
+							tooltip: {
+								mode: "index",
+								intersect: false,
+								callbacks: {
+									title: function (context) {
+										if (selectedMonth === "all") {
+											// Find which month this point belongs to
+											let idx = context[0].dataIndex;
+											let offset = 0;
+											for (let month of ["08", "09", "10", "11"]) {
+												const len = pressureData[month].length;
+												if (idx < offset + len) {
+													const point =
+														pressureData[month][idx - offset];
+													return (
+														point.datetime + " - " + point.state
+													);
+												}
+												offset += len;
+											}
+										} else {
+											const point =
+												pressureData[selectedMonth][
+													context[0].dataIndex
+												];
+											return point
+												? point.datetime + " - " + point.state
+												: "";
+										}
+										return "";
+									},
+								},
+							},
+						},
+						scales: {
+							x: {
+								title: {
+									display: true,
+									text: "Sample Number",
+								},
+								ticks: {
+									maxTicksLimit: 20,
+								},
+							},
+							y: {
+								title: {
+									display: true,
+									text: "Pressure (Torr)",
+								},
+								beginAtZero: true,
+							},
+						},
+					},
+				});
+			}
+
+			function renderMonthStats() {
+				const container = document.getElementById("monthStats");
+				container.innerHTML = "";
+
+				for (let month of ["08", "09", "10", "11"]) {
+					const data = pressureData[month];
+					if (data.length === 0) continue;
+
+					const pressures = data.map((d) => d.pressure);
+					const min = Math.min(...pressures);
+					const max = Math.max(...pressures);
+					const avg = (
+						pressures.reduce((a, b) => a + b, 0) / pressures.length
+					).toFixed(1);
+
+					const monthName =
+						month === "08"
+							? "August"
+							: month === "09"
+							? "September"
+							: month === "10"
+							? "October"
+							: "November";
+
+					const card = document.createElement("div");
+					card.className = "stat-card";
+					card.innerHTML = `
+						<h3>${monthName} 2025</h3>
+						<div class="stat-values">
+							<div class="stat-value">
+								<p>Min</p>
+								<p>${min} Torr</p>
+							</div>
+							<div class="stat-value">
+								<p>Max</p>
+								<p>${max} Torr</p>
+							</div>
+							<div class="stat-value">
+								<p>Avg</p>
+								<p>${avg} Torr</p>
+							</div>
+						</div>
+						<p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">
+							${data.length} samples
+						</p>
+					`;
+
+					container.appendChild(card);
+				}
+			}
+		</script>
+	</body>
+</html>
