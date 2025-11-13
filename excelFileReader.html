@@ -1,1010 +1,2407 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Excel Data Viewer</title>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-		<style>
-			* {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-			}
-
-			body {
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-					Oxygen, Ubuntu, Cantarell, sans-serif;
-				background-color: #f3f4f6;
-				min-height: 100vh;
-				padding: 1.5rem;
-			}
-
-			.container {
-				max-width: 1400px;
-				margin: 0 auto;
-			}
-
-			.header-card {
-				background: white;
-				border-radius: 0.5rem;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-				padding: 1.5rem;
-				margin-bottom: 1.5rem;
-			}
-
-			h1 {
-				font-size: 1.5rem;
-				font-weight: bold;
-				color: #1f2937;
-				margin-bottom: 0.5rem;
-			}
-
-			.file-name {
-				color: #6b7280;
-				margin-bottom: 1rem;
-			}
-
-			.file-input-wrapper {
-				margin-bottom: 1rem;
-			}
-
-			.file-input-label {
-				display: block;
-				font-size: 0.875rem;
-				font-weight: 500;
-				color: #374151;
-				margin-bottom: 0.5rem;
-			}
-
-			input[type="file"] {
-				display: block;
-				width: 100%;
-				padding: 0.5rem;
-				border: 1px solid #d1d5db;
-				border-radius: 0.375rem;
-				font-size: 0.875rem;
-			}
-
-			.sheet-selector {
-				margin-bottom: 1rem;
-			}
-
-			.sheet-selector label {
-				display: block;
-				font-size: 0.875rem;
-				font-weight: 500;
-				color: #374151;
-				margin-bottom: 0.5rem;
-			}
-
-			select {
-				border: 1px solid #d1d5db;
-				border-radius: 0.375rem;
-				padding: 0.5rem 0.75rem;
-				font-size: 0.875rem;
-				background-color: white;
-				cursor: pointer;
-			}
-
-			select:focus {
-				outline: none;
-				border-color: #3b82f6;
-				box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-			}
-
-			.stats-row {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-			}
-
-			.stats {
-				font-size: 0.875rem;
-				color: #6b7280;
-			}
-
-			.refresh-btn {
-				background-color: #3b82f6;
-				color: white;
-				padding: 0.5rem 1rem;
-				border: none;
-				border-radius: 0.375rem;
-				font-size: 0.875rem;
-				font-weight: 500;
-				cursor: pointer;
-				transition: background-color 0.2s;
-			}
-
-			.refresh-btn:hover {
-				background-color: #2563eb;
-			}
-
-			.table-card {
-				background: white;
-				border-radius: 0.5rem;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-				overflow: hidden;
-			}
-
-			.table-wrapper {
-				overflow-x: auto;
-			}
-
-			table {
-				width: 100%;
-				border-collapse: collapse;
-			}
-
-			thead {
-				background-color: #f9fafb;
-			}
-
-			th {
-				padding: 0.75rem 1rem;
-				text-align: left;
-				font-size: 0.75rem;
-				font-weight: 500;
-				color: #6b7280;
-				text-transform: uppercase;
-				letter-spacing: 0.05em;
-				border-bottom: 1px solid #e5e7eb;
-			}
-
-			th:first-child {
-				position: sticky;
-				left: 0;
-				background-color: #f3f4f6;
-				z-index: 10;
-			}
-
-			tbody tr {
-				border-bottom: 1px solid #e5e7eb;
-			}
-
-			tbody tr:hover {
-				background-color: #f9fafb;
-			}
-
-			td {
-				padding: 0.75rem 1rem;
-				font-size: 0.875rem;
-				color: #111827;
-				white-space: nowrap;
-			}
-
-			td:first-child {
-				position: sticky;
-				left: 0;
-				background-color: #f9fafb;
-				font-weight: 500;
-				color: #6b7280;
-				z-index: 5;
-			}
-
-			tbody tr:hover td:first-child {
-				background-color: #f3f4f6;
-			}
-
-			.loading,
-			.error,
-			.empty {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				min-height: 400px;
-				text-align: center;
-			}
-
-			.spinner {
-				border: 3px solid #e5e7eb;
-				border-top: 3px solid #3b82f6;
-				border-radius: 50%;
-				width: 3rem;
-				height: 3rem;
-				animation: spin 1s linear infinite;
-				margin: 0 auto 1rem;
-			}
-
-			@keyframes spin {
-				0% {
-					transform: rotate(0deg);
-				}
-				100% {
-					transform: rotate(360deg);
-				}
-			}
-
-			.error-box {
-				background-color: #fef2f2;
-				border: 1px solid #fecaca;
-				border-radius: 0.5rem;
-				padding: 1.5rem;
-				max-width: 500px;
-			}
-
-			.error-box h2 {
-				color: #991b1b;
-				font-size: 1.125rem;
-				margin-bottom: 0.5rem;
-			}
-
-			.error-box p {
-				color: #dc2626;
-				margin-bottom: 1rem;
-			}
-
-			.error-box .note {
-				font-size: 0.875rem;
-				color: #6b7280;
-			}
-
-			.empty-box {
-				background-color: #fefce8;
-				border: 1px solid #fde68a;
-				border-radius: 0.5rem;
-				padding: 1.5rem;
-				margin-top: 1.5rem;
-			}
-
-			.empty-box p {
-				color: #92400e;
-			}
-
-			.hidden {
-				display: none;
-			}
-
-			/* View Toggle Buttons */
-			.view-toggle {
-				display: flex;
-				gap: 0.5rem;
-				margin-bottom: 1rem;
-			}
-
-			.view-toggle button {
-				padding: 0.5rem 1rem;
-				border: 2px solid #e5e7eb;
-				background: white;
-				border-radius: 0.375rem;
-				cursor: pointer;
-				font-weight: 500;
-				transition: all 0.2s;
-			}
-
-			.view-toggle button.active {
-				background: #3b82f6;
-				color: white;
-				border-color: #3b82f6;
-			}
-
-			.view-toggle button:hover:not(.active) {
-				border-color: #3b82f6;
-				background: #eff6ff;
-			}
-
-			/* Pressure Visualization Styles */
-			#pressureView {
-				width: 100%;
-			}
-
-			.month-buttons {
-				display: flex;
-				gap: 0.5rem;
-				margin-bottom: 1rem;
-				flex-wrap: wrap;
-			}
-
-			.month-btn {
-				padding: 0.5rem 1rem;
-				border: none;
-				border-radius: 0.5rem;
-				font-weight: 500;
-				cursor: pointer;
-				transition: all 0.2s;
-			}
-
-			.month-btn.active-all {
-				background: #3b82f6;
-				color: white;
-			}
-
-			.month-btn.active-08 {
-				background: #8884d8;
-				color: white;
-			}
-
-			.month-btn.active-09 {
-				background: #82ca9d;
-				color: white;
-			}
-
-			.month-btn.active-10 {
-				background: #ffc658;
-				color: white;
-			}
-
-			.month-btn.active-11 {
-				background: #ff7c7c;
-				color: white;
-			}
-
-			.month-btn:not([class*="active"]) {
-				background: #e5e7eb;
-				color: #374151;
-			}
-
-			.month-btn:not([class*="active"]):hover {
-				background: #d1d5db;
-			}
-
-			.chart-container {
-				position: relative;
-				height: 500px;
-				background: white;
-				padding: 1rem;
-				border-radius: 0.5rem;
-				margin-bottom: 1rem;
-			}
-
-			.stats-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-				gap: 1rem;
-				margin-bottom: 1rem;
-			}
-
-			.stat-card {
-				background: white;
-				border-radius: 0.5rem;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-				padding: 1rem;
-			}
-
-			.stat-card h3 {
-				font-size: 1.125rem;
-				font-weight: bold;
-				margin-bottom: 0.5rem;
-			}
-
-			.stat-values {
-				display: grid;
-				grid-template-columns: repeat(3, 1fr);
-				gap: 0.5rem;
-				font-size: 0.875rem;
-			}
-
-			.stat-value p:first-child {
-				color: #6b7280;
-			}
-
-			.stat-value p:last-child {
-				font-weight: 600;
-			}
-
-			.observation-box {
-				background: #eff6ff;
-				border: 1px solid #bfdbfe;
-				border-radius: 0.5rem;
-				padding: 1rem;
-			}
-
-			.observation-box h3 {
-				color: #1e3a8a;
-				font-weight: 600;
-				margin-bottom: 0.5rem;
-			}
-
-			.observation-box ul {
-				color: #1e40af;
-				font-size: 0.875rem;
-				list-style: none;
-				padding-left: 0;
-			}
-
-			.observation-box li {
-				margin-bottom: 0.25rem;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="container">
-			<div id="loadingView" class="loading hidden">
-				<div>
-					<div class="spinner"></div>
-					<p style="color: #6b7280">Loading Excel file...</p>
-				</div>
-			</div>
-
-			<div id="errorView" class="error hidden">
-				<div class="error-box">
-					<h2>Error Loading File</h2>
-					<p id="errorMessage"></p>
-					<p class="note">
-						Please select a valid Excel file (.xlsx, .xls)
-					</p>
-				</div>
-			</div>
-
-			<div id="mainView">
-				<div class="header-card">
-					<h1>Excel Data Viewer</h1>
-
-					<div class="view-toggle">
-						<button id="tableViewBtn" class="active">Table View</button>
-						<button id="pressureViewBtn">Pressure Visualization</button>
-					</div>
-
-					<p class="file-name" id="fileName">No file selected</p>
-
-					<div class="file-input-wrapper">
-						<label class="file-input-label" for="fileInput">
-							Select Excel File:
-						</label>
-						<input type="file" id="fileInput" accept=".xlsx,.xls" />
-					</div>
-
-					<div id="sheetSelectorWrapper" class="sheet-selector hidden">
-						<label for="sheetSelector">Select Sheet:</label>
-						<select id="sheetSelector"></select>
-					</div>
-
-					<div class="stats-row">
-						<p class="stats" id="stats">0 rows × 0 columns</p>
-						<button class="refresh-btn" id="refreshBtn" disabled>
-							Refresh
-						</button>
-					</div>
-				</div>
-
-				<!-- Table View -->
-				<div id="tableViewContent">
-					<div class="table-card">
-						<div class="table-wrapper">
-							<table id="dataTable">
-								<thead id="tableHead"></thead>
-								<tbody id="tableBody"></tbody>
-							</table>
-						</div>
-					</div>
-
-					<div id="emptyView" class="empty-box hidden">
-						<p>
-							No data found in the selected sheet. The sheet may be
-							empty.
-						</p>
-					</div>
-				</div>
-
-				<!-- Pressure Visualization View -->
-				<div id="pressureView" class="hidden">
-					<div class="header-card">
-						<h2 style="font-size: 1.875rem; margin-bottom: 0.5rem">
-							Pressure Data Analysis (Aug-Nov 2025)
-						</h2>
-						<p class="file-name">
-							Tracking pressure fluctuations across process states
-						</p>
-
-						<div class="month-buttons">
-							<button class="month-btn active-all" data-month="all">
-								All Months
-							</button>
-							<button class="month-btn" data-month="08">August</button>
-							<button class="month-btn" data-month="09">
-								September
-							</button>
-							<button class="month-btn" data-month="10">October</button>
-							<button class="month-btn" data-month="11">November</button>
-						</div>
-					</div>
-
-					<div class="chart-container">
-						<canvas id="pressureChart"></canvas>
-					</div>
-
-					<div class="stats-grid" id="monthStats"></div>
-
-					<div class="observation-box">
-						<h3>Key Observations:</h3>
-						<ul>
-							<li>
-								• Pressure starts high (~755-760 Torr) during WAFER
-								WARMUP phase
-							</li>
-							<li>
-								• Sharp drops occur during DEHYDRATION process (down to
-								~11-15 Torr)
-							</li>
-							<li>
-								• Pressure gradually recovers after dehydration cycles
-							</li>
-							<li>
-								• Pattern repeats consistently across all four months
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<script>
-			let workbook = null;
-			let currentData = [];
-			let currentHeaders = [];
-			let currentSheetIndex = 0;
-
-			const fileInput = document.getElementById("fileInput");
-			const sheetSelector = document.getElementById("sheetSelector");
-			const sheetSelectorWrapper = document.getElementById(
-				"sheetSelectorWrapper"
-			);
-			const refreshBtn = document.getElementById("refreshBtn");
-			const fileName = document.getElementById("fileName");
-			const stats = document.getElementById("stats");
-			const tableHead = document.getElementById("tableHead");
-			const tableBody = document.getElementById("tableBody");
-			const loadingView = document.getElementById("loadingView");
-			const errorView = document.getElementById("errorView");
-			const mainView = document.getElementById("mainView");
-			const emptyView = document.getElementById("emptyView");
-			const errorMessage = document.getElementById("errorMessage");
-
-			fileInput.addEventListener("change", handleFileSelect);
-			sheetSelector.addEventListener("change", handleSheetChange);
-			refreshBtn.addEventListener("click", () => {
-				if (workbook) {
-					loadSheetData(currentSheetIndex);
-				}
-			});
-
-			function handleFileSelect(e) {
-				const file = e.target.files[0];
-				if (!file) return;
-
-				showLoading();
-
-				const reader = new FileReader();
-				reader.onload = function (e) {
-					try {
-						const data = new Uint8Array(e.target.result);
-						workbook = XLSX.read(data, { type: "array" });
-
-						fileName.textContent = `File: ${file.name}`;
-						refreshBtn.disabled = false;
-
-						// Populate sheet selector
-						populateSheetSelector();
-
-						// Load first sheet
-						loadSheetData(0);
-
-						hideLoading();
-					} catch (err) {
-						showError(err.message);
-					}
-				};
-
-				reader.onerror = function () {
-					showError("Failed to read file");
-				};
-
-				reader.readAsArrayBuffer(file);
-			}
-
-			function populateSheetSelector() {
-				sheetSelector.innerHTML = "";
-				workbook.SheetNames.forEach((name, idx) => {
-					const option = document.createElement("option");
-					option.value = idx;
-					option.textContent = name;
-					sheetSelector.appendChild(option);
-				});
-
-				if (workbook.SheetNames.length > 1) {
-					sheetSelectorWrapper.classList.remove("hidden");
-				} else {
-					sheetSelectorWrapper.classList.add("hidden");
-				}
-			}
-
-			function handleSheetChange(e) {
-				currentSheetIndex = parseInt(e.target.value);
-				loadSheetData(currentSheetIndex);
-			}
-
-			function loadSheetData(sheetIndex) {
-				try {
-					const sheetName = workbook.SheetNames[sheetIndex];
-					const worksheet = workbook.Sheets[sheetName];
-
-					// Convert to JSON
-					const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-						header: 1,
-					});
-
-					if (jsonData.length > 0) {
-						currentHeaders = jsonData[0];
-						currentData = jsonData.slice(1);
-					} else {
-						currentHeaders = [];
-						currentData = [];
-					}
-
-					renderTable();
-					updateStats();
-
-					if (currentData.length === 0) {
-						emptyView.classList.remove("hidden");
-					} else {
-						emptyView.classList.add("hidden");
-					}
-				} catch (err) {
-					showError(err.message);
-				}
-			}
-
-			function renderTable() {
-				// Render headers
-				tableHead.innerHTML = "";
-				const headerRow = document.createElement("tr");
-
-				// Row number header
-				const thRowNum = document.createElement("th");
-				thRowNum.textContent = "#";
-				headerRow.appendChild(thRowNum);
-
-				// Data headers
-				currentHeaders.forEach((header, idx) => {
-					const th = document.createElement("th");
-					th.textContent = header || `Column ${idx + 1}`;
-					headerRow.appendChild(th);
-				});
-
-				tableHead.appendChild(headerRow);
-
-				// Render body
-				tableBody.innerHTML = "";
-				currentData.forEach((row, rowIdx) => {
-					const tr = document.createElement("tr");
-
-					// Row number
-					const tdRowNum = document.createElement("td");
-					tdRowNum.textContent = rowIdx + 1;
-					tr.appendChild(tdRowNum);
-
-					// Data cells
-					currentHeaders.forEach((_, colIdx) => {
-						const td = document.createElement("td");
-						const value = row[colIdx];
-						td.textContent =
-							value !== undefined && value !== null
-								? String(value)
-								: "-";
-						tr.appendChild(td);
-					});
-
-					tableBody.appendChild(tr);
-				});
-			}
-
-			function updateStats() {
-				stats.textContent = `${currentData.length} rows × ${currentHeaders.length} columns`;
-			}
-
-			function showLoading() {
-				mainView.classList.add("hidden");
-				errorView.classList.add("hidden");
-				loadingView.classList.remove("hidden");
-			}
-
-			function hideLoading() {
-				loadingView.classList.add("hidden");
-				mainView.classList.remove("hidden");
-			}
-
-			function showError(message) {
-				loadingView.classList.add("hidden");
-				mainView.classList.add("hidden");
-				errorMessage.textContent = message;
-				errorView.classList.remove("hidden");
-			}
-
-			// Pressure Visualization functionality
-			let pressureChart = null;
-			let pressureData = { "08": [], "09": [], 10: [], 11: [] };
-			let selectedMonth = "all";
-
-			const tableViewBtn = document.getElementById("tableViewBtn");
-			const pressureViewBtn = document.getElementById("pressureViewBtn");
-			const tableViewContent = document.getElementById("tableViewContent");
-			const pressureView = document.getElementById("pressureView");
-			const monthButtons = document.querySelectorAll(".month-btn");
-
-			// View toggle handlers
-			tableViewBtn.addEventListener("click", () => {
-				tableViewBtn.classList.add("active");
-				pressureViewBtn.classList.remove("active");
-				tableViewContent.classList.remove("hidden");
-				pressureView.classList.add("hidden");
-			});
-
-			pressureViewBtn.addEventListener("click", () => {
-				pressureViewBtn.classList.add("active");
-				tableViewBtn.classList.remove("active");
-				pressureView.classList.remove("hidden");
-				tableViewContent.classList.add("hidden");
-
-				// Process data for pressure visualization
-				if (workbook && currentData.length > 0) {
-					processPressureData();
-					renderPressureChart();
-					renderMonthStats();
-				}
-			});
-
-			// Month button handlers
-			monthButtons.forEach((btn) => {
-				btn.addEventListener("click", () => {
-					selectedMonth = btn.dataset.month;
-
-					// Update active state
-					monthButtons.forEach((b) => {
-						b.className = "month-btn";
-					});
-					btn.classList.add(`active-${selectedMonth}`);
-
-					renderPressureChart();
-				});
-			});
-
-			function processPressureData() {
-				pressureData = { "08": [], "09": [], 10: [], 11: [] };
-
-				// Find columns for each month
-				const monthColumns = {
-					"08": { dt: -1, pressure: -1, state: -1 },
-					"09": { dt: -1, pressure: -1, state: -1 },
-					10: { dt: -1, pressure: -1, state: -1 },
-					11: { dt: -1, pressure: -1, state: -1 },
-				};
-
-				// Find column indices
-				currentHeaders.forEach((header, idx) => {
-					for (let month of ["08", "09", "10", "11"]) {
-						if (header.includes(`${month}_DateTime`)) {
-							monthColumns[month].dt = idx;
-						} else if (header.includes(`${month}_Pressure`)) {
-							monthColumns[month].pressure = idx;
-						} else if (header.includes(`${month}_ProcessState`)) {
-							monthColumns[month].state = idx;
-						}
-					}
-				});
-
-				// Process each row
-				currentData.forEach((row, rowIdx) => {
-					for (let month of ["08", "09", "10", "11"]) {
-						const cols = monthColumns[month];
-						if (cols.dt !== -1 && cols.pressure !== -1) {
-							const datetime = row[cols.dt];
-							const pressure = parseFloat(row[cols.pressure]);
-							const state = cols.state !== -1 ? row[cols.state] : "";
-
-							if (datetime && !isNaN(pressure)) {
-								pressureData[month].push({
-									datetime,
-									pressure,
-									state,
-									sequence: pressureData[month].length,
-								});
-							}
-						}
-					}
-				});
-			}
-
-			function renderPressureChart() {
-				const canvas = document.getElementById("pressureChart");
-				const ctx = canvas.getContext("2d");
-
-				// Destroy existing chart
-				if (pressureChart) {
-					pressureChart.destroy();
-				}
-
-				let datasets = [];
-				let labels = [];
-
-				const monthColors = {
-					"08": "#8884d8",
-					"09": "#82ca9d",
-					10: "#ffc658",
-					11: "#ff7c7c",
-				};
-
-				if (selectedMonth === "all") {
-					// Show all months
-					let offset = 0;
-					for (let month of ["08", "09", "10", "11"]) {
-						const data = pressureData[month];
-						const monthName =
-							month === "08"
-								? "August"
-								: month === "09"
-								? "September"
-								: month === "10"
-								? "October"
-								: "November";
-
-						// Extend labels
-						for (let i = 0; i < data.length; i++) {
-							labels.push(offset + i);
-						}
-
-						// Create dataset for this month
-						const fullData = new Array(labels.length).fill(null);
-						data.forEach((point, idx) => {
-							fullData[offset + idx] = point.pressure;
-						});
-
-						datasets.push({
-							label: monthName,
-							data: fullData,
-							borderColor: monthColors[month],
-							backgroundColor: monthColors[month] + "20",
-							borderWidth: 2,
-							pointRadius: 0,
-							tension: 0,
-						});
-
-						offset += data.length;
-					}
-				} else {
-					// Show single month
-					const data = pressureData[selectedMonth];
-					const monthName =
-						selectedMonth === "08"
-							? "August"
-							: selectedMonth === "09"
-							? "September"
-							: selectedMonth === "10"
-							? "October"
-							: "November";
-
-					labels = data.map((_, idx) => idx);
-					datasets.push({
-						label: "Pressure (Torr)",
-						data: data.map((d) => d.pressure),
-						borderColor: "#8884d8",
-						backgroundColor: "#8884d820",
-						borderWidth: 2,
-						pointRadius: 0,
-						tension: 0,
-					});
-				}
-
-				pressureChart = new Chart(ctx, {
-					type: "line",
-					data: {
-						labels: labels,
-						datasets: datasets,
-					},
-					options: {
-						responsive: true,
-						maintainAspectRatio: false,
-						plugins: {
-							legend: {
-								display: true,
-								position: "top",
-							},
-							tooltip: {
-								mode: "index",
-								intersect: false,
-								callbacks: {
-									title: function (context) {
-										if (selectedMonth === "all") {
-											// Find which month this point belongs to
-											let idx = context[0].dataIndex;
-											let offset = 0;
-											for (let month of ["08", "09", "10", "11"]) {
-												const len = pressureData[month].length;
-												if (idx < offset + len) {
-													const point =
-														pressureData[month][idx - offset];
-													return (
-														point.datetime + " - " + point.state
-													);
-												}
-												offset += len;
-											}
-										} else {
-											const point =
-												pressureData[selectedMonth][
-													context[0].dataIndex
-												];
-											return point
-												? point.datetime + " - " + point.state
-												: "";
-										}
-										return "";
-									},
-								},
-							},
-						},
-						scales: {
-							x: {
-								title: {
-									display: true,
-									text: "Sample Number",
-								},
-								ticks: {
-									maxTicksLimit: 20,
-								},
-							},
-							y: {
-								title: {
-									display: true,
-									text: "Pressure (Torr)",
-								},
-								beginAtZero: true,
-							},
-						},
-					},
-				});
-			}
-
-			function renderMonthStats() {
-				const container = document.getElementById("monthStats");
-				container.innerHTML = "";
-
-				for (let month of ["08", "09", "10", "11"]) {
-					const data = pressureData[month];
-					if (data.length === 0) continue;
-
-					const pressures = data.map((d) => d.pressure);
-					const min = Math.min(...pressures);
-					const max = Math.max(...pressures);
-					const avg = (
-						pressures.reduce((a, b) => a + b, 0) / pressures.length
-					).toFixed(1);
-
-					const monthName =
-						month === "08"
-							? "August"
-							: month === "09"
-							? "September"
-							: month === "10"
-							? "October"
-							: "November";
-
-					const card = document.createElement("div");
-					card.className = "stat-card";
-					card.innerHTML = `
-						<h3>${monthName} 2025</h3>
-						<div class="stat-values">
-							<div class="stat-value">
-								<p>Min</p>
-								<p>${min} Torr</p>
-							</div>
-							<div class="stat-value">
-								<p>Max</p>
-								<p>${max} Torr</p>
-							</div>
-							<div class="stat-value">
-								<p>Avg</p>
-								<p>${avg} Torr</p>
-							</div>
-						</div>
-						<p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">
-							${data.length} samples
-						</p>
-					`;
-
-					container.appendChild(card);
-				}
-			}
-		</script>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/logo/DCSS_Logo.jpg" />
+    <title>Excel Data Viewer</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f3f4f6;
+        min-height: 100vh;
+        padding: 1.5rem;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .header-card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+
+      .file-name {
+        color: #6b7280;
+        margin-bottom: 1rem;
+      }
+
+      .file-input-wrapper {
+        margin-bottom: 1rem;
+      }
+
+      .file-input-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+      }
+
+      input[type="file"] {
+        display: block;
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+      }
+
+      .sheet-selector {
+        margin-bottom: 1rem;
+      }
+
+      .sheet-selector label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+      }
+
+      select {
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        background-color: white;
+        cursor: pointer;
+      }
+
+      select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .stats-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .stats {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+
+      .refresh-btn {
+        background-color: #3b82f6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .refresh-btn:hover {
+        background-color: #2563eb;
+      }
+
+      .table-card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .table-wrapper {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        background-color: #f9fafb;
+      }
+
+      th {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      th:first-child {
+        position: sticky;
+        left: 0;
+        background-color: #f3f4f6;
+        z-index: 10;
+      }
+
+      tbody tr {
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      tbody tr:hover {
+        background-color: #f9fafb;
+      }
+
+      td {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        color: #111827;
+        white-space: nowrap;
+      }
+
+      td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: #f9fafb;
+        font-weight: 500;
+        color: #6b7280;
+        z-index: 5;
+      }
+
+      tbody tr:hover td:first-child {
+        background-color: #f3f4f6;
+      }
+
+      .loading,
+      .error,
+      .empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        text-align: center;
+      }
+
+      .spinner {
+        border: 3px solid #e5e7eb;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        width: 3rem;
+        height: 3rem;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-box {
+        background-color: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        max-width: 500px;
+      }
+
+      .error-box h2 {
+        color: #991b1b;
+        font-size: 1.125rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .error-box p {
+        color: #dc2626;
+        margin-bottom: 1rem;
+      }
+
+      .error-box .note {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+
+      .empty-box {
+        background-color: #fefce8;
+        border: 1px solid #fde68a;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .empty-box p {
+        color: #92400e;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* View Toggle Buttons */
+      .view-toggle {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .view-toggle button {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e5e7eb;
+        background: white;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .view-toggle button.active {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+      }
+
+      .view-toggle button:hover:not(.active) {
+        border-color: #3b82f6;
+        background: #eff6ff;
+      }
+
+      /* Pressure Visualization Styles */
+      #pressureView {
+        width: 100%;
+      }
+
+      .month-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .month-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .month-btn.active-all {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .month-btn.active-08 {
+        background: #8884d8;
+        color: white;
+      }
+
+      .month-btn.active-09 {
+        background: #82ca9d;
+        color: white;
+      }
+
+      .month-btn.active-10 {
+        background: #ffc658;
+        color: white;
+      }
+
+      .month-btn.active-11 {
+        background: #ff7c7c;
+        color: white;
+      }
+
+      .month-btn:not([class*="active"]) {
+        background: #e5e7eb;
+        color: #374151;
+      }
+
+      .month-btn:not([class*="active"]):hover {
+        background: #d1d5db;
+      }
+
+      .zoom-controls {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        align-items: center;
+      }
+
+      .zoom-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #3b82f6;
+        background: white;
+        color: #3b82f6;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .zoom-btn:hover {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .zoom-btn:active {
+        transform: scale(0.95);
+      }
+
+      .zoom-info {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-left: auto;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 500px;
+        background: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .chart-scroll-container {
+        background: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .chart-scroll-slider {
+        width: 100%;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+        margin-top: 0.5rem;
+      }
+
+      .chart-scroll-track {
+        height: 100%;
+        background: #3b82f6;
+        border-radius: 4px;
+        position: absolute;
+        left: 0;
+        transition: all 0.1s ease;
+      }
+
+      .chart-scroll-label {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+        color: #6b7280;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+      }
+
+      .stat-card h3 {
+        font-size: 1.125rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-values {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      .stat-value p:first-child {
+        color: #6b7280;
+      }
+
+      .stat-value p:last-child {
+        font-weight: 600;
+      }
+
+      .observation-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 0.5rem;
+        padding: 1rem;
+      }
+
+      .observation-box h3 {
+        color: #1e3a8a;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .observation-box ul {
+        color: #1e40af;
+        font-size: 0.875rem;
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .observation-box li {
+        margin-bottom: 0.25rem;
+      }
+
+      /* Progress Bar Styles */
+      .progress-container {
+        width: 100%;
+        max-width: 500px;
+        background: #e5e7eb;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin: 1.5rem auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 1px solid #d1d5db;
+      }
+
+      .progress-bar {
+        height: 2.5rem;
+        background: linear-gradient(90deg, #3b82f6, #2563eb);
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.875rem;
+        min-width: 50px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        will-change: width;
+      }
+      .processing-message {
+        text-align: center;
+        color: #374151;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0 1rem;
+        min-height: 20px;
+      }
+
+      #loadingText {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      .virtual-scroll-wrapper {
+        height: 600px;
+        overflow-y: auto;
+        position: relative;
+      }
+
+      .data-size-warning {
+        background: #fef3c7;
+        border: 1px solid #fbbf24;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .data-size-warning p {
+        color: #92400e;
+        margin-bottom: 0.5rem;
+      }
+
+      .data-size-warning strong {
+        color: #78350f;
+      }
+
+      .filter-controls {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #e5e7eb;
+      }
+
+      .filter-controls h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #374151;
+      }
+
+      .filter-checkboxes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .filter-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .filter-checkbox input[type="checkbox"] {
+        width: 1.125rem;
+        height: 1.125rem;
+        cursor: pointer;
+      }
+
+      .filter-checkbox label {
+        cursor: pointer;
+        color: #374151;
+        font-size: 0.875rem;
+      }
+
+      .filter-actions {
+        margin-top: 0.75rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .filter-btn {
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #d1d5db;
+        background: white;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .filter-btn:hover {
+        background: #f3f4f6;
+      }
+
+      .filter-btn.primary {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+      }
+
+      .filter-btn.primary:hover {
+        background: #2563eb;
+      }
+
+      /* Active Filter Display */
+      .active-filter-display {
+        background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+        border: 2px solid #3b82f6;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        margin: 1rem 0;
+      }
+
+      .active-filter-display h4 {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e40af;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .filter-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .filter-tag {
+        background: white;
+        border: 1px solid #3b82f6;
+        border-radius: 1rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+        color: #1e40af;
+        font-weight: 500;
+      }
+
+      .filter-tag.all {
+        background: #10b981;
+        border-color: #10b981;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="loadingView" class="loading hidden">
+        <div>
+          <div class="spinner"></div>
+          <p style="color: #6b7280" id="loadingText">Loading Excel file...</p>
+          <div
+            class="progress-container"
+            style="max-width: 400px; margin: 1rem auto"
+            id="progressContainer"
+          >
+            <div class="progress-bar" id="progressBar" style="width: 0%">
+              0%
+            </div>
+          </div>
+          <p class="processing-message" id="processingMessage"></p>
+        </div>
+      </div>
+
+      <div id="errorView" class="error hidden">
+        <div class="error-box">
+          <h2>Error Loading File</h2>
+          <p id="errorMessage"></p>
+          <p class="note">Please select a valid Excel file (.xlsx, .xls)</p>
+        </div>
+      </div>
+
+      <div id="mainView">
+        <div class="header-card">
+          <h1>Excel Data Viewer</h1>
+
+          <div class="view-toggle">
+            <button id="tableViewBtn" class="active">Table View</button>
+            <button id="pressureViewBtn">Pressure Visualization</button>
+          </div>
+
+          <p class="file-name" id="fileName">No file selected</p>
+
+          <div class="file-input-wrapper">
+            <label class="file-input-label" for="fileInput">
+              Select Excel File:
+            </label>
+            <input type="file" id="fileInput" accept=".xlsx,.xls" />
+          </div>
+
+          <div id="sheetSelectorWrapper" class="sheet-selector hidden">
+            <label for="sheetSelector">Select Sheet:</label>
+            <select id="sheetSelector"></select>
+          </div>
+
+          <div class="stats-row">
+            <p class="stats" id="stats">0 rows × 0 columns</p>
+            <button class="refresh-btn" id="refreshBtn" disabled>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Table View -->
+        <div id="tableViewContent">
+          <div id="dataSizeWarning" class="data-size-warning hidden">
+            <p>
+              <strong>⚠️ Large Dataset Detected</strong>
+            </p>
+            <p>
+              This file contains <strong id="totalRowsWarning">0</strong> rows.
+            </p>
+            <p style="font-size: 0.875rem; margin-top: 0.5rem">
+              💡 Table view uses intelligent sampling for optimal performance.
+              All data is preserved for analysis and pressure visualization.
+            </p>
+          </div>
+
+          <div
+            class="filter-controls"
+            id="filterControls"
+            style="display: none"
+          >
+            <h3>🔍 Filter by Process State</h3>
+            <div class="filter-checkboxes" id="filterCheckboxes">
+              <!-- Checkboxes will be dynamically generated -->
+            </div>
+            <div class="filter-actions">
+              <button class="filter-btn primary" id="applyFilterBtn">
+                Apply Filter
+              </button>
+              <button class="filter-btn" id="selectAllBtn">Select All</button>
+              <button class="filter-btn" id="clearAllBtn">Clear All</button>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-wrapper virtual-scroll-wrapper" id="tableWrapper">
+              <table id="dataTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="emptyView" class="empty-box hidden">
+            <p>No data found in the selected sheet. The sheet may be empty.</p>
+          </div>
+        </div>
+
+        <!-- Pressure Visualization View -->
+        <div id="pressureView" class="hidden">
+          <div class="header-card">
+            <h2 style="font-size: 1.875rem; margin-bottom: 0.5rem">
+              Pressure Data Analysis (Aug-Nov 2025)
+            </h2>
+            <p class="file-name">
+              Tracking pressure fluctuations across process states
+            </p>
+
+            <!-- Active Filter Display -->
+            <div
+              id="activeFilterDisplay"
+              class="active-filter-display"
+              style="display: none"
+            >
+              <h4>🔍 Active Filters:</h4>
+              <div id="activeFilterTags" class="filter-tags"></div>
+            </div>
+
+            <div class="month-buttons">
+              <button class="month-btn active-all" data-month="all">
+                All Months
+              </button>
+              <button class="month-btn" data-month="08">August</button>
+              <button class="month-btn" data-month="09">September</button>
+              <button class="month-btn" data-month="10">October</button>
+              <button class="month-btn" data-month="11">November</button>
+            </div>
+
+            <div class="zoom-controls" id="zoomControls" style="display: none">
+              <button class="zoom-btn" id="zoomInBtn" title="Zoom In">
+                🔍+ Zoom In
+              </button>
+              <button class="zoom-btn" id="zoomOutBtn" title="Zoom Out">
+                🔍- Zoom Out
+              </button>
+              <button class="zoom-btn" id="resetZoomBtn" title="Reset Zoom">
+                ↺ Reset Zoom
+              </button>
+              <span class="zoom-info"
+                >💡 Tip: Scroll to zoom, drag chart to pan, or use scrollbar
+                below</span
+              >
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <canvas id="pressureChart"></canvas>
+          </div>
+
+          <div
+            class="chart-scroll-container"
+            id="chartScrollContainer"
+            style="display: none"
+          >
+            <div class="chart-scroll-slider" id="chartScrollSlider">
+              <div class="chart-scroll-track" id="chartScrollTrack"></div>
+            </div>
+            <div class="chart-scroll-label">
+              <span id="scrollStart">0</span>
+              <span id="scrollEnd">0</span>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="monthStats"></div>
+
+          <div class="observation-box">
+            <h3>Key Observations:</h3>
+            <ul>
+              <li>
+                • Pressure starts high (~755-760 Torr) during WAFER WARMUP phase
+              </li>
+              <li>
+                • Sharp drops occur during DEHYDRATION process (down to ~11-15
+                Torr)
+              </li>
+              <li>• Pressure gradually recovers after dehydration cycles</li>
+              <li>• Pattern repeats consistently across all four months</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let workbook = null;
+      let currentData = [];
+      let fullData = []; // Store complete dataset for pressure analysis
+      let currentHeaders = [];
+      let currentSheetIndex = 0;
+      let isProcessing = false;
+      const CHUNK_SIZE = 1000; // Process 1000 rows at a time
+      const RENDER_BATCH_SIZE = 100; // Render 100 rows initially, load more on scroll
+      const MAX_TABLE_ROWS = 50000; // Max rows to display in table view (decimated from full dataset)
+
+      const fileInput = document.getElementById("fileInput");
+      const sheetSelector = document.getElementById("sheetSelector");
+      const sheetSelectorWrapper = document.getElementById(
+        "sheetSelectorWrapper"
+      );
+      const refreshBtn = document.getElementById("refreshBtn");
+      const fileName = document.getElementById("fileName");
+      const stats = document.getElementById("stats");
+      const tableHead = document.getElementById("tableHead");
+      const tableBody = document.getElementById("tableBody");
+      const loadingView = document.getElementById("loadingView");
+      const errorView = document.getElementById("errorView");
+      const mainView = document.getElementById("mainView");
+      const emptyView = document.getElementById("emptyView");
+      const errorMessage = document.getElementById("errorMessage");
+      const progressBar = document.getElementById("progressBar");
+      const progressContainer = document.getElementById("progressContainer");
+      const processingMessage = document.getElementById("processingMessage");
+      const loadingText = document.getElementById("loadingText");
+      const dataSizeWarning = document.getElementById("dataSizeWarning");
+      const totalRowsWarning = document.getElementById("totalRowsWarning");
+      const tableWrapper = document.getElementById("tableWrapper");
+      const filterControls = document.getElementById("filterControls");
+      const filterCheckboxes = document.getElementById("filterCheckboxes");
+      const applyFilterBtn = document.getElementById("applyFilterBtn");
+      const selectAllBtn = document.getElementById("selectAllBtn");
+      const clearAllBtn = document.getElementById("clearAllBtn");
+      const activeFilterDisplay = document.getElementById(
+        "activeFilterDisplay"
+      );
+      const activeFilterTags = document.getElementById("activeFilterTags");
+
+      let renderedRows = 0;
+      let isLoadingMore = false;
+      let availableProcessStates = [];
+      let selectedProcessStates = new Set();
+      let filteredData = [];
+      let processStateColumns = []; // Store indices of process state columns
+
+      fileInput.addEventListener("change", handleFileSelect);
+      sheetSelector.addEventListener("change", handleSheetChange);
+      refreshBtn.addEventListener("click", () => {
+        if (workbook) {
+          loadSheetData(currentSheetIndex);
+        }
+      });
+
+      // Virtual scrolling for large datasets
+      tableWrapper.addEventListener("scroll", handleScroll);
+
+      // Filter event listeners
+      applyFilterBtn.addEventListener("click", applyFilter);
+      selectAllBtn.addEventListener("click", selectAllFilters);
+      clearAllBtn.addEventListener("click", clearAllFilters);
+
+      function handleScroll(e) {
+        const activeData = getActiveTableData();
+        if (isLoadingMore || renderedRows >= activeData.length) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = e.target;
+        const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+
+        // Load more when scrolled to 80%
+        if (scrollPercentage > 0.8) {
+          loadMoreRows();
+        }
+      }
+
+      function updateProgress(percent, message = "") {
+        progressBar.style.width = `${percent}%`;
+        progressBar.textContent = `${Math.round(percent)}%`;
+
+        if (message) {
+          processingMessage.textContent = message;
+          processingMessage.style.display = "block";
+        } else {
+          processingMessage.style.display = "none";
+        }
+
+        // Ensure progress container is visible
+        if (percent > 0 && percent < 100) {
+          progressContainer.style.display = "block";
+          loadingText.style.display = "block";
+        } else if (percent === 0) {
+          progressBar.style.width = "0%";
+          progressBar.textContent = "0%";
+        }
+      }
+
+      async function handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (isProcessing) {
+          alert("Already processing a file. Please wait...");
+          return;
+        }
+
+        isProcessing = true;
+        showLoading();
+        updateProgress(5, "Starting file read...");
+
+        const reader = new FileReader();
+
+        reader.onprogress = function (event) {
+          if (event.lengthComputable) {
+            const percentLoaded = 5 + (event.loaded / event.total) * 25; // 5-30%
+            updateProgress(
+              percentLoaded,
+              `Reading file... ${formatBytes(event.loaded)} / ${formatBytes(
+                event.total
+              )}`
+            );
+          }
+        };
+
+        reader.onload = async function (e) {
+          try {
+            updateProgress(35, "File loaded, parsing Excel data...");
+
+            // Use setTimeout to allow UI to update
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            const data = new Uint8Array(e.target.result);
+            console.log(
+              `📊 File size: ${data.length} bytes (${formatBytes(data.length)})`
+            );
+
+            updateProgress(50, "Loading workbook structure...");
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            try {
+              console.log(
+                "🔧 Attempting to parse workbook with newer library..."
+              );
+
+              workbook = XLSX.read(data, {
+                type: "array",
+                dense: true, // CHANGED: Try dense format (arrays instead of cell objects)
+                cellDates: false,
+                cellNF: false,
+                cellStyles: false,
+                cellFormula: false,
+                cellHTML: false,
+                sheetStubs: true,
+              });
+
+              console.log("✓ Workbook loaded successfully (DENSE MODE)");
+              console.log("✓ Sheets found:", workbook.SheetNames);
+              console.log("✓ Workbook keys:", Object.keys(workbook));
+
+              // Log first sheet details
+              if (workbook.SheetNames.length > 0) {
+                const firstSheetName = workbook.SheetNames[0];
+                const firstSheet = workbook.Sheets[firstSheetName];
+                console.log(
+                  `✓ Sheet "${firstSheetName}" type:`,
+                  typeof firstSheet
+                );
+                console.log(`✓ Sheet is array?:`, Array.isArray(firstSheet));
+
+                if (Array.isArray(firstSheet)) {
+                  console.log(
+                    `✓ DENSE sheet length:`,
+                    firstSheet.length,
+                    "rows"
+                  );
+                  if (firstSheet.length > 0) {
+                    console.log(`✓ First row:`, firstSheet[0]);
+                  }
+                } else {
+                  console.log(
+                    `✓ Sheet keys:`,
+                    Object.keys(firstSheet).slice(0, 30)
+                  );
+                }
+              }
+            } catch (xlsxError) {
+              console.error("✗ XLSX.read failed:", xlsxError);
+              throw new Error("Failed to parse Excel: " + xlsxError.message);
+            }
+
+            updateProgress(70, "Workbook loaded, preparing sheets...");
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            fileName.textContent = `File: ${file.name}`;
+            refreshBtn.disabled = false;
+
+            // Populate sheet selector
+            populateSheetSelector();
+
+            updateProgress(85, "Loading first sheet data...");
+            await new Promise((resolve) => setTimeout(resolve, 50));
+
+            // Load first sheet
+            await loadSheetData(0);
+
+            updateProgress(100, "Complete!");
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            hideLoading();
+            isProcessing = false;
+          } catch (err) {
+            console.error("✗ Fatal error:", err);
+            console.error("✗ Stack trace:", err.stack);
+            showError(
+              err.message +
+                "\n\nCheck browser console (F12) for detailed error information."
+            );
+            isProcessing = false;
+          }
+        };
+
+        reader.onerror = function () {
+          showError("Failed to read file");
+          isProcessing = false;
+        };
+
+        reader.readAsArrayBuffer(file);
+      }
+
+      function formatBytes(bytes) {
+        if (bytes === 0) return "0 Bytes";
+        const k = 1024;
+        const sizes = ["Bytes", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i]
+        );
+      }
+
+      function populateSheetSelector() {
+        sheetSelector.innerHTML = "";
+        workbook.SheetNames.forEach((name, idx) => {
+          const option = document.createElement("option");
+          option.value = idx;
+          option.textContent = name;
+          sheetSelector.appendChild(option);
+        });
+
+        if (workbook.SheetNames.length > 1) {
+          sheetSelectorWrapper.classList.remove("hidden");
+        } else {
+          sheetSelectorWrapper.classList.add("hidden");
+        }
+      }
+
+      function handleSheetChange(e) {
+        currentSheetIndex = parseInt(e.target.value);
+        loadSheetData(currentSheetIndex);
+      }
+
+      async function loadSheetData(sheetIndex) {
+        try {
+          showLoading();
+          updateProgress(0, "Loading sheet...");
+
+          const sheetName = workbook.SheetNames[sheetIndex];
+          const worksheet = workbook.Sheets[sheetName];
+
+          console.log(`\n🔄 Loading sheet: "${sheetName}"`);
+          console.log(`📊 Sheet object type:`, typeof worksheet);
+          console.log(`📊 Sheet is array?:`, Array.isArray(worksheet));
+          console.log(`📊 Sheet properties:`, Object.keys(worksheet).length);
+
+          updateProgress(20, "Converting to JSON...");
+          await new Promise((resolve) => setTimeout(resolve, 10));
+
+          // Convert to JSON with chunked processing and progress updates
+          const jsonData = await convertSheetToJsonChunked(
+            worksheet,
+            (progress) => {
+              updateProgress(20 + progress * 0.4, "Converting to JSON..."); // 20-60%
+            }
+          );
+
+          console.log(`📊 JSON data returned: ${jsonData.length} rows`);
+
+          updateProgress(60, "Processing data...");
+          await new Promise((resolve) => setTimeout(resolve, 10));
+
+          // Decimation function for table data
+          function decimateTableData(data, maxRows) {
+            if (data.length <= maxRows) return data;
+
+            const step = Math.ceil(data.length / maxRows);
+            const decimated = [];
+
+            for (let i = 0; i < data.length; i += step) {
+              decimated.push(data[i]);
+            }
+
+            console.log(
+              `📉 Table: Decimated ${data.length.toLocaleString()} rows to ${decimated.length.toLocaleString()} for display (step: ${step})`
+            );
+            return decimated;
+          }
+
+          // Handle headers - find first non-empty row or use first row
+          let headerRow = [];
+          let dataStartIndex = 0;
+
+          if (jsonData.length > 0) {
+            console.log(`Total rows in sheet: ${jsonData.length}`);
+
+            // Try to find header row (first row with data)
+            for (let i = 0; i < Math.min(10, jsonData.length); i++) {
+              const row = jsonData[i];
+              const hasData =
+                row &&
+                row.some(
+                  (cell) => cell !== "" && cell !== null && cell !== undefined
+                );
+              if (hasData) {
+                headerRow = row;
+                dataStartIndex = i + 1;
+                console.log(
+                  `Found headers at row ${i}, columns: ${headerRow.length}`
+                );
+                break;
+              }
+            }
+
+            // If no headers found, create generic ones based on max columns
+            if (headerRow.length === 0 && jsonData.length > 0) {
+              const maxCols = Math.max(
+                ...jsonData.map((row) => (row ? row.length : 0))
+              );
+              console.log(
+                `No headers found, creating ${maxCols} generic headers`
+              );
+              headerRow = Array.from(
+                { length: maxCols },
+                (_, i) => `Column ${i + 1}`
+              );
+              dataStartIndex = 0;
+            }
+
+            currentHeaders = headerRow;
+            currentData = jsonData.slice(dataStartIndex);
+
+            // Store full data for pressure analysis
+            fullData = [...currentData];
+
+            // Ensure all rows have the same length as headers to prevent display issues
+            const numHeaders = currentHeaders.length;
+            currentData = currentData.map((row) => {
+              if (!row) return Array(numHeaders).fill("");
+              if (row.length < numHeaders) {
+                // Pad short rows with empty strings
+                return [...row, ...Array(numHeaders - row.length).fill("")];
+              }
+              return row;
+            });
+
+            // Apply same padding to full data
+            fullData = fullData.map((row) => {
+              if (!row) return Array(numHeaders).fill("");
+              if (row.length < numHeaders) {
+                return [...row, ...Array(numHeaders - row.length).fill("")];
+              }
+              return row;
+            });
+
+            console.log(
+              `Loaded ${fullData.length.toLocaleString()} total data rows with ${
+                currentHeaders.length
+              } columns`
+            );
+
+            // Decimate table data if dataset is large
+            if (currentData.length > MAX_TABLE_ROWS) {
+              updateProgress(
+                65,
+                `Optimizing display (${currentData.length.toLocaleString()} rows)...`
+              );
+              await new Promise((resolve) => setTimeout(resolve, 10));
+              currentData = decimateTableData(currentData, MAX_TABLE_ROWS);
+              console.log(
+                `✓ Displaying ${currentData.length.toLocaleString()} rows in table view`
+              );
+            }
+          } else {
+            currentHeaders = [];
+            currentData = [];
+            fullData = [];
+          }
+
+          updateProgress(80, "Rendering table...");
+          await new Promise((resolve) => setTimeout(resolve, 10));
+
+          // Check if large dataset
+          if (fullData.length > 10000) {
+            dataSizeWarning.classList.remove("hidden");
+            if (fullData.length > MAX_TABLE_ROWS) {
+              totalRowsWarning.textContent = `${fullData.length.toLocaleString()} (showing ${currentData.length.toLocaleString()} sampled rows)`;
+            } else {
+              totalRowsWarning.textContent =
+                currentData.length.toLocaleString();
+            }
+          } else {
+            dataSizeWarning.classList.add("hidden");
+          }
+
+          renderedRows = 0;
+          await renderTable();
+          updateStats();
+
+          // Populate filter controls
+          await populateProcessStateFilters();
+
+          updateProgress(100, "Complete!");
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          if (currentData.length === 0) {
+            emptyView.classList.remove("hidden");
+          } else {
+            emptyView.classList.add("hidden");
+          }
+
+          hideLoading();
+        } catch (err) {
+          console.error("Error loading sheet:", err);
+          showError(err.message);
+        }
+      }
+
+      async function convertSheetToJsonChunked(worksheet, progressCallback) {
+        // For large files, this helps prevent browser freezing
+        return new Promise(async (resolve) => {
+          try {
+            console.log(`\n🔍 Converting worksheet to JSON...`);
+            console.log(
+              `📊 Worksheet is array (dense)?:`,
+              Array.isArray(worksheet)
+            );
+
+            // Handle DENSE format (worksheet is an array of rows)
+            if (Array.isArray(worksheet)) {
+              console.log(`✓ DENSE format detected: ${worksheet.length} rows`);
+
+              const totalRows = worksheet.length;
+              const jsonData = [];
+              const chunkSize = 10000; // Process 10k rows at a time
+
+              for (let i = 0; i < totalRows; i += chunkSize) {
+                const end = Math.min(i + chunkSize, totalRows);
+
+                // Process chunk
+                for (let j = i; j < end; j++) {
+                  const row = worksheet[j];
+                  if (!row) {
+                    jsonData.push([]);
+                  } else {
+                    jsonData.push(
+                      row.map((cell) => {
+                        if (!cell) return "";
+                        return cell.v !== undefined ? String(cell.v) : "";
+                      })
+                    );
+                  }
+                }
+
+                // Report progress
+                if (progressCallback) {
+                  progressCallback((end / totalRows) * 100);
+                }
+
+                // Yield to browser every chunk
+                if (end < totalRows) {
+                  await new Promise((resolve) => setTimeout(resolve, 0));
+                }
+              }
+
+              console.log(
+                `✓ Converted ${jsonData.length} rows from dense format`
+              );
+              if (jsonData.length > 0) {
+                console.log("📄 First row:", jsonData[0]?.slice(0, 5), "...");
+              }
+
+              resolve(jsonData);
+              return;
+            }
+
+            // Handle SPARSE format (traditional worksheet with cell addresses)
+            console.log(`📊 Sparse format - checking for !ref...`);
+
+            // Get the range - if undefined, manually calculate it
+            let sheetRange = worksheet["!ref"];
+            console.log(`📍 Original sheet range: ${sheetRange}`);
+
+            // If no range found, calculate it from cell addresses
+            if (!sheetRange) {
+              console.warn(
+                "⚠️ No !ref property, calculating range manually..."
+              );
+
+              // Check all worksheet properties first
+              const allKeys = Object.keys(worksheet);
+              console.log(`📊 Total worksheet properties: ${allKeys.length}`);
+              console.log(
+                `📊 First 20 keys: ${allKeys.slice(0, 20).join(", ")}`
+              );
+
+              // Find all cell addresses in the worksheet
+              const cellAddresses = allKeys.filter((key) => key[0] !== "!");
+              console.log(`📊 Found ${cellAddresses.length} cell addresses`);
+
+              if (cellAddresses.length === 0) {
+                console.error("✗ No cells found - trying conversion anyway");
+                // Don't return, try conversion anyway
+              } else {
+                // Calculate the range from cell addresses
+                let minRow = Infinity,
+                  maxRow = 0,
+                  minCol = Infinity,
+                  maxCol = 0;
+
+                cellAddresses.forEach((addr) => {
+                  try {
+                    const decoded = XLSX.utils.decode_cell(addr);
+                    minRow = Math.min(minRow, decoded.r);
+                    maxRow = Math.max(maxRow, decoded.r);
+                    minCol = Math.min(minCol, decoded.c);
+                    maxCol = Math.max(maxCol, decoded.c);
+                  } catch (e) {
+                    // Skip invalid addresses
+                  }
+                });
+
+                if (minRow !== Infinity) {
+                  const startCell = XLSX.utils.encode_cell({
+                    r: minRow,
+                    c: minCol,
+                  });
+                  const endCell = XLSX.utils.encode_cell({
+                    r: maxRow,
+                    c: maxCol,
+                  });
+                  sheetRange = `${startCell}:${endCell}`;
+                  worksheet["!ref"] = sheetRange;
+
+                  console.log(
+                    `✓ Calculated range: ${sheetRange} (${
+                      maxRow - minRow + 1
+                    } rows × ${maxCol - minCol + 1} cols)`
+                  );
+                }
+              }
+            }
+
+            // Try multiple methods to read the data
+            let jsonData;
+
+            try {
+              // Method 1: Standard conversion with all options
+              jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                header: 1,
+                defval: "", // Use empty string for missing cells
+                blankrows: true, // Include blank rows
+                raw: false, // Convert all values to strings
+                range: 0, // Start from row 0
+              });
+              console.log(`✓ Method 1 - Converted ${jsonData.length} rows`);
+            } catch (e) {
+              console.error("✗ Method 1 failed:", e);
+
+              // Method 2: Try without options
+              try {
+                jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                console.log(`✓ Method 2 - Converted ${jsonData.length} rows`);
+              } catch (e2) {
+                console.error("✗ Method 2 failed:", e2);
+                jsonData = [];
+              }
+            }
+
+            // Log sample data
+            if (jsonData.length > 0) {
+              console.log(
+                "📄 First row (headers):",
+                jsonData[0]?.slice(0, 5),
+                "..."
+              );
+              console.log(
+                "📄 Second row (data):",
+                jsonData[1]?.slice(0, 5),
+                "..."
+              );
+              if (jsonData.length > 10) {
+                console.log("📄 Row 10:", jsonData[10]?.slice(0, 5), "...");
+              }
+            } else {
+              console.error("✗ No data extracted from sheet");
+            }
+
+            if (progressCallback) {
+              progressCallback(100);
+            }
+
+            resolve(jsonData);
+          } catch (error) {
+            console.error("✗ convertSheetToJsonChunked error:", error);
+            console.error("✗ Stack:", error.stack);
+            resolve([]);
+          }
+        });
+      }
+
+      async function renderTable() {
+        // Render headers
+        tableHead.innerHTML = "";
+        const headerRow = document.createElement("tr");
+
+        // Row number header
+        const thRowNum = document.createElement("th");
+        thRowNum.textContent = "#";
+        headerRow.appendChild(thRowNum);
+
+        // Data headers
+        currentHeaders.forEach((header, idx) => {
+          const th = document.createElement("th");
+          th.textContent = header || `Column ${idx + 1}`;
+          headerRow.appendChild(th);
+        });
+
+        tableHead.appendChild(headerRow);
+
+        // Clear body and render initial batch
+        tableBody.innerHTML = "";
+        renderedRows = 0;
+
+        await loadMoreRows();
+      }
+
+      async function loadMoreRows() {
+        const activeData = getActiveTableData();
+        if (isLoadingMore || renderedRows >= activeData.length) return;
+
+        isLoadingMore = true;
+        const batchSize = activeData.length > 10000 ? RENDER_BATCH_SIZE : 1000;
+        const endRow = Math.min(renderedRows + batchSize, activeData.length);
+
+        const fragment = document.createDocumentFragment();
+
+        for (let rowIdx = renderedRows; rowIdx < endRow; rowIdx++) {
+          const row = activeData[rowIdx];
+          const tr = document.createElement("tr");
+
+          // Row number
+          const tdRowNum = document.createElement("td");
+          tdRowNum.textContent = rowIdx + 1;
+          tr.appendChild(tdRowNum);
+
+          // Data cells
+          currentHeaders.forEach((_, colIdx) => {
+            const td = document.createElement("td");
+            const value = row && row[colIdx];
+            // Handle empty cells, null, undefined, empty strings
+            td.textContent =
+              value !== undefined && value !== null && value !== ""
+                ? String(value)
+                : "-";
+            tr.appendChild(td);
+          });
+
+          fragment.appendChild(tr);
+
+          // Yield to browser every 50 rows to keep UI responsive
+          if (rowIdx % 50 === 0 && rowIdx > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          }
+        }
+
+        tableBody.appendChild(fragment);
+        renderedRows = endRow;
+        isLoadingMore = false;
+
+        // Update stats to show loading progress
+        updateStats();
+      }
+
+      function updateStats() {
+        const activeData = getActiveTableData();
+        const filterActive =
+          selectedProcessStates.size > 0 &&
+          selectedProcessStates.size < availableProcessStates.length;
+
+        if (renderedRows < activeData.length) {
+          stats.textContent = `${renderedRows.toLocaleString()} / ${activeData.length.toLocaleString()} rows × ${
+            currentHeaders.length
+          } columns (loading more...)${filterActive ? " [FILTERED]" : ""}`;
+        } else {
+          stats.textContent = `${activeData.length.toLocaleString()} rows × ${
+            currentHeaders.length
+          } columns${filterActive ? " [FILTERED]" : ""}`;
+        }
+      }
+
+      function showLoading() {
+        mainView.classList.add("hidden");
+        errorView.classList.add("hidden");
+        loadingView.classList.remove("hidden");
+        progressContainer.style.display = "block";
+      }
+
+      function showLoading() {
+        mainView.classList.add("hidden");
+        errorView.classList.add("hidden");
+        loadingView.classList.remove("hidden");
+        progressContainer.style.display = "block";
+        loadingText.style.display = "block";
+        processingMessage.style.display = "block";
+      }
+
+      function hideLoading() {
+        loadingView.classList.add("hidden");
+        mainView.classList.remove("hidden");
+        progressBar.style.width = "0%";
+        progressBar.textContent = "0%";
+        processingMessage.textContent = "";
+        processingMessage.style.display = "none";
+      }
+
+      function showError(message) {
+        loadingView.classList.add("hidden");
+        mainView.classList.add("hidden");
+        errorMessage.textContent = message;
+        errorView.classList.remove("hidden");
+        progressBar.style.width = "0%";
+        progressBar.textContent = "0%";
+        processingMessage.textContent = "";
+      }
+
+      // Filter functionality
+      function getActiveTableData() {
+        // Return filtered data if filter is active, otherwise return currentData
+        if (
+          selectedProcessStates.size > 0 &&
+          selectedProcessStates.size < availableProcessStates.length
+        ) {
+          return filteredData.length > 0 ? filteredData : currentData;
+        }
+        return currentData;
+      }
+
+      function updateActiveFilterDisplay() {
+        // Update the filter display in the visualization view
+        if (!activeFilterDisplay || !activeFilterTags) return;
+
+        const filterActive =
+          selectedProcessStates.size > 0 &&
+          selectedProcessStates.size < availableProcessStates.length;
+
+        if (!filterActive || selectedProcessStates.size === 0) {
+          // Show "All Process States" when no filter or all selected
+          activeFilterDisplay.style.display = "block";
+          activeFilterTags.innerHTML =
+            '<span class="filter-tag all">All Process States</span>';
+        } else {
+          // Show selected filters
+          activeFilterDisplay.style.display = "block";
+          activeFilterTags.innerHTML = "";
+
+          const sortedStates = Array.from(selectedProcessStates).sort();
+          sortedStates.forEach((state) => {
+            const tag = document.createElement("span");
+            tag.className = "filter-tag";
+            tag.textContent = state;
+            activeFilterTags.appendChild(tag);
+          });
+        }
+      }
+
+      async function populateProcessStateFilters() {
+        try {
+          console.log("🔍 Populating process state filters...");
+
+          // Find ProcessState column indices
+          processStateColumns = [];
+          currentHeaders.forEach((header, idx) => {
+            if (
+              header &&
+              header.toString().toLowerCase().includes("processstate")
+            ) {
+              processStateColumns.push(idx);
+              console.log(
+                `Found ProcessState column at index ${idx}: ${header}`
+              );
+            }
+          });
+
+          if (processStateColumns.length === 0) {
+            console.log(
+              "⚠️ No ProcessState columns found - hiding filter controls"
+            );
+            filterControls.style.display = "none";
+            return;
+          }
+
+          // Extract unique states from fullData
+          const statesSet = new Set();
+          const dataToScan = fullData.length > 0 ? fullData : currentData;
+
+          dataToScan.forEach((row, idx) => {
+            processStateColumns.forEach((colIdx) => {
+              const state = row[colIdx];
+              if (
+                state &&
+                state !== "" &&
+                state !== null &&
+                state !== undefined
+              ) {
+                statesSet.add(String(state).trim());
+              }
+            });
+
+            // Yield every 10000 rows to keep UI responsive
+            if (idx % 10000 === 0 && idx > 0) {
+              // Brief yield for large datasets
+            }
+          });
+
+          availableProcessStates = Array.from(statesSet).sort();
+          console.log(
+            `✓ Found ${availableProcessStates.length} unique process states`
+          );
+
+          // Generate checkboxes
+          filterCheckboxes.innerHTML = "";
+          availableProcessStates.forEach((state) => {
+            const div = document.createElement("div");
+            div.className = "filter-checkbox";
+            const safeId = `filter_${state.replace(/[^a-zA-Z0-9]/g, "_")}`;
+            div.innerHTML = `
+              <input type="checkbox" id="${safeId}" value="${state}" checked>
+              <label for="${safeId}">${state}</label>
+            `;
+            filterCheckboxes.appendChild(div);
+            selectedProcessStates.add(state); // Start with all selected
+          });
+
+          filterControls.style.display = "block";
+          console.log("✓ Filter controls populated and shown");
+
+          // Update the active filter display in visualization
+          updateActiveFilterDisplay();
+        } catch (err) {
+          console.error("Error populating filters:", err);
+        }
+      }
+
+      function selectAllFilters() {
+        const checkboxes = filterCheckboxes.querySelectorAll(
+          'input[type="checkbox"]'
+        );
+        checkboxes.forEach((cb) => {
+          cb.checked = true;
+          selectedProcessStates.add(cb.value);
+        });
+        console.log("✓ All filters selected");
+        updateActiveFilterDisplay();
+      }
+
+      function clearAllFilters() {
+        const checkboxes = filterCheckboxes.querySelectorAll(
+          'input[type="checkbox"]'
+        );
+        checkboxes.forEach((cb) => {
+          cb.checked = false;
+        });
+        selectedProcessStates.clear();
+        console.log("✓ All filters cleared");
+        updateActiveFilterDisplay();
+      }
+
+      async function applyFilter() {
+        try {
+          console.log("🔍 Applying process state filter...");
+
+          // Read current selections
+          selectedProcessStates.clear();
+          const checkboxes = filterCheckboxes.querySelectorAll(
+            'input[type="checkbox"]'
+          );
+          checkboxes.forEach((cb) => {
+            if (cb.checked) {
+              selectedProcessStates.add(cb.value);
+            }
+          });
+
+          console.log(
+            `Filter selection: ${selectedProcessStates.size} states selected`
+          );
+
+          // If all states selected or none selected, show all data
+          if (
+            selectedProcessStates.size === 0 ||
+            selectedProcessStates.size === availableProcessStates.length
+          ) {
+            filteredData = [...currentData];
+            console.log("✓ Showing all data (no filter active)");
+          } else {
+            // Filter currentData based on selected process states
+            filteredData = currentData.filter((row) => {
+              // Check if any ProcessState column matches selected states
+              return processStateColumns.some((colIdx) => {
+                const state = row[colIdx];
+                if (
+                  state &&
+                  state !== "" &&
+                  state !== null &&
+                  state !== undefined
+                ) {
+                  return selectedProcessStates.has(String(state).trim());
+                }
+                return false;
+              });
+            });
+            console.log(
+              `✓ Filtered to ${filteredData.length.toLocaleString()} rows`
+            );
+          }
+
+          // Update table view if visible
+          if (!tableViewContent.classList.contains("hidden")) {
+            console.log("Updating table view with filtered data...");
+            renderedRows = 0;
+            tableBody.innerHTML = "";
+            await renderTable();
+            updateStats();
+            console.log("✓ Table view updated");
+          }
+
+          // Update the active filter display
+          updateActiveFilterDisplay();
+
+          // Update pressure visualization if visible
+          if (!pressureView.classList.contains("hidden")) {
+            console.log(
+              "Updating pressure visualization with filtered data..."
+            );
+            await processPressureData();
+            renderPressureChart();
+            console.log("✓ Pressure visualization updated");
+          }
+
+          console.log("✓ Filter applied successfully");
+        } catch (err) {
+          console.error("Error applying filter:", err);
+          showError(`Filter error: ${err.message}`);
+        }
+      }
+
+      // Pressure Visualization functionality
+      let pressureChart = null;
+      let pressureData = { "08": [], "09": [], 10: [], 11: [] };
+      let selectedMonth = "all";
+
+      const tableViewBtn = document.getElementById("tableViewBtn");
+      const pressureViewBtn = document.getElementById("pressureViewBtn");
+      const tableViewContent = document.getElementById("tableViewContent");
+      const pressureView = document.getElementById("pressureView");
+      const monthButtons = document.querySelectorAll(".month-btn");
+      const zoomControls = document.getElementById("zoomControls");
+      const zoomInBtn = document.getElementById("zoomInBtn");
+      const zoomOutBtn = document.getElementById("zoomOutBtn");
+      const resetZoomBtn = document.getElementById("resetZoomBtn");
+      const chartScrollContainer = document.getElementById(
+        "chartScrollContainer"
+      );
+      const chartScrollSlider = document.getElementById("chartScrollSlider");
+      const chartScrollTrack = document.getElementById("chartScrollTrack");
+      const scrollStart = document.getElementById("scrollStart");
+      const scrollEnd = document.getElementById("scrollEnd");
+
+      // View toggle handlers
+      tableViewBtn.addEventListener("click", () => {
+        tableViewBtn.classList.add("active");
+        pressureViewBtn.classList.remove("active");
+        tableViewContent.classList.remove("hidden");
+        pressureView.classList.add("hidden");
+      });
+
+      pressureViewBtn.addEventListener("click", async () => {
+        if (isProcessing) {
+          alert("Please wait for current operation to complete");
+          return;
+        }
+
+        isProcessing = true;
+        pressureViewBtn.classList.add("active");
+        tableViewBtn.classList.remove("active");
+        pressureView.classList.remove("hidden");
+        tableViewContent.classList.add("hidden");
+
+        // Process data for pressure visualization
+        // Use fullData if available (complete dataset), otherwise use currentData
+        if (workbook && (fullData.length > 0 || currentData.length > 0)) {
+          showLoading();
+          updateProgress(0, "Initializing chart processing...");
+
+          await new Promise((resolve) => setTimeout(resolve, 50));
+
+          updateProgress(5, "Processing pressure data from Excel...");
+          await processPressureData();
+
+          updateProgress(
+            72,
+            "Preparing chart rendering (optimizing large dataset)..."
+          );
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          updateProgress(75, "Rendering pressure visualization...");
+          await renderPressureChart();
+
+          updateProgress(95, "Calculating statistics...");
+          await renderMonthStats();
+
+          updateProgress(100, "Complete!");
+          await new Promise((resolve) => setTimeout(resolve, 400));
+
+          hideLoading();
+        }
+        isProcessing = false;
+      });
+
+      // Month button handlers
+      monthButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          selectedMonth = btn.dataset.month;
+
+          // Update active state
+          monthButtons.forEach((b) => {
+            b.className = "month-btn";
+          });
+          btn.classList.add(`active-${selectedMonth}`);
+
+          renderPressureChart();
+        });
+      });
+
+      // Zoom control handlers
+      zoomInBtn.addEventListener("click", () => {
+        if (pressureChart) {
+          pressureChart.zoom(1.2);
+        }
+      });
+
+      zoomOutBtn.addEventListener("click", () => {
+        if (pressureChart) {
+          pressureChart.zoom(0.8);
+        }
+      });
+
+      resetZoomBtn.addEventListener("click", () => {
+        if (pressureChart) {
+          pressureChart.resetZoom();
+        }
+      });
+
+      // Scrollbar functionality for navigating zoomed chart
+      let isDragging = false;
+      let chartDataLength = 0;
+
+      function updateScrollbar() {
+        if (!pressureChart) return; // Remove "All Months" restriction
+
+        const chart = pressureChart;
+        const xScale = chart.scales?.x;
+
+        // Check if scale exists and is initialized
+        if (!xScale || xScale.min === undefined || xScale.max === undefined) {
+          console.log("⚠️ Chart scales not yet initialized");
+          return;
+        }
+
+        const min = xScale.min || 0;
+        const max = xScale.max || chartDataLength;
+
+        const visibleStart = min;
+        const visibleEnd = max;
+        const totalRange = chartDataLength;
+
+        if (totalRange > 0) {
+          const startPercent = (visibleStart / totalRange) * 100;
+          const widthPercent = ((visibleEnd - visibleStart) / totalRange) * 100;
+
+          chartScrollTrack.style.left = startPercent + "%";
+          chartScrollTrack.style.width = widthPercent + "%";
+
+          scrollStart.textContent = Math.round(visibleStart).toLocaleString();
+          scrollEnd.textContent = Math.round(visibleEnd).toLocaleString();
+        }
+      }
+      chartScrollSlider.addEventListener("mousedown", (e) => {
+        if (!pressureChart) return; // Remove "All Months" restriction
+        isDragging = true;
+        handleScrollDrag(e);
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+          handleScrollDrag(e);
+        }
+      });
+
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+
+      function handleScrollDrag(e) {
+        if (!pressureChart) return; // Remove "All Months" restriction
+
+        const rect = chartScrollSlider.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+
+        const chart = pressureChart;
+        const xScale = chart.scales?.x;
+
+        // Check if scale exists and is initialized
+        if (!xScale || xScale.min === undefined || xScale.max === undefined) {
+          console.log("⚠️ Chart scales not yet ready for scrolling");
+          return;
+        }
+
+        const currentRange = xScale.max - xScale.min;
+        const newCenter = percentage * chartDataLength;
+
+        const newMin = Math.max(0, newCenter - currentRange / 2);
+        const newMax = Math.min(chartDataLength, newMin + currentRange);
+
+        chart.zoomScale("x", { min: newMin, max: newMax }, "none");
+        updateScrollbar();
+      }
+
+      async function processPressureData() {
+        pressureData = { "08": [], "09": [], 10: [], 11: [] };
+
+        console.log("📊 Starting pressure data processing...");
+
+        // Use fullData for pressure analysis (all data points)
+        const dataToProcess = fullData.length > 0 ? fullData : currentData;
+
+        // Determine if filter is active
+        const filterActive =
+          selectedProcessStates.size > 0 &&
+          selectedProcessStates.size < availableProcessStates.length;
+        console.log(
+          `Filter active: ${filterActive}, Selected states: ${selectedProcessStates.size}`
+        );
+
+        // Find columns for each month
+        const monthColumns = {
+          "08": { dt: -1, pressure: -1, state: -1 },
+          "09": { dt: -1, pressure: -1, state: -1 },
+          10: { dt: -1, pressure: -1, state: -1 },
+          11: { dt: -1, pressure: -1, state: -1 },
+        };
+
+        // Find column indices
+        currentHeaders.forEach((header, idx) => {
+          for (let month of ["08", "09", "10", "11"]) {
+            if (header.includes(`${month}_DateTime`)) {
+              monthColumns[month].dt = idx;
+            } else if (header.includes(`${month}_Pressure`)) {
+              monthColumns[month].pressure = idx;
+            } else if (header.includes(`${month}_ProcessState`)) {
+              monthColumns[month].state = idx;
+            }
+          }
+        });
+
+        console.log("📊 Column indices:", monthColumns);
+
+        // Process each row with progress updates
+        const totalRows = dataToProcess.length;
+        const updateInterval = Math.max(1, Math.floor(totalRows / 50)); // Update every 2%
+        const yieldInterval = 5000; // Yield to browser every 5000 rows
+
+        console.log(`📊 Processing ${totalRows.toLocaleString()} rows...`);
+
+        for (let rowIdx = 0; rowIdx < totalRows; rowIdx++) {
+          const row = dataToProcess[rowIdx];
+
+          for (let month of ["08", "09", "10", "11"]) {
+            const cols = monthColumns[month];
+            if (cols.dt !== -1 && cols.pressure !== -1) {
+              const datetime = row[cols.dt];
+              const pressure = parseFloat(row[cols.pressure]);
+              const state = cols.state !== -1 ? row[cols.state] : "";
+
+              // Apply filter if active
+              if (filterActive && state) {
+                const trimmedState = String(state).trim();
+                if (!selectedProcessStates.has(trimmedState)) {
+                  continue; // Skip this data point if state not selected
+                }
+              }
+
+              if (datetime && !isNaN(pressure)) {
+                pressureData[month].push({
+                  datetime,
+                  pressure,
+                  state,
+                  sequence: pressureData[month].length,
+                });
+              }
+            }
+          }
+
+          // Update progress periodically with smooth increments
+          if (rowIdx % updateInterval === 0) {
+            const progress = 10 + (rowIdx / totalRows) * 60; // 10-70% for processing
+            updateProgress(
+              progress,
+              `Processing ${rowIdx.toLocaleString()} / ${totalRows.toLocaleString()} rows...`
+            );
+          }
+
+          // Yield to browser every N rows to keep UI responsive
+          if (rowIdx % yieldInterval === 0 && rowIdx > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          }
+        }
+
+        console.log("✓ Pressure data processed:");
+        for (let month of ["08", "09", "10", "11"]) {
+          console.log(
+            `  - Month ${month}: ${pressureData[month].length} data points`
+          );
+        }
+      }
+
+      async function renderPressureChart() {
+        const canvas = document.getElementById("pressureChart");
+        const ctx = canvas.getContext("2d");
+
+        updateProgress(72, "Preparing chart data...");
+        await new Promise((resolve) => setTimeout(resolve, 10));
+
+        // Destroy existing chart
+        if (pressureChart) {
+          pressureChart.destroy();
+        }
+
+        let datasets = [];
+        let labels = [];
+
+        const monthColors = {
+          "08": "#8884d8",
+          "09": "#82ca9d",
+          10: "#ffc658",
+          11: "#ff7c7c",
+        };
+
+        updateProgress(74, "Optimizing data for display...");
+        await new Promise((resolve) => setTimeout(resolve, 10));
+
+        // Decimation function - intelligently sample data for display
+        function decimateData(data, maxPoints = 10000) {
+          if (data.length <= maxPoints) return data;
+
+          const step = Math.ceil(data.length / maxPoints);
+          const decimated = [];
+
+          for (let i = 0; i < data.length; i += step) {
+            decimated.push(data[i]);
+          }
+
+          console.log(
+            `📉 Decimated ${data.length.toLocaleString()} points to ${decimated.length.toLocaleString()} (step: ${step})`
+          );
+          return decimated;
+        }
+
+        updateProgress(76, "Building datasets...");
+        await new Promise((resolve) => setTimeout(resolve, 10));
+
+        if (selectedMonth === "all") {
+          updateProgress(
+            78,
+            "Processing all months (this may take a moment)..."
+          );
+          await new Promise((resolve) => setTimeout(resolve, 10));
+
+          // Show all months - decimate heavily for performance
+          let offset = 0;
+          for (let month of ["08", "09", "10", "11"]) {
+            const rawData = pressureData[month];
+            const data = decimateData(rawData, 5000); // Max 5k points per month for "all" view
+            const monthName =
+              month === "08"
+                ? "August"
+                : month === "09"
+                ? "September"
+                : month === "10"
+                ? "October"
+                : "November";
+
+            // Extend labels
+            for (let i = 0; i < data.length; i++) {
+              labels.push(offset + i);
+            }
+
+            // Create dataset for this month
+            const fullData = new Array(labels.length).fill(null);
+            data.forEach((point, idx) => {
+              fullData[offset + idx] = point.pressure;
+            });
+
+            datasets.push({
+              label: monthName,
+              data: fullData,
+              borderColor: monthColors[month],
+              backgroundColor: monthColors[month] + "20",
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0,
+            });
+
+            offset += data.length;
+
+            // Yield after each month
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          }
+        } else {
+          updateProgress(
+            78,
+            `Processing ${
+              selectedMonth === "08"
+                ? "August"
+                : selectedMonth === "09"
+                ? "September"
+                : selectedMonth === "10"
+                ? "October"
+                : "November"
+            } data...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, 10));
+
+          // Show single month - decimate but allow more detail
+          const rawData = pressureData[selectedMonth];
+          const data = decimateData(rawData, 20000); // Max 20k points for single month view
+          const monthName =
+            selectedMonth === "08"
+              ? "August"
+              : selectedMonth === "09"
+              ? "September"
+              : selectedMonth === "10"
+              ? "October"
+              : "November";
+
+          labels = data.map((_, idx) => idx);
+          datasets.push({
+            label: "Pressure (Torr)",
+            data: data.map((d) => d.pressure),
+            borderColor: "#8884d8",
+            backgroundColor: "#8884d820",
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0,
+          });
+        }
+
+        updateProgress(82, "Initializing chart renderer...");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        // Show zoom controls for all views (including "All Months")
+        zoomControls.style.display = "flex";
+        chartScrollContainer.style.display = "block";
+        chartDataLength = labels.length;
+
+        updateProgress(
+          85,
+          `Rendering chart with ${labels.length.toLocaleString()} data points...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        pressureChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: datasets,
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false, // Disable animation for faster rendering
+            plugins: {
+              legend: {
+                display: true,
+                position: "top",
+              },
+              decimation: {
+                enabled: true,
+                algorithm: "lttb", // Largest-Triangle-Three-Buckets algorithm
+                samples: 1000, // Further downsample if zoomed out
+              },
+              zoom: {
+                zoom: {
+                  wheel: {
+                    enabled: true, // Enable for all views including "All Months"
+                    speed: 0.1,
+                  },
+                  pinch: {
+                    enabled: true, // Enable for all views
+                  },
+                  drag: {
+                    enabled: false,
+                  },
+                  mode: "x",
+                  onZoom: function ({ chart }) {
+                    updateScrollbar();
+                  },
+                },
+                pan: {
+                  enabled: true, // Enable for all views
+                  mode: "x",
+                  modifierKey: null,
+                  onPan: function ({ chart }) {
+                    updateScrollbar();
+                  },
+                },
+                limits: {
+                  x: {
+                    min: "original",
+                    max: "original",
+                  },
+                },
+              },
+              tooltip: {
+                mode: "index",
+                intersect: false,
+                callbacks: {
+                  title: function (context) {
+                    if (selectedMonth === "all") {
+                      // Find which month this point belongs to
+                      let idx = context[0].dataIndex;
+                      let offset = 0;
+                      for (let month of ["08", "09", "10", "11"]) {
+                        const len = pressureData[month].length;
+                        if (idx < offset + len) {
+                          const point = pressureData[month][idx - offset];
+                          return point.datetime + " - " + point.state;
+                        }
+                        offset += len;
+                      }
+                    } else {
+                      const point =
+                        pressureData[selectedMonth][context[0].dataIndex];
+                      return point ? point.datetime + " - " + point.state : "";
+                    }
+                    return "";
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Sample Number",
+                },
+                ticks: {
+                  maxTicksLimit: 20,
+                },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Pressure (Torr)",
+                },
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+
+        // Initialize scrollbar for all views (including "All Months")
+        setTimeout(() => {
+          updateScrollbar();
+        }, 100);
+      }
+
+      async function renderMonthStats() {
+        const container = document.getElementById("monthStats");
+        container.innerHTML = "";
+
+        for (let month of ["08", "09", "10", "11"]) {
+          const data = pressureData[month];
+          if (data.length === 0) continue;
+
+          // Calculate stats without spreading large arrays (avoids stack overflow)
+          let min = Infinity;
+          let max = -Infinity;
+          let sum = 0;
+
+          for (let i = 0; i < data.length; i++) {
+            const pressure = data[i].pressure;
+            if (pressure < min) min = pressure;
+            if (pressure > max) max = pressure;
+            sum += pressure;
+          }
+
+          const avg = (sum / data.length).toFixed(1);
+
+          const monthName =
+            month === "08"
+              ? "August"
+              : month === "09"
+              ? "September"
+              : month === "10"
+              ? "October"
+              : "November";
+
+          const card = document.createElement("div");
+          card.className = "stat-card";
+          card.innerHTML = `
+
+      	<h3>${monthName} 2025</h3>
+      	<div class="stat-values">
+      		<div class="stat-value">
+      			<p>Min</p>
+      			<p>${min} Torr</p>
+      		</div>
+      		<div class="stat-value">
+      			<p>Max</p>
+      			<p>${max} Torr</p>
+      		</div>
+      		<div class="stat-value">
+      			<p>Avg</p>
+      			<p>${avg} Torr</p>
+      		</div>
+      	</div>
+      	<p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">
+      		${data.length} samples
+      	</p>
+      `;
+
+          container.appendChild(card);
+        }
+      }
+    </script>
+  </body>
 </html>
