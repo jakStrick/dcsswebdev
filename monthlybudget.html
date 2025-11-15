@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Budget Alignment Tool</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 1rem;
+      }
+
+      .controls {
+        padding: 2rem;
+        background: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .control-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .control-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .control-item label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #495057;
+        font-size: 0.875rem;
+      }
+
+      .control-item input {
+        padding: 0.75rem;
+        border: 2px solid #dee2e6;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+
+      .control-item input:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .btn {
+        padding: 0.875rem 2rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background: #5a6268;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+        background: #f8f9fa;
+      }
+
+      .summary-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .summary-card .label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+
+      .summary-card .value {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #212529;
+      }
+
+      .summary-card.positive .value {
+        color: #28a745;
+      }
+
+      .summary-card.negative .value {
+        color: #dc3545;
+      }
+
+      .summary-card.warning .value {
+        color: #ffc107;
+      }
+
+      .content {
+        padding: 2rem;
+      }
+
+      .paycheck-section {
+        margin-bottom: 2rem;
+      }
+
+      .paycheck-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .paycheck-header h2 {
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .paycheck-info {
+        text-align: right;
+      }
+
+      .paycheck-amount {
+        font-size: 1.75rem;
+        font-weight: bold;
+      }
+
+      .paycheck-remaining {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .bills-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .bills-table thead {
+        background: #f8f9fa;
+      }
+
+      .bills-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+      }
+
+      .bills-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .bills-table tr:hover {
+        background: #f8f9fa;
+      }
+
+      .bill-name {
+        font-weight: 600;
+        color: #212529;
+      }
+
+      .bill-category {
+        font-size: 0.875rem;
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      .amount {
+        font-weight: 600;
+        color: #dc3545;
+      }
+
+      .balance {
+        color: #6c757d;
+      }
+
+      .due-date {
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .badge-ach {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+
+      .badge-up {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .badge-cl {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .badge-priority {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .totals-row {
+        background: #f8f9fa;
+        font-weight: bold;
+      }
+
+      .totals-row td {
+        border-top: 3px solid #667eea;
+        padding: 1.5rem 1rem;
+      }
+
+      .recommendations {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #e7f3ff;
+        border-left: 4px solid #2196f3;
+        border-radius: 0.5rem;
+      }
+
+      .recommendations h3 {
+        color: #1976d2;
+        margin-bottom: 1rem;
+      }
+
+      .recommendations ul {
+        list-style-position: inside;
+        color: #495057;
+      }
+
+      .recommendations li {
+        padding: 0.5rem 0;
+      }
+
+      .alert {
+        padding: 1rem 1.5rem;
+        margin: 1rem 0;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .alert-warning {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        color: #856404;
+      }
+
+      .alert-danger {
+        background: #f8d7da;
+        border-left: 4px solid #dc3545;
+        color: #721c24;
+      }
+
+      .alert-success {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        color: #155724;
+      }
+
+      .icon {
+        font-size: 1.5rem;
+      }
+
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+        .controls,
+        .btn-group {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>💰 Budget Alignment Tool</h1>
+        <p>Optimize bill payments across pay periods for maximum debt payoff</p>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <div class="control-item">
+            <label>Your Next Payday (Biweekly)</label>
+            <input type="date" id="yourPayday" value="2025-11-21" />
+          </div>
+          <div class="control-item">
+            <label>Your Take-Home Pay</label>
+            <input type="number" id="yourPay" value="3803.89" step="0.01" />
+          </div>
+          <div class="control-item">
+            <label>Wife's Take-Home Pay</label>
+            <input type="number" id="wifePay" value="1099.48" step="0.01" />
+          </div>
+          <div class="control-item">
+            <label>Current Bank Balance</label>
+            <input type="number" id="bankBalance" value="1406.88" step="0.01" />
+          </div>
+          <div class="control-item">
+            <label>Month/Year</label>
+            <input type="month" id="monthYear" value="2025-11" />
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="calculateBudget()">
+            Calculate Alignment
+          </button>
+          <button class="btn btn-secondary" onclick="toggleAdjustments()">
+            Adjust Bills
+          </button>
+          <button class="btn btn-secondary" onclick="toggleSavingsManager()">
+            Manage Savings
+          </button>
+          <button class="btn btn-secondary" onclick="window.print()">
+            Print Report
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="adjustmentsPanel"
+        style="
+          display: none;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-bottom: 2px solid #e9ecef;
+        "
+      >
+        <h3 style="margin-bottom: 1.5rem; color: #495057">
+          💰 Adjust Monthly Amounts
+        </h3>
+        <div
+          id="adjustableFields"
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+          "
+        ></div>
+        <div style="margin-top: 1.5rem; text-align: center">
+          <button class="btn btn-primary" onclick="applyAdjustments()">
+            Apply Changes
+          </button>
+          <button class="btn btn-secondary" onclick="toggleAdjustments()">
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="savingsPanel"
+        style="
+          display: none;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-bottom: 2px solid #e9ecef;
+        "
+      >
+        <h3 style="margin-bottom: 1.5rem; color: #495057">
+          💵 Manage Surplus Savings
+        </h3>
+        <div style="max-width: 500px; margin: 0 auto">
+          <div
+            style="
+              margin-bottom: 1.5rem;
+              padding: 1rem;
+              background: white;
+              border-radius: 0.5rem;
+              border: 2px solid #667eea;
+            "
+          >
+            <div
+              style="font-size: 0.875rem; color: #6c757d; margin-bottom: 0.5rem"
+            >
+              Current Balance
+            </div>
+            <div
+              id="currentSavingsDisplay"
+              style="font-size: 2rem; font-weight: bold; color: #667eea"
+            >
+              $0.00
+            </div>
+          </div>
+
+          <div class="control-item" style="margin-bottom: 1rem">
+            <label>Add/Subtract Amount</label>
+            <input
+              type="number"
+              id="savingsAmount"
+              placeholder="Enter amount"
+              step="0.01"
+              style="
+                padding: 0.75rem;
+                border: 2px solid #dee2e6;
+                border-radius: 0.5rem;
+                font-size: 1rem;
+                width: 100%;
+              "
+            />
+          </div>
+
+          <div
+            style="
+              display: flex;
+              gap: 1rem;
+              flex-wrap: wrap;
+              justify-content: center;
+            "
+          >
+            <button class="btn btn-primary" onclick="addToSavings()">
+              Add to Savings
+            </button>
+            <button class="btn btn-secondary" onclick="subtractFromSavings()">
+              Withdraw
+            </button>
+            <button class="btn btn-secondary" onclick="resetSavings()">
+              Reset to $0
+            </button>
+            <button class="btn btn-secondary" onclick="toggleSavingsManager()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="results"></div>
+    </div>
+
+    <script>
+      // Bill data structure
+      const billsData = [
+        // Main Fixed Monthly Expenses
+        {
+          name: "Mortgage",
+          category: "Main",
+          amount: 2820.46,
+          balance: 381561.09,
+          dueDay: 15,
+          ach: false,
+          type: "CL",
+          priority: 1,
+        },
+        {
+          name: "Rent",
+          category: "Main",
+          amount: 2395.0,
+          balance: 0,
+          dueDay: 1,
+          ach: false,
+          type: "CL",
+          priority: 1,
+        },
+        {
+          name: "Solar",
+          category: "Main",
+          amount: 164.55,
+          balance: 164.55,
+          dueDay: 21,
+          ach: true,
+          type: "UP",
+          priority: 2,
+        },
+        {
+          name: "Cellular",
+          category: "Main",
+          amount: 184.62,
+          balance: 185.62,
+          dueDay: 25,
+          ach: true,
+          type: "UP",
+          priority: 2,
+        },
+        {
+          name: "Car Payment",
+          category: "Main",
+          amount: 587.91,
+          balance: 26859.43,
+          dueDay: 19,
+          ach: false,
+          type: "UP",
+          priority: 1,
+        },
+        {
+          name: "Achieve Loan",
+          category: "Main",
+          amount: 1500.0,
+          balance: 35801.26,
+          dueDay: 15,
+          ach: true,
+          type: "N",
+          priority: 1,
+        },
+        {
+          name: "Sadzi School",
+          category: "Main",
+          amount: 0.0,
+          balance: 2200.0,
+          dueDay: 4,
+          ach: false,
+          type: "UP",
+          priority: 2,
+        },
+        {
+          name: "Auto Insurance",
+          category: "Main",
+          amount: 590.76,
+          balance: 0,
+          dueDay: 25,
+          ach: true,
+          type: "UP",
+          priority: 1,
+        },
+        {
+          name: "Achieve Loan 2",
+          category: "Main",
+          amount: 507.0,
+          balance: 16300.0,
+          dueDay: 30,
+          ach: true,
+          type: "CL",
+          priority: 1,
+        },
+
+        // Credit Cards
+        {
+          name: "Amex",
+          category: "Credit Card",
+          amount: 0.0,
+          balance: 0,
+          dueDay: 17,
+          ach: false,
+          type: "CL",
+          priority: 3,
+        },
+        {
+          name: "Credit One 7801 Green",
+          category: "Credit Card",
+          amount: 500.0,
+          balance: 1050.9,
+          dueDay: 2,
+          ach: false,
+          type: "CL",
+          priority: 2,
+        },
+        {
+          name: "Credit One 3694 Blue",
+          category: "Credit Card",
+          amount: 0.0,
+          balance: 0,
+          dueDay: 23,
+          ach: false,
+          type: "CL",
+          priority: 3,
+        },
+        {
+          name: "Mercury Credit",
+          category: "Credit Card",
+          amount: 1769.08,
+          balance: 2470.1,
+          dueDay: 9,
+          ach: false,
+          type: "CL",
+          priority: 2,
+        },
+        {
+          name: "Quick Silver 9014",
+          category: "Credit Card",
+          amount: 0.0,
+          balance: 0,
+          dueDay: 21,
+          ach: false,
+          type: "CL",
+          priority: 3,
+        },
+        {
+          name: "Capital One Claudia",
+          category: "Credit Card",
+          amount: 159.41,
+          balance: 0,
+          dueDay: 23,
+          ach: false,
+          type: "CL",
+          priority: 2,
+        },
+        {
+          name: "Discover",
+          category: "Credit Card",
+          amount: 0.0,
+          balance: 0,
+          dueDay: 5,
+          ach: false,
+          type: "CL",
+          priority: 3,
+        },
+        {
+          name: "Home Depot",
+          category: "Credit Card",
+          amount: 0.0,
+          balance: 0,
+          dueDay: 20,
+          ach: false,
+          type: "CL",
+          priority: 3,
+        },
+        {
+          name: "Mariner Credit",
+          category: "Credit Card",
+          amount: 552.5,
+          balance: 4185.82,
+          dueDay: 9,
+          ach: false,
+          type: "CL",
+          priority: 2,
+        },
+        {
+          name: "Affirm",
+          category: "Credit Card",
+          amount: 266.73,
+          balance: 800.18,
+          dueDay: 10,
+          ach: true,
+          type: "CL",
+          priority: 2,
+        },
+        {
+          name: "Providence (ARSTRAT-Sugar)",
+          category: "Credit Card",
+          amount: 104.27,
+          balance: 8507.0,
+          dueDay: 26,
+          ach: true,
+          type: "N",
+          priority: 2,
+        },
+
+        // Utilities (amounts are adjustable)
+        {
+          name: "Ziply",
+          category: "Utilities",
+          amount: 147.42,
+          balance: 0,
+          dueDay: 27,
+          ach: false,
+          type: "CL",
+          priority: 2,
+          adjustable: true,
+        },
+        {
+          name: "Garbage",
+          category: "Utilities",
+          amount: 68.29,
+          balance: 0,
+          dueDay: 21,
+          ach: false,
+          type: "UP",
+          priority: 2,
+          adjustable: true,
+        },
+        {
+          name: "NW Natural",
+          category: "Utilities",
+          amount: 35.73,
+          balance: 0,
+          dueDay: 9,
+          ach: false,
+          type: "CL",
+          priority: 2,
+          adjustable: true,
+        },
+        {
+          name: "Portland General Electric (PGE)",
+          category: "Utilities",
+          amount: 266.09,
+          balance: 0,
+          dueDay: 15,
+          ach: false,
+          type: "CL",
+          priority: 2,
+          adjustable: true,
+        },
+        {
+          name: "Water",
+          category: "Utilities",
+          amount: 0.0, // Bi-monthly - $0 for November
+          balance: 0,
+          dueDay: 20,
+          ach: false,
+          type: "CL",
+          priority: 2,
+          adjustable: true,
+          bimonthly: true,
+        },
+        {
+          name: "Blue Mountain",
+          category: "Utilities",
+          amount: 65.29,
+          balance: 0,
+          dueDay: 1,
+          ach: true,
+          type: "UP",
+          priority: 2,
+          adjustable: true,
+        },
+        {
+          name: "Brooks Pest Service",
+          category: "Utilities",
+          amount: 109.0,
+          balance: 0,
+          dueDay: 8,
+          ach: false,
+          type: "UP",
+          priority: 2,
+          adjustable: true,
+        },
+
+        // Monthly Budget Items
+        {
+          name: "Groceries",
+          category: "Budget",
+          amount: 600.0,
+          balance: 0,
+          dueDay: 1, // Spread throughout month
+          ach: false,
+          type: "N",
+          priority: 3,
+          adjustable: true,
+        },
+        {
+          name: "Lunch/Eating Out",
+          category: "Budget",
+          amount: 200.0,
+          balance: 0,
+          dueDay: 1,
+          ach: false,
+          type: "N",
+          priority: 3,
+          adjustable: true,
+        },
+        {
+          name: "Gas (2 Vehicles)",
+          category: "Budget",
+          amount: 300.0,
+          balance: 0,
+          dueDay: 1,
+          ach: false,
+          type: "N",
+          priority: 3,
+          adjustable: true,
+        },
+        {
+          name: "Budget Surplus/Savings",
+          category: "Budget",
+          amount: 1000.0,
+          balance: 0,
+          dueDay: 30, // End of month
+          ach: false,
+          type: "N",
+          priority: 4,
+          adjustable: true,
+        },
+      ];
+
+      function toggleAdjustments() {
+        const panel = document.getElementById("adjustmentsPanel");
+        if (panel.style.display === "none") {
+          // Show panel and populate fields for ALL bills
+          const fieldsContainer = document.getElementById("adjustableFields");
+          fieldsContainer.innerHTML = "";
+
+          // Group bills by category
+          const categories = {
+            Main: [],
+            "Credit Card": [],
+            Utilities: [],
+            Budget: [],
+          };
+
+          billsData.forEach((bill) => {
+            if (categories[bill.category]) {
+              categories[bill.category].push(bill);
+            }
+          });
+
+          // Render bills by category
+          Object.keys(categories).forEach((category) => {
+            if (categories[category].length > 0) {
+              fieldsContainer.innerHTML += `
+                <div style="margin-bottom: 1.5rem;">
+                  <h4 style="color: #667eea; margin-bottom: 0.75rem; font-size: 1rem; border-bottom: 2px solid #667eea; padding-bottom: 0.25rem;">${category}</h4>
+                  <div class="control-group">
+              `;
+
+              categories[category].forEach((bill, index) => {
+                const fieldHTML = `
+                  <div class="control-item">
+                    <label>${bill.name}${
+                  bill.bimonthly ? " (Bi-monthly)" : ""
+                }</label>
+                    <input type="number" id="adjust_${
+                      bill.name
+                    }" value="${bill.amount.toFixed(2)}" step="0.01" 
+                           data-bill-name="${
+                             bill.name
+                           }" style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
+                  </div>
+                `;
+                fieldsContainer.innerHTML += fieldHTML;
+              });
+
+              fieldsContainer.innerHTML += `
+                  </div>
+                </div>
+              `;
+            }
+          });
+
+          panel.style.display = "block";
+        } else {
+          panel.style.display = "none";
+        }
+      }
+
+      function applyAdjustments() {
+        // Update bill amounts based on input fields
+        const adjustments = {};
+        const inputs = document.querySelectorAll('[id^="adjust_"]');
+        inputs.forEach((input) => {
+          const billName = input.dataset.billName;
+          const newAmount = parseFloat(input.value) || 0;
+          const bill = billsData.find((b) => b.name === billName);
+          if (bill) {
+            bill.amount = newAmount;
+            adjustments[billName] = newAmount;
+          }
+        });
+
+        // Save adjustments to localStorage
+        localStorage.setItem("billAdjustments", JSON.stringify(adjustments));
+
+        // Recalculate budget
+        calculateBudget();
+
+        // Close panel
+        toggleAdjustments();
+      }
+
+      function loadSavedAdjustments() {
+        // Load adjustments from localStorage
+        const saved = localStorage.getItem("billAdjustments");
+        if (saved) {
+          try {
+            const adjustments = JSON.parse(saved);
+            Object.keys(adjustments).forEach((billName) => {
+              const bill = billsData.find((b) => b.name === billName);
+              if (bill) {
+                bill.amount = adjustments[billName];
+              }
+            });
+          } catch (e) {
+            console.error("Error loading saved adjustments:", e);
+          }
+        }
+      }
+
+      function toggleSavingsManager() {
+        const panel = document.getElementById("savingsPanel");
+        if (panel.style.display === "none") {
+          // Show panel and update display
+          const currentSavings = parseFloat(
+            localStorage.getItem("surplusSavings") || "0"
+          );
+          document.getElementById("currentSavingsDisplay").textContent =
+            "$" +
+            currentSavings.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+          panel.style.display = "block";
+        } else {
+          panel.style.display = "none";
+        }
+      }
+
+      function addToSavings() {
+        const amount =
+          parseFloat(document.getElementById("savingsAmount").value) || 0;
+        if (amount <= 0) {
+          alert("Please enter a valid positive amount");
+          return;
+        }
+
+        const currentSavings = parseFloat(
+          localStorage.getItem("surplusSavings") || "0"
+        );
+        const newSavings = currentSavings + amount;
+        localStorage.setItem("surplusSavings", newSavings.toString());
+
+        document.getElementById("currentSavingsDisplay").textContent =
+          "$" +
+          newSavings.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        document.getElementById("savingsAmount").value = "";
+
+        // Recalculate to update the summary card
+        calculateBudget();
+      }
+
+      function subtractFromSavings() {
+        const amount =
+          parseFloat(document.getElementById("savingsAmount").value) || 0;
+        if (amount <= 0) {
+          alert("Please enter a valid positive amount");
+          return;
+        }
+
+        const currentSavings = parseFloat(
+          localStorage.getItem("surplusSavings") || "0"
+        );
+        const newSavings = Math.max(0, currentSavings - amount);
+        localStorage.setItem("surplusSavings", newSavings.toString());
+
+        document.getElementById("currentSavingsDisplay").textContent =
+          "$" +
+          newSavings.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+        document.getElementById("savingsAmount").value = "";
+
+        // Recalculate to update the summary card
+        calculateBudget();
+      }
+
+      function resetSavings() {
+        if (
+          confirm(
+            "Are you sure you want to reset your surplus savings balance to $0?"
+          )
+        ) {
+          localStorage.setItem("surplusSavings", "0");
+          document.getElementById("currentSavingsDisplay").textContent =
+            "$0.00";
+          document.getElementById("savingsAmount").value = "";
+
+          // Recalculate to update the summary card
+          calculateBudget();
+        }
+      }
+
+      function calculateBudget() {
+        const yourPaydayInput = document.getElementById("yourPayday").value;
+        const yourPay = parseFloat(document.getElementById("yourPay").value);
+        const wifePay = parseFloat(document.getElementById("wifePay").value);
+        const bankBalance = parseFloat(
+          document.getElementById("bankBalance").value
+        );
+        const monthYearInput = document.getElementById("monthYear").value;
+
+        const [year, month] = monthYearInput.split("-").map(Number);
+        const yourPayday = new Date(yourPaydayInput);
+
+        // Calculate all pay periods for the month
+        const payPeriods = calculatePayPeriods(
+          yourPayday,
+          year,
+          month,
+          yourPay,
+          wifePay
+        );
+
+        // Assign bills to pay periods
+        const assignments = assignBillsToPayPeriods(payPeriods, year, month);
+
+        // Render the results
+        renderResults(assignments, payPeriods, year, month, bankBalance);
+      }
+
+      function calculatePayPeriods(firstPayday, year, month, yourPay, wifePay) {
+        const periods = [];
+        const startOfMonth = new Date(year, month - 1, 1);
+        const endOfMonth = new Date(year, month, 0);
+
+        console.log(`Calculating pay periods for ${month}/${year}`);
+        console.log(
+          `Month range: ${startOfMonth.toDateString()} to ${endOfMonth.toDateString()}`
+        );
+
+        // You get paid twice per month (Thursdays biweekly)
+        // Wife gets paid twice per month (Tuesdays biweekly, opposite weeks)
+        const yourReferencePayday = new Date(firstPayday);
+        console.log(
+          `Your reference payday: ${yourReferencePayday.toDateString()}`
+        );
+
+        // Start from well before the target month to ensure we catch all paychecks
+        let yourCurrentPayday = new Date(yourReferencePayday);
+
+        // Go back to find a starting point before the month begins
+        // Go back enough weeks to ensure we find the first paycheck of any month
+        while (yourCurrentPayday > startOfMonth) {
+          yourCurrentPayday.setDate(yourCurrentPayday.getDate() - 14);
+        }
+        console.log(
+          `Your starting search point: ${yourCurrentPayday.toDateString()}`
+        );
+
+        // Collect all YOUR paychecks that fall in the month
+        const yourPaychecks = [];
+        while (yourCurrentPayday <= endOfMonth) {
+          if (
+            yourCurrentPayday >= startOfMonth &&
+            yourCurrentPayday <= endOfMonth
+          ) {
+            console.log(
+              `Found YOUR paycheck: ${yourCurrentPayday.toDateString()}`
+            );
+            yourPaychecks.push(new Date(yourCurrentPayday));
+          }
+          yourCurrentPayday.setDate(yourCurrentPayday.getDate() + 14);
+        }
+
+        // Calculate wife's paychecks (Tuesdays)
+        // Wife gets paid on Tuesdays, you get paid on Thursdays
+        // They're on opposite biweekly schedules
+        const wifePaychecks = [];
+
+        // Start from your reference payday, but go to the OPPOSITE week's Tuesday
+        let wifeCurrentPayday = new Date(yourReferencePayday);
+
+        // First, go back 2 days to get from Thursday to Tuesday
+        wifeCurrentPayday.setDate(wifeCurrentPayday.getDate() - 2);
+
+        // Then go back 7 days to get to the OPPOSITE week (since she's paid on off-weeks from you)
+        wifeCurrentPayday.setDate(wifeCurrentPayday.getDate() - 7);
+
+        // Go back to find starting point
+        while (wifeCurrentPayday > startOfMonth) {
+          wifeCurrentPayday.setDate(wifeCurrentPayday.getDate() - 14);
+        }
+        console.log(
+          `Wife's starting search point: ${wifeCurrentPayday.toDateString()}`
+        );
+
+        // Collect all wife's paychecks that fall in the month
+        while (wifeCurrentPayday <= endOfMonth) {
+          if (
+            wifeCurrentPayday >= startOfMonth &&
+            wifeCurrentPayday <= endOfMonth
+          ) {
+            console.log(
+              `Found WIFE paycheck: ${wifeCurrentPayday.toDateString()}`
+            );
+            wifePaychecks.push(new Date(wifeCurrentPayday));
+          }
+          wifeCurrentPayday.setDate(wifeCurrentPayday.getDate() + 14);
+        }
+
+        // Combine all paychecks
+        const allPaychecks = [];
+
+        yourPaychecks.forEach((date) => {
+          allPaychecks.push({
+            date: date,
+            amount: yourPay,
+            person: "You",
+            bills: [],
+            totalAssigned: 0,
+          });
+        });
+
+        wifePaychecks.forEach((date) => {
+          allPaychecks.push({
+            date: date,
+            amount: wifePay,
+            person: "Wife",
+            bills: [],
+            totalAssigned: 0,
+          });
+        });
+
+        // Sort by date
+        allPaychecks.sort((a, b) => a.date - b.date);
+
+        // Remove any duplicates (shouldn't happen but just in case)
+        const uniquePaychecks = [];
+        const seenDates = new Set();
+
+        allPaychecks.forEach((pc) => {
+          const dateKey = pc.date.toISOString().split("T")[0] + pc.person;
+          if (!seenDates.has(dateKey)) {
+            seenDates.add(dateKey);
+            uniquePaychecks.push(pc);
+          }
+        });
+
+        return uniquePaychecks;
+      }
+
+      function assignBillsToPayPeriods(payPeriods, year, month) {
+        const assignments = payPeriods.map((p) => ({ ...p, bills: [] }));
+
+        // Get today's date for filtering already-paid bills
+        const today = new Date();
+        const isCurrentMonth =
+          year === today.getFullYear() && month === today.getMonth() + 1;
+
+        // Filter bills with non-zero amounts
+        let activeBills = billsData.filter((bill) => bill.amount > 0);
+
+        // If viewing current month, only show bills that haven't been paid yet (due date >= today)
+        // Exception: Budget items always show (they're ongoing monthly expenses)
+        if (isCurrentMonth) {
+          activeBills = activeBills.filter((bill) => {
+            // Always include budget items (groceries, gas, etc.)
+            if (bill.category === "Budget") {
+              return true;
+            }
+            // For other bills, only show if due date hasn't passed
+            const dueDate = new Date(year, month - 1, bill.dueDay);
+            return dueDate >= today;
+          });
+        }
+
+        // Sort bills by priority (1 = highest) then by due date
+        const sortedBills = [...activeBills].sort((a, b) => {
+          if (a.priority !== b.priority) return a.priority - b.priority;
+          return a.dueDay - b.dueDay;
+        });
+
+        // Separate budget items that should be split across all paychecks
+        const budgetItemsToSplit = sortedBills.filter(
+          (bill) =>
+            bill.category === "Budget" &&
+            (bill.name === "Groceries" ||
+              bill.name === "Lunch/Eating Out" ||
+              bill.name === "Gas (2 Vehicles)")
+        );
+
+        const otherBills = sortedBills.filter(
+          (bill) =>
+            !(
+              bill.category === "Budget" &&
+              (bill.name === "Groceries" ||
+                bill.name === "Lunch/Eating Out" ||
+                bill.name === "Gas (2 Vehicles)")
+            )
+        );
+
+        // Assign regular bills to the appropriate pay period
+        otherBills.forEach((bill) => {
+          const dueDate = new Date(year, month - 1, bill.dueDay);
+
+          // Find the best pay period (last payday before or on due date)
+          let bestPeriodIndex = -1;
+          let minDaysDiff = Infinity;
+
+          assignments.forEach((period, index) => {
+            const daysDiff = Math.floor(
+              (dueDate - period.date) / (1000 * 60 * 60 * 24)
+            );
+
+            // Prefer paying from a paycheck that comes before the due date
+            // but is closest to it (within 0-14 days before due date ideally)
+            if (daysDiff >= 0 && daysDiff < minDaysDiff) {
+              minDaysDiff = daysDiff;
+              bestPeriodIndex = index;
+            }
+          });
+
+          // If no period found before due date, assign to earliest period
+          if (bestPeriodIndex === -1) {
+            bestPeriodIndex = 0;
+          }
+
+          // Assign bill to the period
+          assignments[bestPeriodIndex].bills.push({
+            ...bill,
+            dueDate: dueDate,
+          });
+          assignments[bestPeriodIndex].totalAssigned += bill.amount;
+        });
+
+        // Distribute budget items evenly across all paychecks
+        budgetItemsToSplit.forEach((bill) => {
+          const amountPerPaycheck = bill.amount / assignments.length;
+
+          assignments.forEach((period) => {
+            period.bills.push({
+              ...bill,
+              amount: amountPerPaycheck,
+              dueDate: period.date, // Use the paycheck date as the "due date" for budget items
+              splitItem: true,
+            });
+            period.totalAssigned += amountPerPaycheck;
+          });
+        });
+
+        return assignments;
+      }
+
+      function renderResults(
+        assignments,
+        payPeriods,
+        year,
+        month,
+        bankBalance
+      ) {
+        const resultsDiv = document.getElementById("results");
+
+        // Check if viewing current month
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+        const isCurrentMonth =
+          year === today.getFullYear() && month === today.getMonth() + 1;
+
+        // Calculate summary statistics
+        // Total income = sum of all paychecks in the month (4 total: you 2x, wife 2x)
+        const totalIncome = assignments.reduce((sum, p) => sum + p.amount, 0);
+
+        // Remaining income = sum of paychecks that haven't been received yet (date >= today)
+        const remainingIncome = isCurrentMonth
+          ? assignments
+              .filter((p) => p.date >= today)
+              .reduce((sum, p) => sum + p.amount, 0)
+          : totalIncome;
+
+        // For current month: only count expenses from future paychecks
+        // For future months: count all expenses
+        const totalExpenses = isCurrentMonth
+          ? assignments
+              .filter((p) => p.date >= today)
+              .reduce((sum, p) => sum + p.totalAssigned, 0)
+          : assignments.reduce((sum, p) => sum + p.totalAssigned, 0);
+
+        const netCashFlow = remainingIncome - totalExpenses;
+        const totalDebt = billsData.reduce((sum, b) => sum + b.balance, 0);
+        const projectedBalance = bankBalance + remainingIncome - totalExpenses;
+
+        console.log("=== CALCULATION BREAKDOWN ===");
+        console.log("Is Current Month:", isCurrentMonth);
+        console.log("Today's Date:", today.toDateString());
+        console.log("");
+        console.log("--- INCOME ---");
+        console.log(
+          "Total Income (all paychecks in month):",
+          totalIncome.toFixed(2)
+        );
+        console.log(
+          "Remaining Income (future paychecks only):",
+          remainingIncome.toFixed(2)
+        );
+        console.log("");
+        console.log("--- EXPENSES ---");
+        console.log(
+          "Total Expenses (bills assigned to future paychecks):",
+          totalExpenses.toFixed(2)
+        );
+        console.log("");
+        console.log("--- RESULTS ---");
+        console.log("Bank Balance (starting):", bankBalance.toFixed(2));
+        console.log("");
+        console.log("NET CASH FLOW = Remaining Income - Total Expenses");
+        console.log(
+          `NET CASH FLOW = ${remainingIncome.toFixed(
+            2
+          )} - ${totalExpenses.toFixed(2)} = ${netCashFlow.toFixed(2)}`
+        );
+        console.log("");
+        console.log(
+          "PROJECTED BALANCE = Bank Balance + Remaining Income - Total Expenses"
+        );
+        console.log(
+          `PROJECTED BALANCE = ${bankBalance.toFixed(
+            2
+          )} + ${remainingIncome.toFixed(2)} - ${totalExpenses.toFixed(
+            2
+          )} = ${projectedBalance.toFixed(2)}`
+        );
+        console.log("");
+        console.log(
+          "DIFFERENCE = Projected Balance - Net Cash Flow = Bank Balance"
+        );
+        console.log(
+          `DIFFERENCE = ${projectedBalance.toFixed(2)} - ${netCashFlow.toFixed(
+            2
+          )} = ${(projectedBalance - netCashFlow).toFixed(2)}`
+        );
+        console.log("=== END BREAKDOWN ===");
+        console.log("");
+
+        // Calculate how many paychecks for each person (total)
+        const yourPaychecksTotal = assignments.filter(
+          (p) => p.person === "You"
+        ).length;
+        const wifePaychecksTotal = assignments.filter(
+          (p) => p.person === "Wife"
+        ).length;
+
+        // Calculate remaining paychecks (not yet received)
+        const yourPaychecksRemaining = isCurrentMonth
+          ? assignments.filter((p) => p.person === "You" && p.date >= today)
+              .length
+          : yourPaychecksTotal;
+        const wifePaychecksRemaining = isCurrentMonth
+          ? assignments.filter((p) => p.person === "Wife" && p.date >= today)
+              .length
+          : wifePaychecksTotal;
+
+        // Calculate surplus savings for this month
+        const surplusBill = billsData.find(
+          (b) => b.name === "Budget Surplus/Savings"
+        );
+        const monthlySurplus = surplusBill ? surplusBill.amount : 0;
+
+        // Get accumulated savings from localStorage
+        let accumulatedSavings = parseFloat(
+          localStorage.getItem("surplusSavings") || "0"
+        );
+
+        let html = `
+                <div class="summary">
+                    <div class="summary-card">
+                        <div class="label">Current Bank Balance</div>
+                        <div class="value" style="color: #667eea;">$${bankBalance.toFixed(
+                          2
+                        )}</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="label">Total Monthly Income</div>
+                        <div class="value positive">$${totalIncome.toFixed(
+                          2
+                        )}</div>
+                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
+                            You: ${yourPaychecksTotal}x | Wife: ${wifePaychecksTotal}x paychecks
+                        </div>
+                    </div>
+                    ${
+                      isCurrentMonth
+                        ? `
+                    <div class="summary-card">
+                        <div class="label">Remaining Income</div>
+                        <div class="value positive">$${remainingIncome.toFixed(
+                          2
+                        )}</div>
+                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
+                            You: ${yourPaychecksRemaining}x | Wife: ${wifePaychecksRemaining}x left
+                        </div>
+                    </div>
+                    `
+                        : ""
+                    }
+                    <div class="summary-card">
+                        <div class="label">${
+                          isCurrentMonth ? "Remaining " : "Total "
+                        }Bills</div>
+                        <div class="value negative">$${totalExpenses.toFixed(
+                          2
+                        )}</div>
+                    </div>
+                    <div class="summary-card ${
+                      netCashFlow >= 0 ? "positive" : "negative"
+                    }">
+                        <div class="label">Net Cash Flow</div>
+                        <div class="value">$${netCashFlow.toFixed(2)}</div>
+                    </div>
+                    <div class="summary-card ${
+                      projectedBalance >= 0 ? "positive" : "negative"
+                    }">
+                        <div class="label">Projected Balance</div>
+                        <div class="value">$${projectedBalance.toFixed(2)}</div>
+                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
+                            After all bills paid
+                        </div>
+                    </div>
+                    <div class="summary-card warning">
+                        <div class="label">Total Debt</div>
+                        <div class="value">$${totalDebt.toLocaleString(
+                          "en-US",
+                          { minimumFractionDigits: 2 }
+                        )}</div>
+                    </div>
+                    <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <div class="label" style="color: rgba(255,255,255,0.9);">Surplus Savings Balance</div>
+                        <div class="value" style="color: white;">$${accumulatedSavings.toLocaleString(
+                          "en-US",
+                          { minimumFractionDigits: 2 }
+                        )}</div>
+                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem;">
+                            This month: $${monthlySurplus.toFixed(2)}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content">
+            `;
+
+        // Add alerts based on cash flow
+        if (netCashFlow < 0) {
+          html += `
+                    <div class="alert alert-danger">
+                        <span class="icon">⚠️</span>
+                        <div>
+                            <strong>Budget Deficit!</strong> Your expenses exceed income by $${Math.abs(
+                              netCashFlow
+                            ).toFixed(2)}. 
+                            Consider deferring non-essential payments or negotiating payment plans.
+                        </div>
+                    </div>
+                `;
+        } else if (netCashFlow > 0) {
+          html += `
+                    <div class="alert alert-success">
+                        <span class="icon">✓</span>
+                        <div>
+                            <strong>Budget Surplus!</strong> You have $${netCashFlow.toFixed(
+                              2
+                            )} remaining after all bills. 
+                            Consider applying this to your highest-interest debt.
+                        </div>
+                    </div>
+                `;
+        }
+
+        // Render each pay period
+        assignments.forEach((period, index) => {
+          const remaining = period.amount - period.totalAssigned;
+          const utilizationPercent = (
+            (period.totalAssigned / period.amount) *
+            100
+          ).toFixed(1);
+
+          html += `
+                    <div class="paycheck-section">
+                        <div class="paycheck-header">
+                            <h2>
+                                <span>💵</span>
+                                Paycheck ${index + 1} - ${period.person}
+                                <span style="font-size: 1rem; opacity: 0.9; font-weight: normal;">
+                                    (${period.date.toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })})
+                                </span>
+                            </h2>
+                            <div class="paycheck-info">
+                                <div class="paycheck-amount">$${period.amount.toFixed(
+                                  2
+                                )}</div>
+                                <div class="paycheck-remaining" style="color: ${
+                                  remaining >= 0 ? "#90EE90" : "#FFB6C6"
+                                }">
+                                    Remaining: $${remaining.toFixed(
+                                      2
+                                    )} (${utilizationPercent}% used)
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="bills-table">
+                            <thead>
+                                <tr>
+                                    <th>Bill Name</th>
+                                    <th>Category</th>
+                                    <th>Due Date</th>
+                                    <th>Amount</th>
+                                    <th>Balance</th>
+                                    <th>Payment Type</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+          // Sort bills by due date
+          const sortedBills = [...period.bills].sort(
+            (a, b) => a.dueDate - b.dueDate
+          );
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          sortedBills.forEach((bill) => {
+            const daysToPay = Math.floor(
+              (bill.dueDate - period.date) / (1000 * 60 * 60 * 24)
+            );
+
+            // Check if due date is within 3 days from today
+            const daysUntilDue = Math.floor(
+              (bill.dueDate - today) / (1000 * 60 * 60 * 24)
+            );
+
+            const priorityLabel =
+              bill.priority === 1
+                ? "High"
+                : bill.priority === 2
+                ? "Medium"
+                : "Low";
+
+            html += `
+                        <tr>
+                            <td>
+                                <div class="bill-name">${bill.name}</div>
+                                ${
+                                  daysUntilDue >= 0 && daysUntilDue <= 3
+                                    ? '<span class="badge badge-priority">Due Soon</span>'
+                                    : ""
+                                }
+                            </td>
+                            <td><span class="bill-category">${
+                              bill.category
+                            }</span></td>
+                            <td><span class="due-date">${bill.dueDate.toLocaleDateString(
+                              "en-US",
+                              { month: "short", day: "numeric" }
+                            )}</span></td>
+                            <td><span class="amount">$${bill.amount.toFixed(
+                              2
+                            )}</span></td>
+                            <td><span class="balance">$${bill.balance.toLocaleString(
+                              "en-US",
+                              { minimumFractionDigits: 2 }
+                            )}</span></td>
+                            <td>
+                                ${
+                                  bill.ach
+                                    ? '<span class="badge badge-ach">ACH</span>'
+                                    : ""
+                                }
+                                <span class="badge badge-${bill.type.toLowerCase()}">${
+              bill.type
+            }</span>
+                            </td>
+                            <td>${priorityLabel}</td>
+                        </tr>
+                    `;
+          });
+
+          html += `
+                                <tr class="totals-row">
+                                    <td colspan="3"><strong>Subtotal</strong></td>
+                                    <td><strong class="amount">$${period.totalAssigned.toFixed(
+                                      2
+                                    )}</strong></td>
+                                    <td colspan="3"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+        });
+
+        // Add recommendations
+        html += generateRecommendations(assignments, netCashFlow, totalDebt);
+
+        html += `</div>`;
+
+        resultsDiv.innerHTML = html;
+      }
+
+      function generateRecommendations(assignments, netCashFlow, totalDebt) {
+        let html = '<div class="recommendations">';
+        html += "<h3>💡 Recommendations for Debt Payoff Optimization</h3>";
+        html += "<ul>";
+
+        if (netCashFlow > 0) {
+          // Find highest interest debt (approximated by balance/amount ratio)
+          const debtBills = billsData.filter(
+            (b) => b.balance > 0 && b.amount > 0
+          );
+          const highestInterest = debtBills.sort(
+            (a, b) => b.balance / b.amount - a.balance / a.amount
+          )[0];
+
+          if (highestInterest) {
+            html += `<li><strong>Apply surplus to ${
+              highestInterest.name
+            }:</strong> Add the $${netCashFlow.toFixed(
+              2
+            )} surplus to your payment of $${highestInterest.amount.toFixed(
+              2
+            )} to pay down the balance of $${highestInterest.balance.toLocaleString(
+              "en-US",
+              { minimumFractionDigits: 2 }
+            )} faster.</li>`;
+          }
+        }
+
+        // Check for overloaded pay periods
+        assignments.forEach((period, index) => {
+          if (period.totalAssigned > period.amount) {
+            html += `<li><strong>Warning:</strong> Paycheck ${
+              index + 1
+            } is overallocated by $${(
+              period.totalAssigned - period.amount
+            ).toFixed(
+              2
+            )}. Consider negotiating payment dates or deferring lower-priority bills.</li>`;
+          }
+        });
+
+        // Debt avalanche suggestion
+        const highInterestDebts = billsData
+          .filter((b) => b.balance > 1000 && b.category === "Credit Card")
+          .sort((a, b) => b.balance - a.balance);
+
+        if (highInterestDebts.length > 0) {
+          html += `<li><strong>Debt Avalanche Strategy:</strong> Focus extra payments on ${
+            highInterestDebts[0].name
+          } ($${highInterestDebts[0].balance.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+          })} balance) while maintaining minimums on others.</li>`;
+        }
+
+        // Payment timing optimization
+        html +=
+          "<li><strong>Payment Timing:</strong> Bills are assigned to the last paycheck before their due date to maximize cash flow flexibility.</li>";
+
+        // ACH reminder
+        const achBills = billsData.filter((b) => b.ach && b.amount > 0);
+        if (achBills.length > 0) {
+          html += `<li><strong>ACH Reminder:</strong> You have ${achBills.length} bills set for automatic payment. Ensure funds are available 2-3 days before the due date.</li>`;
+        }
+
+        html += "</ul>";
+        html += "</div>";
+
+        return html;
+      }
+
+      // Auto-calculate on page load
+      window.addEventListener("DOMContentLoaded", () => {
+        // Load saved adjustments first
+        loadSavedAdjustments();
+
+        // Then calculate budget
+        calculateBudget();
+
+        // Auto-recalculate when month/year changes
+        document.getElementById("monthYear").addEventListener("change", () => {
+          calculateBudget();
+        });
+      });
+    </script>
+  </body>
+</html>

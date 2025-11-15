@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="images/logo/DCSS_Logo.jpg" />
-    <title>Excel Data Viewer</title>
+    <title>Excel Data Analyzer & Visualizer</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
@@ -654,6 +654,159 @@
         border-color: #10b981;
         color: white;
       }
+
+      /* Configuration Panel */
+      .config-panel {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border: 2px solid #10b981;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .config-panel h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #065f46;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .config-section {
+        margin-bottom: 1.5rem;
+      }
+
+      .config-section:last-child {
+        margin-bottom: 0;
+      }
+
+      .config-section h4 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #047857;
+        margin-bottom: 0.5rem;
+      }
+
+      .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+
+      .config-input {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .config-input label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #065f46;
+      }
+
+      .config-input select,
+      .config-input input {
+        padding: 0.5rem;
+        border: 1px solid #a7f3d0;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        background: white;
+        color: #1f2937;
+      }
+
+      .config-input select:focus,
+      .config-input input:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px #d1fae5;
+      }
+
+      .chart-type-selector {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .chart-type-btn {
+        flex: 1;
+        min-width: 120px;
+        padding: 0.75rem 1rem;
+        border: 2px solid #d1d5db;
+        border-radius: 0.5rem;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .chart-type-btn:hover {
+        border-color: #10b981;
+        background: #f0fdf4;
+      }
+
+      .chart-type-btn.active {
+        border-color: #10b981;
+        background: #10b981;
+        color: white;
+      }
+
+      .chart-type-btn .icon {
+        font-size: 1.5rem;
+      }
+
+      .chart-type-btn .label {
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .config-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .config-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .config-btn.primary {
+        background: #10b981;
+        color: white;
+      }
+
+      .config-btn.primary:hover {
+        background: #059669;
+      }
+
+      .config-btn.secondary {
+        background: #e5e7eb;
+        color: #1f2937;
+      }
+
+      .config-btn.secondary:hover {
+        background: #d1d5db;
+      }
+
+      .detection-info {
+        background: #dbeafe;
+        border-left: 4px solid #3b82f6;
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        color: #1e40af;
+        margin-top: 0.5rem;
+      }
     </style>
   </head>
   <body>
@@ -685,11 +838,11 @@
 
       <div id="mainView">
         <div class="header-card">
-          <h1>Excel Data Viewer</h1>
+          <h1>Excel Data Analyzer & Visualizer</h1>
 
           <div class="view-toggle">
             <button id="tableViewBtn" class="active">Table View</button>
-            <button id="pressureViewBtn">Pressure Visualization</button>
+            <button id="pressureViewBtn">Data Visualization</button>
           </div>
 
           <p class="file-name" id="fileName">No file selected</p>
@@ -710,6 +863,86 @@
             <p class="stats" id="stats">0 rows × 0 columns</p>
             <button class="refresh-btn" id="refreshBtn" disabled>
               Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Configuration Panel (shown after file load) -->
+        <div id="configPanel" class="config-panel" style="display: none">
+          <h3>⚙️ Configure Visualization</h3>
+
+          <div class="config-section">
+            <h4>Chart Type</h4>
+            <div class="chart-type-selector">
+              <button class="chart-type-btn active" data-type="line">
+                <span class="icon">📈</span>
+                <span class="label">Line Chart</span>
+              </button>
+              <button class="chart-type-btn" data-type="bar">
+                <span class="icon">📊</span>
+                <span class="label">Bar Chart</span>
+              </button>
+              <button class="chart-type-btn" data-type="scatter">
+                <span class="icon">⚫</span>
+                <span class="label">Scatter Plot</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="config-section">
+            <h4>Data Configuration</h4>
+            <div class="config-grid">
+              <div class="config-input">
+                <label for="xAxisSelect">X-Axis (Horizontal)</label>
+                <select id="xAxisSelect">
+                  <option value="">-- Auto-detect --</option>
+                </select>
+                <div
+                  id="xAxisInfo"
+                  class="detection-info"
+                  style="display: none"
+                ></div>
+              </div>
+
+              <div class="config-input">
+                <label for="yAxisSelect">Y-Axis (Vertical)</label>
+                <select id="yAxisSelect">
+                  <option value="">-- Auto-detect --</option>
+                </select>
+                <div
+                  id="yAxisInfo"
+                  class="detection-info"
+                  style="display: none"
+                ></div>
+              </div>
+
+              <div class="config-input">
+                <label for="groupBySelect">Group By (Optional)</label>
+                <select id="groupBySelect">
+                  <option value="">-- None --</option>
+                </select>
+                <div
+                  id="groupByInfo"
+                  class="detection-info"
+                  style="display: none"
+                ></div>
+              </div>
+
+              <div class="config-input">
+                <label for="filterColumnSelect">Filter Column (Optional)</label>
+                <select id="filterColumnSelect">
+                  <option value="">-- None --</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-actions">
+            <button class="config-btn primary" id="applyConfigBtn">
+              Apply Configuration
+            </button>
+            <button class="config-btn secondary" id="autoDetectBtn">
+              Auto-Detect Best Settings
             </button>
           </div>
         </div>
@@ -857,6 +1090,21 @@
       const RENDER_BATCH_SIZE = 100; // Render 100 rows initially, load more on scroll
       const MAX_TABLE_ROWS = 50000; // Max rows to display in table view (decimated from full dataset)
 
+      // Configuration and detection variables
+      let detectedColumns = {
+        numeric: [], // Columns with numeric data
+        datetime: [], // Columns with date/time data
+        categorical: [], // Columns with categorical data
+        text: [], // Other text columns
+      };
+      let chartConfig = {
+        type: "line", // line, bar, scatter
+        xAxis: null, // Column index for X-axis
+        yAxis: null, // Column index for Y-axis
+        groupBy: null, // Column index for grouping
+        filterColumn: null, // Column index for filtering
+      };
+
       const fileInput = document.getElementById("fileInput");
       const sheetSelector = document.getElementById("sheetSelector");
       const sheetSelectorWrapper = document.getElementById(
@@ -889,6 +1137,19 @@
       );
       const activeFilterTags = document.getElementById("activeFilterTags");
 
+      // Configuration panel elements
+      const configPanel = document.getElementById("configPanel");
+      const chartTypeBtns = document.querySelectorAll(".chart-type-btn");
+      const xAxisSelect = document.getElementById("xAxisSelect");
+      const yAxisSelect = document.getElementById("yAxisSelect");
+      const groupBySelect = document.getElementById("groupBySelect");
+      const filterColumnSelect = document.getElementById("filterColumnSelect");
+      const applyConfigBtn = document.getElementById("applyConfigBtn");
+      const autoDetectBtn = document.getElementById("autoDetectBtn");
+      const xAxisInfo = document.getElementById("xAxisInfo");
+      const yAxisInfo = document.getElementById("yAxisInfo");
+      const groupByInfo = document.getElementById("groupByInfo");
+
       let renderedRows = 0;
       let isLoadingMore = false;
       let availableProcessStates = [];
@@ -911,6 +1172,27 @@
       applyFilterBtn.addEventListener("click", applyFilter);
       selectAllBtn.addEventListener("click", selectAllFilters);
       clearAllBtn.addEventListener("click", clearAllFilters);
+
+      // Configuration panel event listeners
+      chartTypeBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          chartTypeBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          chartConfig.type = btn.dataset.type;
+
+          // Re-render chart if we're currently viewing the visualization
+          if (
+            window.processedChartData &&
+            !pressureView.classList.contains("hidden")
+          ) {
+            console.log(`Switching to ${chartConfig.type} chart...`);
+            renderGenericChart();
+          }
+        });
+      });
+
+      applyConfigBtn.addEventListener("click", applyConfiguration);
+      autoDetectBtn.addEventListener("click", autoDetectConfiguration);
 
       function handleScroll(e) {
         const activeData = getActiveTableData();
@@ -946,6 +1228,208 @@
         }
       }
 
+      // Parse Excel file in a Web Worker to avoid blocking the main thread
+      function parseExcelInWorker(data, onProgress) {
+        return new Promise((resolve, reject) => {
+          // Create inline worker
+          const workerCode = `
+            self.importScripts('https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js');
+            
+            self.onmessage = function(e) {
+              try {
+                const { data, type, sheetIndex } = e.data;
+                
+                if (type === 'parse') {
+                  // Parse workbook
+                  self.postMessage({ type: 'progress', progress: 25 });
+                  
+                  const workbook = XLSX.read(data, {
+                    type: 'array',
+                    dense: true,
+                    cellDates: false,
+                    cellNF: false,
+                    cellStyles: false,
+                    cellFormula: false,
+                    cellHTML: false,
+                    sheetStubs: true,
+                  });
+                  
+                  self.postMessage({ type: 'progress', progress: 100 });
+                  self.postMessage({ type: 'complete', workbook: workbook });
+                  
+                } else if (type === 'convertSheet') {
+                  // Convert specific sheet to JSON
+                  const workbook = e.data.workbook;
+                  const sheetName = workbook.SheetNames[sheetIndex];
+                  const worksheet = workbook.Sheets[sheetName];
+                  
+                  self.postMessage({ type: 'progress', progress: 10, message: 'Converting sheet...' });
+                  
+                  if (Array.isArray(worksheet)) {
+                    // DENSE format
+                    const totalRows = worksheet.length;
+                    const jsonData = [];
+                    
+                    for (let i = 0; i < totalRows; i++) {
+                      const row = worksheet[i];
+                      if (!row) {
+                        jsonData.push([]);
+                      } else {
+                        jsonData.push(
+                          row.map((cell) => {
+                            if (!cell) return "";
+                            return cell.v !== undefined ? String(cell.v) : "";
+                          })
+                        );
+                      }
+                      
+                      // Report progress every 1000 rows
+                      if (i % 1000 === 0) {
+                        self.postMessage({ 
+                          type: 'progress', 
+                          progress: 10 + (i / totalRows) * 90,
+                          message: \`Converting rows... \${i}/\${totalRows}\`
+                        });
+                      }
+                    }
+                    
+                    self.postMessage({ type: 'sheetComplete', jsonData: jsonData });
+                  } else {
+                    // SPARSE format - use XLSX built-in
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                      header: 1,
+                      defval: "",
+                      raw: false
+                    });
+                    
+                    self.postMessage({ type: 'sheetComplete', jsonData: jsonData });
+                  }
+                }
+              } catch (err) {
+                self.postMessage({ type: 'error', error: err.message });
+              }
+            };
+          `;
+
+          const blob = new Blob([workerCode], {
+            type: "application/javascript",
+          });
+          const workerUrl = URL.createObjectURL(blob);
+          const worker = new Worker(workerUrl);
+
+          worker.onmessage = function (e) {
+            if (e.data.type === "progress") {
+              onProgress(e.data.progress);
+            } else if (e.data.type === "complete") {
+              URL.revokeObjectURL(workerUrl);
+              worker.terminate();
+              resolve(e.data.workbook);
+            } else if (e.data.type === "error") {
+              URL.revokeObjectURL(workerUrl);
+              worker.terminate();
+              reject(new Error(e.data.error));
+            }
+          };
+
+          worker.onerror = function (err) {
+            URL.revokeObjectURL(workerUrl);
+            worker.terminate();
+            reject(err);
+          };
+
+          worker.postMessage({ type: "parse", data: data });
+        });
+      }
+
+      // Convert sheet to JSON in Web Worker
+      function convertSheetInWorker(workbook, sheetIndex, onProgress) {
+        return new Promise((resolve, reject) => {
+          const workerCode = `
+            self.importScripts('https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js');
+            
+            self.onmessage = function(e) {
+              try {
+                const { workbook, sheetIndex } = e.data;
+                const sheetName = workbook.SheetNames[sheetIndex];
+                const worksheet = workbook.Sheets[sheetName];
+                
+                self.postMessage({ type: 'progress', progress: 10, message: 'Converting sheet...' });
+                
+                if (Array.isArray(worksheet)) {
+                  // DENSE format
+                  const totalRows = worksheet.length;
+                  const jsonData = [];
+                  
+                  for (let i = 0; i < totalRows; i++) {
+                    const row = worksheet[i];
+                    if (!row) {
+                      jsonData.push([]);
+                    } else {
+                      jsonData.push(
+                        row.map((cell) => {
+                          if (!cell) return "";
+                          return cell.v !== undefined ? String(cell.v) : "";
+                        })
+                      );
+                    }
+                    
+                    // Report progress every 1000 rows
+                    if (i % 1000 === 0) {
+                      self.postMessage({ 
+                        type: 'progress', 
+                        progress: 10 + (i / totalRows) * 90,
+                        message: \`Converting \${i.toLocaleString()}/\${totalRows.toLocaleString()} rows\`
+                      });
+                    }
+                  }
+                  
+                  self.postMessage({ type: 'complete', jsonData: jsonData });
+                } else {
+                  // SPARSE format - use XLSX built-in
+                  const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                    header: 1,
+                    defval: "",
+                    raw: false
+                  });
+                  
+                  self.postMessage({ type: 'complete', jsonData: jsonData });
+                }
+              } catch (err) {
+                self.postMessage({ type: 'error', error: err.message });
+              }
+            };
+          `;
+
+          const blob = new Blob([workerCode], {
+            type: "application/javascript",
+          });
+          const workerUrl = URL.createObjectURL(blob);
+          const worker = new Worker(workerUrl);
+
+          worker.onmessage = function (e) {
+            if (e.data.type === "progress") {
+              onProgress(e.data.progress, e.data.message);
+            } else if (e.data.type === "complete") {
+              URL.revokeObjectURL(workerUrl);
+              worker.terminate();
+              resolve(e.data.jsonData);
+            } else if (e.data.type === "error") {
+              URL.revokeObjectURL(workerUrl);
+              worker.terminate();
+              reject(new Error(e.data.error));
+            }
+          };
+
+          worker.onerror = function (err) {
+            URL.revokeObjectURL(workerUrl);
+            worker.terminate();
+            reject(err);
+          };
+
+          worker.postMessage({ workbook: workbook, sheetIndex: sheetIndex });
+        });
+      }
+
       async function handleFileSelect(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -959,123 +1443,118 @@
         showLoading();
         updateProgress(5, "Starting file read...");
 
-        const reader = new FileReader();
+        try {
+          // Read file in chunks for smooth progress updates
+          const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB chunks
+          const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+          const chunks = [];
+          let processedBytes = 0;
 
-        reader.onprogress = function (event) {
-          if (event.lengthComputable) {
-            const percentLoaded = 5 + (event.loaded / event.total) * 25; // 5-30%
+          for (let i = 0; i < totalChunks; i++) {
+            const start = i * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, file.size);
+            const chunk = file.slice(start, end);
+
+            // Read chunk as ArrayBuffer
+            const arrayBuffer = await chunk.arrayBuffer();
+            chunks.push(new Uint8Array(arrayBuffer));
+
+            processedBytes += chunk.size;
+            const percentLoaded = 5 + (processedBytes / file.size) * 30; // 5-35%
             updateProgress(
               percentLoaded,
-              `Reading file... ${formatBytes(event.loaded)} / ${formatBytes(
-                event.total
-              )}`
+              `Reading file... ${formatBytes(processedBytes)} / ${formatBytes(
+                file.size
+              )} (${i + 1}/${totalChunks} chunks)`
             );
+
+            // Yield to browser every chunk
+            await new Promise((resolve) => setTimeout(resolve, 0));
           }
-        };
 
-        reader.onload = async function (e) {
-          try {
-            updateProgress(35, "File loaded, parsing Excel data...");
+          updateProgress(35, "Combining file data...");
+          await new Promise((resolve) => setTimeout(resolve, 50));
 
-            // Use setTimeout to allow UI to update
-            await new Promise((resolve) => setTimeout(resolve, 50));
+          // Combine all chunks into single Uint8Array
+          const totalLength = chunks.reduce(
+            (acc, chunk) => acc + chunk.length,
+            0
+          );
+          const data = new Uint8Array(totalLength);
+          let offset = 0;
+          for (const chunk of chunks) {
+            data.set(chunk, offset);
+            offset += chunk.length;
+          }
 
-            const data = new Uint8Array(e.target.result);
-            console.log(
-              `📊 File size: ${data.length} bytes (${formatBytes(data.length)})`
-            );
+          updateProgress(40, "File loaded successfully");
 
-            updateProgress(50, "Loading workbook structure...");
-            await new Promise((resolve) => setTimeout(resolve, 50));
+          console.log(
+            `📊 File size: ${data.length} bytes (${formatBytes(data.length)})`
+          );
 
-            try {
-              console.log(
-                "🔧 Attempting to parse workbook with newer library..."
-              );
+          updateProgress(42, "Parsing workbook structure...");
 
-              workbook = XLSX.read(data, {
-                type: "array",
-                dense: true, // CHANGED: Try dense format (arrays instead of cell objects)
-                cellDates: false,
-                cellNF: false,
-                cellStyles: false,
-                cellFormula: false,
-                cellHTML: false,
-                sheetStubs: true,
-              });
+          // Show message for the parsing phase
+          processingMessage.innerHTML =
+            "⏳ Parsing Excel file... This may take a moment for large files";
 
-              console.log("✓ Workbook loaded successfully (DENSE MODE)");
-              console.log("✓ Sheets found:", workbook.SheetNames);
-              console.log("✓ Workbook keys:", Object.keys(workbook));
+          console.log("🔧 Attempting to parse workbook with newer library...");
 
-              // Log first sheet details
-              if (workbook.SheetNames.length > 0) {
-                const firstSheetName = workbook.SheetNames[0];
-                const firstSheet = workbook.Sheets[firstSheetName];
-                console.log(
-                  `✓ Sheet "${firstSheetName}" type:`,
-                  typeof firstSheet
-                );
-                console.log(`✓ Sheet is array?:`, Array.isArray(firstSheet));
+          // Use Web Worker to parse Excel file off the main thread
+          workbook = await parseExcelInWorker(data, (progress) => {
+            updateProgress(42 + progress * 0.08, "Parsing Excel file...");
+          });
 
-                if (Array.isArray(firstSheet)) {
-                  console.log(
-                    `✓ DENSE sheet length:`,
-                    firstSheet.length,
-                    "rows"
-                  );
-                  if (firstSheet.length > 0) {
-                    console.log(`✓ First row:`, firstSheet[0]);
-                  }
-                } else {
-                  console.log(
-                    `✓ Sheet keys:`,
-                    Object.keys(firstSheet).slice(0, 30)
-                  );
-                }
+          console.log("✓ Workbook loaded successfully (DENSE MODE)");
+          console.log("✓ Sheets found:", workbook.SheetNames);
+          console.log("✓ Workbook keys:", Object.keys(workbook));
+
+          // Log first sheet details
+          if (workbook.SheetNames.length > 0) {
+            const firstSheetName = workbook.SheetNames[0];
+            const firstSheet = workbook.Sheets[firstSheetName];
+            console.log(`✓ Sheet "${firstSheetName}" type:`, typeof firstSheet);
+            console.log(`✓ Sheet is array?:`, Array.isArray(firstSheet));
+
+            if (Array.isArray(firstSheet)) {
+              console.log(`✓ DENSE sheet length:`, firstSheet.length, "rows");
+              if (firstSheet.length > 0) {
+                console.log(`✓ First row:`, firstSheet[0]);
               }
-            } catch (xlsxError) {
-              console.error("✗ XLSX.read failed:", xlsxError);
-              throw new Error("Failed to parse Excel: " + xlsxError.message);
+            } else {
+              console.log(
+                `✓ Sheet keys:`,
+                Object.keys(firstSheet).slice(0, 30)
+              );
             }
-
-            updateProgress(70, "Workbook loaded, preparing sheets...");
-            await new Promise((resolve) => setTimeout(resolve, 50));
-
-            fileName.textContent = `File: ${file.name}`;
-            refreshBtn.disabled = false;
-
-            // Populate sheet selector
-            populateSheetSelector();
-
-            updateProgress(85, "Loading first sheet data...");
-            await new Promise((resolve) => setTimeout(resolve, 50));
-
-            // Load first sheet
-            await loadSheetData(0);
-
-            updateProgress(100, "Complete!");
-
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            hideLoading();
-            isProcessing = false;
-          } catch (err) {
-            console.error("✗ Fatal error:", err);
-            console.error("✗ Stack trace:", err.stack);
-            showError(
-              err.message +
-                "\n\nCheck browser console (F12) for detailed error information."
-            );
-            isProcessing = false;
           }
-        };
 
-        reader.onerror = function () {
-          showError("Failed to read file");
+          updateProgress(50, "Workbook loaded, preparing sheets...");
+          await new Promise((resolve) => setTimeout(resolve, 50));
+
+          fileName.textContent = `File: ${file.name}`;
+          refreshBtn.disabled = false;
+
+          // Populate sheet selector
+          populateSheetSelector();
+
+          updateProgress(55, "Initializing data processing...");
+          await new Promise((resolve) => setTimeout(resolve, 50));
+
+          // Load first sheet
+          await loadSheetData(0);
+
+          updateProgress(100, "Complete!");
+
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          hideLoading();
           isProcessing = false;
-        };
-
-        reader.readAsArrayBuffer(file);
+        } catch (err) {
+          console.error("✗ File reading error:", err);
+          showError("Failed to read file: " + err.message);
+          isProcessing = false;
+        }
       }
 
       function formatBytes(bytes) {
@@ -1112,7 +1591,7 @@
       async function loadSheetData(sheetIndex) {
         try {
           showLoading();
-          updateProgress(0, "Loading sheet...");
+          updateProgress(55, "Loading sheet...");
 
           const sheetName = workbook.SheetNames[sheetIndex];
           const worksheet = workbook.Sheets[sheetName];
@@ -1122,20 +1601,23 @@
           console.log(`📊 Sheet is array?:`, Array.isArray(worksheet));
           console.log(`📊 Sheet properties:`, Object.keys(worksheet).length);
 
-          updateProgress(20, "Converting to JSON...");
-          await new Promise((resolve) => setTimeout(resolve, 10));
+          updateProgress(60, "Converting to JSON in background...");
 
-          // Convert to JSON with chunked processing and progress updates
-          const jsonData = await convertSheetToJsonChunked(
-            worksheet,
-            (progress) => {
-              updateProgress(20 + progress * 0.4, "Converting to JSON..."); // 20-60%
+          // Convert sheet to JSON using Web Worker (non-blocking)
+          const jsonData = await convertSheetInWorker(
+            workbook,
+            sheetIndex,
+            (progress, message) => {
+              updateProgress(
+                60 + progress * 0.25,
+                message || `Converting rows... ${Math.round(progress)}%`
+              ); // 60-85%
             }
           );
 
           console.log(`📊 JSON data returned: ${jsonData.length} rows`);
 
-          updateProgress(60, "Processing data...");
+          updateProgress(85, "Processing data...");
           await new Promise((resolve) => setTimeout(resolve, 10));
 
           // Decimation function for table data
@@ -1245,7 +1727,7 @@
             fullData = [];
           }
 
-          updateProgress(80, "Rendering table...");
+          updateProgress(87, "Rendering table...");
           await new Promise((resolve) => setTimeout(resolve, 10));
 
           // Check if large dataset
@@ -1264,6 +1746,17 @@
           renderedRows = 0;
           await renderTable();
           updateStats();
+
+          updateProgress(92, "Analyzing column types...");
+          await new Promise((resolve) => setTimeout(resolve, 10));
+
+          // Detect column types and show configuration panel
+          detectColumnTypes();
+          populateConfigSelectors();
+          configPanel.style.display = "block";
+
+          updateProgress(95, "Setting up filters...");
+          await new Promise((resolve) => setTimeout(resolve, 10));
 
           // Populate filter controls
           await populateProcessStateFilters();
@@ -1325,9 +1818,9 @@
                   progressCallback((end / totalRows) * 100);
                 }
 
-                // Yield to browser every chunk
+                // Yield to browser every chunk to update UI
                 if (end < totalRows) {
-                  await new Promise((resolve) => setTimeout(resolve, 0));
+                  await new Promise((resolve) => setTimeout(resolve, 10));
                 }
               }
 
@@ -1810,6 +2303,672 @@
           console.error("Error applying filter:", err);
           showError(`Filter error: ${err.message}`);
         }
+      }
+
+      // Data Type Detection and Configuration
+      function detectColumnTypes() {
+        console.log("🔍 Detecting column types...");
+
+        detectedColumns = {
+          numeric: [],
+          datetime: [],
+          categorical: [],
+          text: [],
+        };
+
+        if (!currentHeaders || currentHeaders.length === 0) return;
+
+        const sampleSize = Math.min(100, currentData.length);
+        const samples = currentData.slice(0, sampleSize);
+
+        currentHeaders.forEach((header, colIdx) => {
+          let numericCount = 0;
+          let dateCount = 0;
+          let uniqueValues = new Set();
+          let totalValues = 0;
+
+          samples.forEach((row) => {
+            const value = row[colIdx];
+            if (value === null || value === undefined || value === "") return;
+
+            totalValues++;
+            const strValue = String(value).trim();
+            uniqueValues.add(strValue);
+
+            // Check if numeric
+            const num = parseFloat(strValue);
+            if (!isNaN(num) && isFinite(num)) {
+              numericCount++;
+            }
+
+            // Check if datetime
+            if (isDateTimeColumn(strValue)) {
+              dateCount++;
+            }
+          });
+
+          if (totalValues === 0) return;
+
+          const numericPercent = numericCount / totalValues;
+          const datePercent = dateCount / totalValues;
+          const uniquenessRatio = uniqueValues.size / totalValues;
+
+          // Classification logic
+          if (datePercent > 0.7) {
+            detectedColumns.datetime.push({
+              index: colIdx,
+              name: header,
+              confidence: datePercent,
+            });
+          } else if (numericPercent > 0.8) {
+            detectedColumns.numeric.push({
+              index: colIdx,
+              name: header,
+              confidence: numericPercent,
+            });
+          } else if (uniquenessRatio < 0.5 && uniqueValues.size < 50) {
+            detectedColumns.categorical.push({
+              index: colIdx,
+              name: header,
+              uniqueCount: uniqueValues.size,
+            });
+          } else {
+            detectedColumns.text.push({ index: colIdx, name: header });
+          }
+        });
+
+        console.log("✓ Column detection complete:");
+        console.log(`  - Numeric: ${detectedColumns.numeric.length} columns`);
+        console.log(`  - DateTime: ${detectedColumns.datetime.length} columns`);
+        console.log(
+          `  - Categorical: ${detectedColumns.categorical.length} columns`
+        );
+        console.log(`  - Text: ${detectedColumns.text.length} columns`);
+
+        return detectedColumns;
+      }
+
+      function isDateTimeColumn(value) {
+        if (!value) return false;
+
+        // Common date patterns
+        const datePatterns = [
+          /^\d{4}-\d{2}-\d{2}/, // 2024-01-15
+          /^\d{2}\/\d{2}\/\d{4}/, // 01/15/2024
+          /^\d{2}-\d{2}-\d{4}/, // 01-15-2024
+          /^\d{4}\/\d{2}\/\d{2}/, // 2024/01/15
+          /^\d{1,2}\/\d{1,2}\/\d{2,4}/, // 1/15/24
+          /\d{2}:\d{2}:\d{2}/, // Time component
+        ];
+
+        return datePatterns.some((pattern) => pattern.test(value));
+      }
+
+      function populateConfigSelectors() {
+        // Populate X-axis selector (datetime and numeric columns)
+        xAxisSelect.innerHTML = '<option value="">-- Select X-Axis --</option>';
+
+        // Add "All" option for X-axis
+        if (detectedColumns.numeric.length > 1) {
+          const allOption = document.createElement("option");
+          allOption.value = "all";
+          allOption.textContent = "All Numeric Columns (Sequence)";
+          xAxisSelect.appendChild(allOption);
+        }
+
+        detectedColumns.datetime.forEach((col) => {
+          const option = document.createElement("option");
+          option.value = col.index;
+          option.textContent = `${col.name} (DateTime)`;
+          xAxisSelect.appendChild(option);
+        });
+        detectedColumns.numeric.forEach((col) => {
+          const option = document.createElement("option");
+          option.value = col.index;
+          option.textContent = `${col.name} (Numeric)`;
+          xAxisSelect.appendChild(option);
+        });
+
+        // Populate Y-axis selector (numeric columns only)
+        yAxisSelect.innerHTML = '<option value="">-- Select Y-Axis --</option>';
+
+        // Add "All" option for Y-axis
+        if (detectedColumns.numeric.length > 1) {
+          const allOption = document.createElement("option");
+          allOption.value = "all";
+          allOption.textContent = "All Numeric Columns";
+          yAxisSelect.appendChild(allOption);
+        }
+
+        detectedColumns.numeric.forEach((col) => {
+          const option = document.createElement("option");
+          option.value = col.index;
+          option.textContent = col.name;
+          yAxisSelect.appendChild(option);
+        });
+
+        // Populate Group By selector (categorical columns)
+        groupBySelect.innerHTML = '<option value="">-- None --</option>';
+        detectedColumns.categorical.forEach((col) => {
+          const option = document.createElement("option");
+          option.value = col.index;
+          option.textContent = `${col.name} (${col.uniqueCount} groups)`;
+          groupBySelect.appendChild(option);
+        });
+
+        // Populate Filter Column selector (categorical columns)
+        filterColumnSelect.innerHTML = '<option value="">-- None --</option>';
+        detectedColumns.categorical.forEach((col) => {
+          const option = document.createElement("option");
+          option.value = col.index;
+          option.textContent = `${col.name} (${col.uniqueCount} values)`;
+          filterColumnSelect.appendChild(option);
+        });
+      }
+
+      function autoDetectConfiguration() {
+        console.log("🤖 Auto-detecting best configuration...");
+
+        // Reset chart config
+        chartConfig = {
+          type: "line",
+          xAxis: null,
+          yAxis: null,
+          groupBy: null,
+          filterColumn: null,
+        };
+
+        // Priority 1: Find DateTime column for X-axis
+        if (detectedColumns.datetime.length > 0) {
+          chartConfig.xAxis = detectedColumns.datetime[0].index;
+          xAxisSelect.value = chartConfig.xAxis;
+          xAxisInfo.style.display = "block";
+          xAxisInfo.textContent = `✓ Auto-detected: ${detectedColumns.datetime[0].name}`;
+        } else if (detectedColumns.numeric.length > 1) {
+          // Use first numeric column if no datetime
+          chartConfig.xAxis = detectedColumns.numeric[0].index;
+          xAxisSelect.value = chartConfig.xAxis;
+          xAxisInfo.style.display = "block";
+          xAxisInfo.textContent = `✓ Auto-detected: ${detectedColumns.numeric[0].name}`;
+        }
+
+        // Priority 2: Find best numeric column for Y-axis
+        if (detectedColumns.numeric.length > 0) {
+          // Skip the X-axis column if it's numeric
+          const yAxisCandidates = detectedColumns.numeric.filter(
+            (col) => col.index !== chartConfig.xAxis
+          );
+          if (yAxisCandidates.length > 0) {
+            chartConfig.yAxis = yAxisCandidates[0].index;
+            yAxisSelect.value = chartConfig.yAxis;
+            yAxisInfo.style.display = "block";
+            yAxisInfo.textContent = `✓ Auto-detected: ${yAxisCandidates[0].name}`;
+          }
+        }
+
+        // Priority 3: Find categorical column for grouping
+        if (detectedColumns.categorical.length > 0) {
+          chartConfig.groupBy = detectedColumns.categorical[0].index;
+          groupBySelect.value = chartConfig.groupBy;
+          groupByInfo.style.display = "block";
+          groupByInfo.textContent = `✓ Auto-detected: ${detectedColumns.categorical[0].name} (${detectedColumns.categorical[0].uniqueCount} groups)`;
+        }
+
+        // Priority 4: Find categorical column for filtering
+        if (detectedColumns.categorical.length > 1) {
+          chartConfig.filterColumn = detectedColumns.categorical[1].index;
+          filterColumnSelect.value = chartConfig.filterColumn;
+        } else if (detectedColumns.categorical.length === 1) {
+          chartConfig.filterColumn = detectedColumns.categorical[0].index;
+          filterColumnSelect.value = chartConfig.filterColumn;
+        }
+
+        console.log("✓ Auto-detection complete:", chartConfig);
+
+        // Apply the configuration
+        applyConfiguration();
+      }
+
+      function applyConfiguration() {
+        // Read user selections
+        const xValue = xAxisSelect.value;
+        const yValue = yAxisSelect.value;
+
+        chartConfig.xAxis =
+          xValue === "all" ? "all" : xValue ? parseInt(xValue) : null;
+        chartConfig.yAxis =
+          yValue === "all" ? "all" : yValue ? parseInt(yValue) : null;
+        chartConfig.groupBy = groupBySelect.value
+          ? parseInt(groupBySelect.value)
+          : null;
+        chartConfig.filterColumn = filterColumnSelect.value
+          ? parseInt(filterColumnSelect.value)
+          : null;
+
+        console.log("⚙️ Applying configuration:", chartConfig);
+
+        // Validate configuration
+        if (chartConfig.xAxis === null || chartConfig.yAxis === null) {
+          alert(
+            "Please select both X-Axis and Y-Axis columns to create a visualization."
+          );
+          return;
+        }
+
+        // Update visualization view
+        updateVisualizationForConfig();
+
+        // Switch to visualization view
+        pressureViewBtn.click();
+      }
+
+      function updateVisualizationForConfig() {
+        // This will replace the hardcoded pressure logic
+        console.log("📊 Updating visualization with new configuration...");
+
+        // Process data based on chartConfig
+        processGenericData();
+        renderGenericChart();
+      }
+
+      // Utility function: Decimate data for performance
+      function decimateDataPoints(data, maxPoints = 10000) {
+        if (data.length <= maxPoints) return data;
+
+        const step = Math.ceil(data.length / maxPoints);
+        const decimated = [];
+
+        for (let i = 0; i < data.length; i += step) {
+          decimated.push(data[i]);
+        }
+
+        console.log(
+          `📉 Decimated ${data.length.toLocaleString()} points to ${decimated.length.toLocaleString()} (step: ${step})`
+        );
+
+        return decimated;
+      }
+
+      // Generic data processing for any dataset
+      function processGenericData() {
+        console.log("📊 Processing generic data...");
+
+        const dataToProcess = fullData.length > 0 ? fullData : currentData;
+        const xCol = chartConfig.xAxis;
+        const yCol = chartConfig.yAxis;
+        const groupCol = chartConfig.groupBy;
+
+        // Extract and organize data
+        const chartData = {
+          ungrouped: [],
+          groups: {},
+        };
+
+        // Handle "all" cases
+        if (yCol === "all") {
+          // Plot all numeric columns on Y-axis
+          detectedColumns.numeric.forEach((col) => {
+            const seriesData = [];
+            dataToProcess.forEach((row, idx) => {
+              const xValue = xCol === "all" ? idx : row[xCol];
+              const yValue = parseFloat(row[col.index]);
+
+              if (!isNaN(yValue) && isFinite(yValue)) {
+                seriesData.push({
+                  x: xValue,
+                  y: yValue,
+                  index: idx,
+                });
+              }
+            });
+            chartData.groups[col.name] = seriesData;
+          });
+        } else if (xCol === "all") {
+          // Use row index as X-axis
+          dataToProcess.forEach((row, idx) => {
+            const yValue = parseFloat(row[yCol]);
+
+            if (!isNaN(yValue) && isFinite(yValue)) {
+              const dataPoint = {
+                x: idx,
+                y: yValue,
+                index: idx,
+              };
+
+              if (groupCol !== null && groupCol !== undefined) {
+                const groupValue = row[groupCol] || "Ungrouped";
+                if (!chartData.groups[groupValue]) {
+                  chartData.groups[groupValue] = [];
+                }
+                chartData.groups[groupValue].push(dataPoint);
+              } else {
+                chartData.ungrouped.push(dataPoint);
+              }
+            }
+          });
+        } else {
+          // Normal case: specific columns
+          dataToProcess.forEach((row, idx) => {
+            const xValue = row[xCol];
+            const yValue = parseFloat(row[yCol]);
+
+            // Skip invalid data points
+            if (
+              xValue === null ||
+              xValue === undefined ||
+              xValue === "" ||
+              isNaN(yValue) ||
+              !isFinite(yValue)
+            ) {
+              return;
+            }
+
+            const dataPoint = {
+              x: xValue,
+              y: yValue,
+              index: idx,
+            };
+
+            if (groupCol !== null && groupCol !== undefined) {
+              // Grouped data
+              const groupValue = row[groupCol] || "Ungrouped";
+              if (!chartData.groups[groupValue]) {
+                chartData.groups[groupValue] = [];
+              }
+              chartData.groups[groupValue].push(dataPoint);
+            } else {
+              // Ungrouped data
+              chartData.ungrouped.push(dataPoint);
+            }
+          });
+        }
+
+        // Store processed data globally
+        window.processedChartData = chartData;
+
+        console.log(`✓ Processed data:`, {
+          ungrouped: chartData.ungrouped.length,
+          groups: Object.keys(chartData.groups).length,
+        });
+
+        return chartData;
+      }
+
+      // Generic chart rendering for Line, Bar, and Scatter
+      function renderGenericChart() {
+        console.log("📊 Rendering generic chart...");
+
+        const canvas = document.getElementById("pressureChart");
+        const ctx = canvas.getContext("2d");
+
+        // Destroy existing chart
+        if (pressureChart) {
+          pressureChart.destroy();
+          pressureChart = null;
+        }
+
+        const chartData = window.processedChartData;
+        if (!chartData) {
+          console.error("No processed chart data available");
+          return;
+        }
+
+        // Prepare datasets
+        const datasets = [];
+        const xLabel =
+          chartConfig.xAxis === "all"
+            ? "Row Index"
+            : currentHeaders[chartConfig.xAxis] || "X-Axis";
+        const yLabel =
+          chartConfig.yAxis === "all"
+            ? "All Numeric Columns"
+            : currentHeaders[chartConfig.yAxis] || "Y-Axis";
+
+        // For bar charts, we need labels array
+        let labels = [];
+
+        if (chartConfig.type === "bar") {
+          // Extract unique x values for labels
+          const allDataPoints =
+            chartConfig.groupBy !== null &&
+            Object.keys(chartData.groups).length > 0
+              ? Object.values(chartData.groups).flat()
+              : chartData.ungrouped;
+
+          // Get unique x values and sort them
+          const xValues = [...new Set(allDataPoints.map((p) => p.x))];
+          labels = xValues.sort((a, b) => {
+            // Try numeric sort first
+            const numA = parseFloat(a);
+            const numB = parseFloat(b);
+            if (!isNaN(numA) && !isNaN(numB)) {
+              return numA - numB;
+            }
+            // Fall back to string sort
+            return String(a).localeCompare(String(b));
+          });
+
+          console.log(
+            `📊 Bar chart labels:`,
+            labels.slice(0, 10),
+            `... (${labels.length} total)`
+          );
+        }
+
+        if (
+          chartConfig.groupBy !== null &&
+          Object.keys(chartData.groups).length > 0
+        ) {
+          // Multiple datasets (one per group)
+          const colors = generateColors(Object.keys(chartData.groups).length);
+          let colorIdx = 0;
+
+          for (const [groupName, dataPoints] of Object.entries(
+            chartData.groups
+          )) {
+            // Decimate large datasets
+            const decimatedData = decimateDataPoints(dataPoints, 20000);
+
+            // For bar charts, convert data to array of y values matching labels
+            let chartData_formatted;
+            if (chartConfig.type === "bar") {
+              // Create a map of x -> y
+              const dataMap = new Map(decimatedData.map((p) => [p.x, p.y]));
+              // Map each label to its y value (or 0 if missing)
+              chartData_formatted = labels.map(
+                (label) => dataMap.get(label) || 0
+              );
+            } else {
+              // For line and scatter, use {x, y} format
+              chartData_formatted = decimatedData;
+            }
+
+            datasets.push({
+              label: groupName,
+              data: chartData_formatted,
+              backgroundColor:
+                chartConfig.type === "bar"
+                  ? colors[colorIdx] + "80"
+                  : colors[colorIdx],
+              borderColor:
+                chartConfig.type === "bar"
+                  ? colors[colorIdx]
+                  : colors[colorIdx],
+              borderWidth:
+                chartConfig.type === "line"
+                  ? 2
+                  : chartConfig.type === "scatter"
+                  ? 0
+                  : 1,
+              fill: chartConfig.type === "bar" ? true : false,
+              pointRadius:
+                chartConfig.type === "scatter"
+                  ? 4
+                  : chartConfig.type === "line"
+                  ? 0
+                  : 1,
+              pointHoverRadius: chartConfig.type === "scatter" ? 6 : 5,
+              pointBackgroundColor: colors[colorIdx],
+              pointBorderColor: colors[colorIdx],
+              pointBorderWidth: chartConfig.type === "scatter" ? 1 : 0,
+              tension: 0.1,
+              barThickness: chartConfig.type === "bar" ? "flex" : undefined,
+              maxBarThickness: chartConfig.type === "bar" ? 50 : undefined,
+            });
+            colorIdx++;
+          }
+        } else {
+          // Single dataset
+          const decimatedData = decimateDataPoints(chartData.ungrouped, 20000);
+
+          // For bar charts, convert data to array of y values matching labels
+          let chartData_formatted;
+          if (chartConfig.type === "bar") {
+            // Create a map of x -> y
+            const dataMap = new Map(decimatedData.map((p) => [p.x, p.y]));
+            // Map each label to its y value (or 0 if missing)
+            chartData_formatted = labels.map(
+              (label) => dataMap.get(label) || 0
+            );
+          } else {
+            // For line and scatter, use {x, y} format
+            chartData_formatted = decimatedData;
+          }
+
+          datasets.push({
+            label: yLabel,
+            data: chartData_formatted,
+            backgroundColor:
+              chartConfig.type === "bar" ? "#3b82f680" : "#3b82f6",
+            borderColor: "#3b82f6",
+            borderWidth:
+              chartConfig.type === "line"
+                ? 2
+                : chartConfig.type === "scatter"
+                ? 0
+                : 1,
+            fill: chartConfig.type === "bar" ? true : false,
+            pointRadius:
+              chartConfig.type === "scatter"
+                ? 4
+                : chartConfig.type === "line"
+                ? 0
+                : 1,
+            pointHoverRadius: chartConfig.type === "scatter" ? 6 : 5,
+            pointBackgroundColor: "#3b82f6",
+            pointBorderColor: "#3b82f6",
+            pointBorderWidth: chartConfig.type === "scatter" ? 1 : 0,
+            tension: 0.1,
+            barThickness: chartConfig.type === "bar" ? "flex" : undefined,
+            maxBarThickness: chartConfig.type === "bar" ? 50 : undefined,
+          });
+        }
+
+        // Create chart - use the actual chart type
+        const chartType = chartConfig.type; // 'bar', 'line', or 'scatter'
+
+        console.log(`📊 Creating chart with type: "${chartType}"`);
+        console.log(`📊 Number of datasets: ${datasets.length}`);
+        if (datasets.length > 0) {
+          console.log(`📊 First dataset sample:`, datasets[0].data.slice(0, 3));
+        }
+
+        // Configure X-axis based on chart type
+        const xAxisConfig =
+          chartConfig.type === "bar"
+            ? {
+                type: "category",
+                title: {
+                  display: true,
+                  text: xLabel,
+                },
+              }
+            : {
+                type: "linear",
+                title: {
+                  display: true,
+                  text: xLabel,
+                },
+              };
+
+        pressureChart = new Chart(ctx, {
+          type: chartType,
+          data: {
+            labels: chartConfig.type === "bar" ? labels : undefined,
+            datasets,
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            parsing: false,
+            normalized: true,
+            plugins: {
+              title: {
+                display: true,
+                text: `${yLabel} vs ${xLabel}`,
+                font: { size: 16, weight: "bold" },
+              },
+              legend: {
+                display: datasets.length > 1,
+                position: "top",
+              },
+              tooltip: {
+                mode: "nearest",
+                intersect: false,
+              },
+              zoom: {
+                zoom: {
+                  wheel: { enabled: true },
+                  pinch: { enabled: true },
+                  mode: "xy",
+                },
+                pan: {
+                  enabled: true,
+                  mode: "xy",
+                },
+              },
+            },
+            scales: {
+              x: xAxisConfig,
+              y: {
+                title: {
+                  display: true,
+                  text: yLabel,
+                },
+              },
+            },
+          },
+        });
+
+        // Show zoom controls
+        if (zoomControls) {
+          zoomControls.style.display = "flex";
+        }
+
+        console.log("✓ Generic chart rendered successfully");
+      }
+
+      function generateColors(count) {
+        const colors = [
+          "#3b82f6", // blue
+          "#10b981", // green
+          "#f59e0b", // amber
+          "#ef4444", // red
+          "#8b5cf6", // purple
+          "#ec4899", // pink
+          "#06b6d4", // cyan
+          "#f97316", // orange
+          "#84cc16", // lime
+          "#6366f1", // indigo
+        ];
+
+        // Repeat colors if we need more
+        const result = [];
+        for (let i = 0; i < count; i++) {
+          result.push(colors[i % colors.length]);
+        }
+        return result;
       }
 
       // Pressure Visualization functionality
