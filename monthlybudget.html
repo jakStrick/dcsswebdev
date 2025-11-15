@@ -1311,7 +1311,7 @@
           allPaychecks.push({
             date: date,
             amount: DavidPay,
-            person: "You",
+            person: "David",
             bills: [],
             totalAssigned: 0,
           });
@@ -1539,7 +1539,7 @@
 
         // Calculate how many paychecks for each person (total)
         const DavidPaychecksTotal = assignments.filter(
-          (p) => p.person === "You"
+          (p) => p.person === "David"
         ).length;
         const ClaudiaPaychecksTotal = assignments.filter(
           (p) => p.person === "Claudia"
@@ -1547,7 +1547,7 @@
 
         // Calculate remaining paychecks (not yet received)
         const DavidPaychecksRemaining = isCurrentMonth
-          ? assignments.filter((p) => p.person === "You" && p.date >= today)
+          ? assignments.filter((p) => p.person === "David" && p.date >= today)
               .length
           : DavidPaychecksTotal;
         const ClaudiaPaychecksRemaining = isCurrentMonth
@@ -1593,7 +1593,7 @@
                           2
                         )}</div>
                         <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            You: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks
+                            David: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks
                         </div>
                     </div>
                     ${
@@ -1605,7 +1605,7 @@
                           2
                         )}</div>
                         <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            You: ${DavidPaychecksRemaining}x | Claudia: ${ClaudiaPaychecksRemaining}x left
+                            David: ${DavidPaychecksRemaining}x | Claudia: ${ClaudiaPaychecksRemaining}x left
                         </div>
                     </div>
                     `
