@@ -22,6 +22,119 @@
       href="./assets/css/dashboard-styles.css"
     />
     <title>Personal Dashboard - DCSS Web Dev</title>
+    <style>
+      /* Sidebar Widget Styles */
+      .sidebar-widget {
+        width: 280px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+      }
+
+      .widget-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #667eea;
+      }
+
+      .widget-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #2d3748;
+      }
+
+      .widget-content {
+        position: relative;
+      }
+
+      .pages-dropdown {
+        position: relative;
+      }
+
+      .dropdown-toggle {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+      }
+
+      .dropdown-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .dropdown-arrow {
+        transition: transform 0.3s ease;
+        font-size: 0.75rem;
+      }
+
+      .dropdown-toggle.active .dropdown-arrow {
+        transform: rotate(180deg);
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1000;
+      }
+
+      .dropdown-menu.show {
+        max-height: 400px;
+        opacity: 1;
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        color: #2d3748;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .dropdown-item:last-child {
+        border-bottom: none;
+      }
+
+      .dropdown-item:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.1) 0%,
+          rgba(118, 75, 162, 0.1) 100%
+        );
+        padding-left: 1.25rem;
+      }
+
+      .item-icon {
+        font-size: 1.25rem;
+      }
+    </style>
   </head>
   <body>
     <div id="navbar-placeholder"></div>
@@ -56,107 +169,154 @@
         </div>
       </div>
 
-      <!-- Statistics Cards -->
-      <div class="dashboard-grid">
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-icon">📊</div>
-          </div>
-          <div class="stat-title">Total Records</div>
-          <div class="stat-value" id="totalRecords">0</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-icon">📝</div>
-          </div>
-          <div class="stat-title">Active Items</div>
-          <div class="stat-value" id="activeItems">0</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <div class="stat-icon">🕐</div>
-          </div>
-          <div class="stat-title">Last Updated</div>
-          <div class="stat-value" id="lastUpdated" style="font-size: 1.5rem">
-            --
-          </div>
-        </div>
-      </div>
-
-      <!-- Data Section -->
-      <div class="data-section">
-        <h2>📋 Personal Data</h2>
-
-        <!-- Drag and Drop Zone -->
-        <div class="drop-zone" id="dropZone">
-          <div class="drop-zone-icon">📁</div>
-          <div class="drop-zone-text">
-            Drag & Drop files here or click to add data
-          </div>
-          <div class="drop-zone-hint">
-            Supports: Text files, JSON, ZIP files, images, PDFs, videos, and
-            more<br />
-            <small style="color: #999"
-              >Maximum file size: <strong>5 GB</strong> (5120 MB)</small
-            >
-          </div>
-        </div>
-
-        <!-- Add Item Form -->
-        <div class="add-item-form" id="addItemForm">
-          <h3 style="margin-bottom: 15px">Add New Item</h3>
-          <form id="itemForm">
-            <div class="form-row">
-              <div class="form-field">
-                <label for="itemTitle">Title *</label>
-                <input
-                  type="text"
-                  id="itemTitle"
-                  required
-                  placeholder="Enter title"
-                />
+      <!-- Main Content Wrapper with Sidebar -->
+      <div style="display: flex; gap: 1.5rem">
+        <!-- Main Content Area -->
+        <div style="flex: 1">
+          <!-- Statistics Cards -->
+          <div class="dashboard-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-icon">📊</div>
               </div>
-              <div class="form-field">
-                <label for="itemCategory">Category</label>
-                <select id="itemCategory">
-                  <option value="">Select category</option>
-                  <option value="personal">Personal</option>
-                  <option value="work">Work</option>
-                  <option value="project">Project</option>
-                  <option value="note">Note</option>
-                  <option value="other">Other</option>
-                </select>
+              <div class="stat-title">Total Records</div>
+              <div class="stat-value" id="totalRecords">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-icon">📝</div>
+              </div>
+              <div class="stat-title">Active Items</div>
+              <div class="stat-value" id="activeItems">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-icon">🕐</div>
+              </div>
+              <div class="stat-title">Last Updated</div>
+              <div
+                class="stat-value"
+                id="lastUpdated"
+                style="font-size: 1.5rem"
+              >
+                --
               </div>
             </div>
-            <div class="form-field">
-              <label for="itemDescription">Description</label>
-              <textarea
-                id="itemDescription"
-                placeholder="Enter description"
-              ></textarea>
+          </div>
+
+          <!-- Data Section -->
+          <div class="data-section">
+            <h2>📋 Personal Data</h2>
+
+            <!-- Drag and Drop Zone -->
+            <div class="drop-zone" id="dropZone">
+              <div class="drop-zone-icon">📁</div>
+              <div class="drop-zone-text">
+                Drag & Drop files here or click to add data
+              </div>
+              <div class="drop-zone-hint">
+                Supports: Text files, JSON, ZIP files, images, PDFs, videos, and
+                more<br />
+                <small style="color: #999"
+                  >Maximum file size: <strong>5 GB</strong> (5120 MB)</small
+                >
+              </div>
             </div>
-            <div class="form-field">
-              <label for="itemContent">Content</label>
-              <textarea id="itemContent" placeholder="Enter content"></textarea>
+
+            <!-- Add Item Form -->
+            <div class="add-item-form" id="addItemForm">
+              <h3 style="margin-bottom: 15px">Add New Item</h3>
+              <form id="itemForm">
+                <div class="form-row">
+                  <div class="form-field">
+                    <label for="itemTitle">Title *</label>
+                    <input
+                      type="text"
+                      id="itemTitle"
+                      required
+                      placeholder="Enter title"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="itemCategory">Category</label>
+                    <select id="itemCategory">
+                      <option value="">Select category</option>
+                      <option value="personal">Personal</option>
+                      <option value="work">Work</option>
+                      <option value="project">Project</option>
+                      <option value="note">Note</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="itemDescription">Description</label>
+                  <textarea
+                    id="itemDescription"
+                    placeholder="Enter description"
+                  ></textarea>
+                </div>
+                <div class="form-field">
+                  <label for="itemContent">Content</label>
+                  <textarea
+                    id="itemContent"
+                    placeholder="Enter content"
+                  ></textarea>
+                </div>
+                <div class="form-actions">
+                  <button
+                    type="button"
+                    class="btn btn-cancel"
+                    id="cancelFormBtn"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" class="btn btn-success">
+                    Save Item
+                  </button>
+                </div>
+              </form>
             </div>
-            <div class="form-actions">
-              <button type="button" class="btn btn-cancel" id="cancelFormBtn">
-                Cancel
+
+            <div id="dataContent">
+              <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading your data...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Main Content Area -->
+
+        <!-- Sidebar Widget -->
+        <div class="sidebar-widget">
+          <div class="widget-header">
+            <h3>🔗 My Pages</h3>
+          </div>
+          <div class="widget-content">
+            <div class="pages-dropdown">
+              <button class="dropdown-toggle" id="pagesDropdownBtn">
+                <span>Personal Web Pages</span>
+                <span class="dropdown-arrow">▼</span>
               </button>
-              <button type="submit" class="btn btn-success">Save Item</button>
+              <div class="dropdown-menu" id="pagesDropdownMenu">
+                <a
+                  href="monthlybudget.html"
+                  class="dropdown-item"
+                  target="_blank"
+                >
+                  <span class="item-icon">💰</span>
+                  <span>Monthly Budget</span>
+                </a>
+                <!-- Add more pages here as needed -->
+              </div>
             </div>
-          </form>
-        </div>
-
-        <div id="dataContent">
-          <div class="loading">
-            <div class="loading-spinner"></div>
-            <p>Loading your data...</p>
           </div>
         </div>
       </div>
+      <!-- End Main Content Wrapper -->
     </div>
 
     <!-- View Item Modal -->
@@ -1003,6 +1163,24 @@
       window.addEventListener("DOMContentLoaded", async () => {
         await verifyAuth();
         await loadDashboardData();
+
+        // Initialize dropdown toggle
+        const dropdownBtn = document.getElementById("pagesDropdownBtn");
+        const dropdownMenu = document.getElementById("pagesDropdownMenu");
+
+        dropdownBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          this.classList.toggle("active");
+          dropdownMenu.classList.toggle("show");
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function (e) {
+          if (!e.target.closest(".pages-dropdown")) {
+            dropdownBtn.classList.remove("active");
+            dropdownMenu.classList.remove("show");
+          }
+        });
       });
     </script>
   </body>
