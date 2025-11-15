@@ -1,0 +1,230 @@
+const handleFileUpload = async (event) => {
+		const file = event.target.files[0];
+		if (!file) return;
+
+		setFileSize(file.size);
+		setIsProcessing(true);
+		setProgress(0);
+		setParsedMessages([]);
+
+		abortControllerRef.current = new AbortController();
+
+		try {
+			const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+			const messages = [];
+			let processedBytes = 0;
+			let leftover = "";
+
+			const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+			for (let i = 0; i < totalChunks; i++) {
+				if (abortControllerRef.current?.signal.aborted) {
+					break;
+				}
+
+				const start = i * CHUNK_SIZE;
+				const end = Math.min(start + CHUNK_SIZE, file.size);
+				const chunk = file.slice(start, end);
+
+				const text = await chunk.text();
+				const lines = (leftover + text).split("\n");
+
+				// Keep last incomplete line for next chunk
+				leftover = lines.pop() || "";
+
+				// Process complete lines
+				lines.forEach((line, lineIdx) => {
+					// Match format: <- Link (Passive): 3 - Message Received: DataMessage - S1F3
+					const receivedLinkMatch = line.match(
+						/<- Link \([^)]+\): (\d+) - Message Received: DataMessage - S(\d+)F(\d+)/
+					);
+					if (receivedLinkMatch) {
+						const timestamp =
+							line.match(/^(\d{1,2}:\d{2}:\d{2}\.\d{3})/)?.[1] || "";
+						const transaction = receivedLinkMatch[1];
+						const stream = receivedLinkMatch[2];
+						const function_ = receivedLinkMatch[3];
+						messages.push({
+							timestamp,
+							direction: "received",
+							messageType: `S${stream}F${function_}`,
+							transaction: transaction,
+							rawLine: line,
+							lineNumber: Math.floor(start / 100) + lineIdx + 1, // Approximate line number
+						});
+					}
+
+					// Match format: -> Link (Passive): 3 - Message Enqueued: DataMessage - S1F4
+					const sentLinkMatch = line.match(
+						/-> Link \([^)]+\): (\d+) - Message Enqueued: DataMessage - S(\d+)F(\d+)/
+					);
+					if (sentLinkMatch) {
+						const timestamp =
+							line.match(/^(\d{1,2}:\d{2}:\d{2}\.\d{3})/)?.[1] || "";
+						const transaction = sentLinkMatch[1];
+						const stream = sentLinkMatch[2];
+						const function_ = sentLinkMatch[3];
+						messages.push({
+							timestamp,
+							direction: "sent",
+							messageType: `S${stream}F${function_}`,
+							transaction: transaction,
+							rawLine: line,
+							lineNumber: Math.floor(start / 100) + lineIdx + 1,
+						});
+					}
+
+					// Match format: <- Received SECS message: S5F2 - Transaction: 60500 <B[1] 00>
+					const receivedSecsMatch = line.match(
+						/<- Received SECS message: (S\d+F\d+) - Transaction: (\d+)/
+					);
+					if (receivedSecsMatch) {
+						const timestamp =
+							line.match(/^(\d{1,2}:\d{2}:\d{2}\.\d{3})/)?.[1] || "";
+						messages.push({
+							timestamp,
+							direction: "received",
+							messageType: receivedSecsMatch[1],
+							transaction: receivedSecsMatch[2],
+							rawLine: line,
+							lineNumber: Math.floor(start / 100) + lineIdx + 1,
+						});
+					}
+
+					// Match format: -> Send SECS message: S5F1 - Transaction: 60500 <L[3] ...>
+					const sentSecsMatch = line.match(
+						/-> Send SECS message: (S\d+F\d+) - Transaction: (\d+)/
+					);
+					if (sentSecsMatch) {
+						const timestamp =
+							line.match(/^(\d{1,2}:\d{2}:\d{2}\.\d{3})/)?.[1] || "";
+						const messageType = sentSecsMatch[1];
+
+						// Extract alarm ID from S5F1 messages: <U4 210355>
+						let alarmId = null;
+						if (messageType === "S5F1") {
+							const alarmMatch = line.match(/<U4 (\d+)>/);
+							if (alarmMatch) {
+								alarmId = alarmMatch[1];
+							}
+						}
+
+						messages.push({
+							timestamp,
+							direction: "sent",
+							messageType,
+							transaction: sentSecsMatch[2],
+							alarmId,
+							rawLine: line,
+							lineNumber: Math.floor(start / 100) + lineIdx + 1,
+						});
+					}
+				});
+
+				processedBytes += chunk.size;
+				setProgress((processedBytes / file.size) * 100);
+
+				// Update UI every 10 chunks to avoid too many re-renders
+				if (i % 10 === 0 || i === totalChunks - 1) {
+					setParsedMessages([...messages]);
+				}
+			}
+
+			// Process any remaining leftover
+			if (leftover) {
+				// Match format: <- Link (Passive): 3 - Message Received: DataMessage - S1F3
+				const receivedLinkMatch = leftover.match(
+					/<- Link \([^)]+\): (\d+) - Message Received: DataMessage - S(\d+)F(\d+)/
+				);
+				if (receivedLinkMatch) {
+					const timestamp =
+						leftover.match(/^(\d{1,2}:\d{2}:\d{2}\.\d{3})/)?.[1] || "";
+					const transaction = receivedLinkMatch[1];
+					const stream = receivedLinkMatch[2];
+					const function_ = receivedLinkMatch[3];
+					messages.push({
+						timestamp,
+						direction: "received",
+						messageType: `S${stream}F${function_}`,
+						transaction: transaction,
+						rawLine: leftover,
+						lineNumber: totalChunks + 1,
+					});
+				}
+
+				// Match format: -> Link (Passive): 3 - Message Enqueued: DataMessage - S1F4
+				const sentLinkMatch = leftover.match(
+					/-> Link \([^)]+\): (\d+) - Message Enqueued: DataMessage - S(\d+)F(\d+)/
+				);
+				if (sentLinkMatch) {
+					const timestamp =
+						leftover.match(/^(\d{1,2}:\d{2}:\d{2}\.\d{3})/)?.[1] || "";
+					const transaction = sentLinkMatch[1];
+					const stream = sentLinkMatch[2];
+					const function_ = sentLinkMatch[3];
+					messages.push({
+						timestamp,
+						direction: "sent",
+						messageType: `S${stream}F${function_}`,
+						transaction: transaction,
+						rawLine: leftover,
+						lineNumber: totalChunks + 1,
+					});
+				}
+
+				// Match format: <- Received SECS message: S5F2 - Transaction: 60500
+				const receivedSecsMatch = leftover.match(
+					/<- Received SECS message: (S\d+F\d+) - Transaction: (\d+)/
+				);
+				if (receivedSecsMatch) {
+					const timestamp =
+						leftover.match(/^(\d{1,2}:\d{2}:\d{2}\.\d{3})/)?.[1] || "";
+					messages.push({
+						timestamp,
+						direction: "received",
+						messageType: receivedSecsMatch[1],
+						transaction: receivedSecsMatch[2],
+						rawLine: leftover,
+						lineNumber: totalChunks + 1,
+					});
+				}
+
+				// Match format: -> Send SECS message: S5F1 - Transaction: 60500
+				const sentSecsMatch = leftover.match(
+					/-> Send SECS message: (S\d+F\d+) - Transaction: (\d+)/
+				);
+				if (sentSecsMatch) {
+					const timestamp =
+						leftover.match(/^(\d{1,2}:\d{2}:\d{2}\.\d{3})/)?.[1] || "";
+					const messageType = sentSecsMatch[1];
+
+					// Extract alarm ID from S5F1 messages: <U4 210355>
+					let alarmId = null;
+					if (messageType === "S5F1") {
+						const alarmMatch = leftover.match(/<U4 (\d+)>/);
+						if (alarmMatch) {
+							alarmId = alarmMatch[1];
+						}
+					}
+
+					messages.push({
+						timestamp,
+						direction: "sent",
+						messageType,
+						transaction: sentSecsMatch[2],
+						alarmId,
+						rawLine: leftover,
+						lineNumber: totalChunks + 1,
+					});
+				}
+			}
+
+			setParsedMessages(messages);
+			setProgress(100);
+		} catch (error) {
+			console.error("Error processing file:", error);
+			alert("Error processing file: " + error.message);
+		} finally {
+			setIsProcessing(false);
+		}
+	};
