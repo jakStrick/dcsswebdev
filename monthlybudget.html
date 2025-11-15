@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monthly Budget Alignment Tool</title>
+    <link rel="icon" type="image/png" href="images/logo/DCSS_Logo.jpg" />
+    <title>Monthly Budgeting Tool</title>
     <style>
       * {
         margin: 0;
@@ -285,6 +286,21 @@
         color: #721c24;
       }
 
+      .priority-high {
+        color: #dc3545;
+        font-weight: bold;
+      }
+
+      .priority-medium {
+        color: #fd7e14;
+        font-weight: 600;
+      }
+
+      .priority-low {
+        color: #17a2b8;
+        font-weight: 600;
+      }
+
       .totals-row {
         background: #f8f9fa;
         font-weight: bold;
@@ -348,6 +364,34 @@
         font-size: 1.5rem;
       }
 
+      .payment-status-dropdown {
+        padding: 0.5rem;
+        border: 2px solid #dee2e6;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        background: white;
+        cursor: pointer;
+        transition: border-color 0.3s;
+        min-width: 150px;
+      }
+
+      .payment-status-dropdown:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .payment-status-dropdown option[value="NP"] {
+        color: #dc3545;
+      }
+
+      .payment-status-dropdown option[value="PNC"] {
+        color: #ffc107;
+      }
+
+      .payment-status-dropdown option[value="PCL"] {
+        color: #28a745;
+      }
+
       @media print {
         body {
           background: white;
@@ -363,26 +407,30 @@
   <body>
     <div class="container">
       <div class="header">
-        <h1>💰 Budget Alignment Tool</h1>
-        <p>Optimize bill payments across pay periods for maximum debt payoff</p>
+        <h1>💰 Strickland's Monthly Budget App</h1>
+        <p>Pay Off Your Debts</p>
       </div>
 
       <div class="controls">
         <div class="control-group">
           <div class="control-item">
-            <label>Your Next Payday (Biweekly)</label>
-            <input type="date" id="yourPayday" value="2025-11-21" />
+            <label id="paydayLabel">Next Payday</label>
+            <input type="date" id="DavidPayday" value="2025-11-21" />
+            <small
+              id="paydayWarning"
+              style="color: #dc3545; display: none; margin-top: 0.25rem"
+            ></small>
           </div>
           <div class="control-item">
-            <label>Your Take-Home Pay</label>
-            <input type="number" id="yourPay" value="3803.89" step="0.01" />
+            <label>David's Net Pay (Thursdays - Biweekly)</label>
+            <input type="number" id="DavidPay" value="3803.89" step="0.01" />
           </div>
           <div class="control-item">
-            <label>Wife's Take-Home Pay</label>
-            <input type="number" id="wifePay" value="1099.48" step="0.01" />
+            <label>Claudia's Net Pay (Tuesdays - Biweekly)</label>
+            <input type="number" id="ClaudiaPay" value="1099.48" step="0.01" />
           </div>
           <div class="control-item">
-            <label>Current Bank Balance</label>
+            <label>Current Checking Balance</label>
             <input type="number" id="bankBalance" value="1406.88" step="0.01" />
           </div>
           <div class="control-item">
@@ -516,6 +564,110 @@
     </div>
 
     <script>
+      // ===== API Integration for Cloudflare D1 =====
+      const API_BASE_URL = "/api/budget";
+      const USER_ID = "default"; // In production, get this from authentication
+
+      // API Helper Functions
+      async function fetchBudgetData() {
+        try {
+          const response = await fetch(`${API_BASE_URL}?userId=${USER_ID}`);
+          const result = await response.json();
+          if (result.success) {
+            return result.data;
+          }
+          throw new Error(result.error || "Failed to fetch data");
+        } catch (error) {
+          console.error("Error fetching budget data:", error);
+          // Fallback to localStorage if API fails
+          return {
+            settings: {},
+            billAdjustments: JSON.parse(
+              localStorage.getItem("billAdjustments") || "{}"
+            ),
+            paymentStatuses: JSON.parse(
+              localStorage.getItem("paymentStatuses") || "{}"
+            ),
+            miscExpenses: JSON.parse(
+              localStorage.getItem("miscExpenses") || "{}"
+            ),
+            surplusSavings: parseFloat(
+              localStorage.getItem("surplusSavings") || "0"
+            ),
+            bankBalance: localStorage.getItem("bankBalance"),
+          };
+        }
+      }
+
+      async function saveBudgetData(type, data) {
+        try {
+          const response = await fetch(API_BASE_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: USER_ID,
+              type,
+              data,
+            }),
+          });
+          const result = await response.json();
+          if (!result.success) {
+            throw new Error(result.error || "Failed to save data");
+          }
+          return true;
+        } catch (error) {
+          console.error("Error saving budget data:", error);
+          // Fallback to localStorage if API fails
+          switch (type) {
+            case "bankBalance":
+              localStorage.setItem("bankBalance", data.value);
+              break;
+            case "billAdjustments":
+              localStorage.setItem("billAdjustments", JSON.stringify(data));
+              break;
+            case "paymentStatus":
+              const statuses = JSON.parse(
+                localStorage.getItem("paymentStatuses") || "{}"
+              );
+              statuses[`${data.year}-${data.month}-${data.billName}`] =
+                data.status;
+              localStorage.setItem("paymentStatuses", JSON.stringify(statuses));
+              break;
+            case "miscExpense":
+              const misc = JSON.parse(
+                localStorage.getItem("miscExpenses") || "{}"
+              );
+              misc[`${data.year}-${data.month}-Misc-${data.paycheckIndex}`] =
+                data.amount;
+              localStorage.setItem("miscExpenses", JSON.stringify(misc));
+              break;
+            case "surplusSavings":
+              localStorage.setItem("surplusSavings", data.amount.toString());
+              break;
+          }
+          return false;
+        }
+      }
+
+      // Global cache for budget data (refreshed from API)
+      let budgetDataCache = {
+        paymentStatuses: {},
+        miscExpenses: {},
+        surplusSavings: 0,
+      };
+
+      async function refreshBudgetDataCache() {
+        const data = await fetchBudgetData();
+        budgetDataCache = {
+          paymentStatuses: data.paymentStatuses || {},
+          miscExpenses: data.miscExpenses || {},
+          surplusSavings: data.surplusSavings || 0,
+        };
+        return budgetDataCache;
+      }
+
       // Bill data structure
       const billsData = [
         // Main Fixed Monthly Expenses
@@ -909,7 +1061,7 @@
         }
       }
 
-      function applyAdjustments() {
+      async function applyAdjustments() {
         // Update bill amounts based on input fields
         const adjustments = {};
         const inputs = document.querySelectorAll('[id^="adjust_"]');
@@ -923,8 +1075,8 @@
           }
         });
 
-        // Save adjustments to localStorage
-        localStorage.setItem("billAdjustments", JSON.stringify(adjustments));
+        // Save adjustments to API
+        await saveBudgetData("billAdjustments", adjustments);
 
         // Recalculate budget
         calculateBudget();
@@ -933,12 +1085,13 @@
         toggleAdjustments();
       }
 
-      function loadSavedAdjustments() {
-        // Load adjustments from localStorage
-        const saved = localStorage.getItem("billAdjustments");
-        if (saved) {
+      async function loadSavedAdjustments() {
+        // Load adjustments from API
+        const data = await fetchBudgetData();
+        const adjustments = data.billAdjustments || {};
+
+        if (Object.keys(adjustments).length > 0) {
           try {
-            const adjustments = JSON.parse(saved);
             Object.keys(adjustments).forEach((billName) => {
               const bill = billsData.find((b) => b.name === billName);
               if (bill) {
@@ -951,13 +1104,12 @@
         }
       }
 
-      function toggleSavingsManager() {
+      async function toggleSavingsManager() {
         const panel = document.getElementById("savingsPanel");
         if (panel.style.display === "none") {
           // Show panel and update display
-          const currentSavings = parseFloat(
-            localStorage.getItem("surplusSavings") || "0"
-          );
+          const data = await fetchBudgetData();
+          const currentSavings = data.surplusSavings || 0;
           document.getElementById("currentSavingsDisplay").textContent =
             "$" +
             currentSavings.toLocaleString("en-US", {
@@ -970,7 +1122,7 @@
         }
       }
 
-      function addToSavings() {
+      async function addToSavings() {
         const amount =
           parseFloat(document.getElementById("savingsAmount").value) || 0;
         if (amount <= 0) {
@@ -978,11 +1130,10 @@
           return;
         }
 
-        const currentSavings = parseFloat(
-          localStorage.getItem("surplusSavings") || "0"
-        );
+        const data = await fetchBudgetData();
+        const currentSavings = data.surplusSavings || 0;
         const newSavings = currentSavings + amount;
-        localStorage.setItem("surplusSavings", newSavings.toString());
+        await saveBudgetData("surplusSavings", { amount: newSavings });
 
         document.getElementById("currentSavingsDisplay").textContent =
           "$" +
@@ -996,7 +1147,7 @@
         calculateBudget();
       }
 
-      function subtractFromSavings() {
+      async function subtractFromSavings() {
         const amount =
           parseFloat(document.getElementById("savingsAmount").value) || 0;
         if (amount <= 0) {
@@ -1004,11 +1155,10 @@
           return;
         }
 
-        const currentSavings = parseFloat(
-          localStorage.getItem("surplusSavings") || "0"
-        );
+        const data = await fetchBudgetData();
+        const currentSavings = data.surplusSavings || 0;
         const newSavings = Math.max(0, currentSavings - amount);
-        localStorage.setItem("surplusSavings", newSavings.toString());
+        await saveBudgetData("surplusSavings", { amount: newSavings });
 
         document.getElementById("currentSavingsDisplay").textContent =
           "$" +
@@ -1022,13 +1172,13 @@
         calculateBudget();
       }
 
-      function resetSavings() {
+      async function resetSavings() {
         if (
           confirm(
-            "Are you sure you want to reset your surplus savings balance to $0?"
+            "Are you sure you want to reset David surplus savings balance to $0?"
           )
         ) {
-          localStorage.setItem("surplusSavings", "0");
+          await saveBudgetData("surplusSavings", { amount: 0 });
           document.getElementById("currentSavingsDisplay").textContent =
             "$0.00";
           document.getElementById("savingsAmount").value = "";
@@ -1039,24 +1189,26 @@
       }
 
       function calculateBudget() {
-        const yourPaydayInput = document.getElementById("yourPayday").value;
-        const yourPay = parseFloat(document.getElementById("yourPay").value);
-        const wifePay = parseFloat(document.getElementById("wifePay").value);
+        const DavidPaydayInput = document.getElementById("DavidPayday").value;
+        const DavidPay = parseFloat(document.getElementById("DavidPay").value);
+        const ClaudiaPay = parseFloat(
+          document.getElementById("ClaudiaPay").value
+        );
         const bankBalance = parseFloat(
           document.getElementById("bankBalance").value
         );
         const monthYearInput = document.getElementById("monthYear").value;
 
         const [year, month] = monthYearInput.split("-").map(Number);
-        const yourPayday = new Date(yourPaydayInput);
+        const DavidPayday = new Date(DavidPaydayInput);
 
         // Calculate all pay periods for the month
         const payPeriods = calculatePayPeriods(
-          yourPayday,
+          DavidPayday,
           year,
           month,
-          yourPay,
-          wifePay
+          DavidPay,
+          ClaudiaPay
         );
 
         // Assign bills to pay periods
@@ -1066,7 +1218,13 @@
         renderResults(assignments, payPeriods, year, month, bankBalance);
       }
 
-      function calculatePayPeriods(firstPayday, year, month, yourPay, wifePay) {
+      function calculatePayPeriods(
+        firstPayday,
+        year,
+        month,
+        DavidPay,
+        ClaudiaPay
+      ) {
         const periods = [];
         const startOfMonth = new Date(year, month - 1, 1);
         const endOfMonth = new Date(year, month, 0);
@@ -1077,93 +1235,93 @@
         );
 
         // You get paid twice per month (Thursdays biweekly)
-        // Wife gets paid twice per month (Tuesdays biweekly, opposite weeks)
-        const yourReferencePayday = new Date(firstPayday);
+        // Claudia gets paid twice per month (Tuesdays biweekly, opposite weeks)
+        const DavidReferencePayday = new Date(firstPayday);
         console.log(
-          `Your reference payday: ${yourReferencePayday.toDateString()}`
+          `David reference payday: ${DavidReferencePayday.toDateString()}`
         );
 
         // Start from well before the target month to ensure we catch all paychecks
-        let yourCurrentPayday = new Date(yourReferencePayday);
+        let DavidCurrentPayday = new Date(DavidReferencePayday);
 
         // Go back to find a starting point before the month begins
         // Go back enough weeks to ensure we find the first paycheck of any month
-        while (yourCurrentPayday > startOfMonth) {
-          yourCurrentPayday.setDate(yourCurrentPayday.getDate() - 14);
+        while (DavidCurrentPayday > startOfMonth) {
+          DavidCurrentPayday.setDate(DavidCurrentPayday.getDate() - 14);
         }
         console.log(
-          `Your starting search point: ${yourCurrentPayday.toDateString()}`
+          `David starting search point: ${DavidCurrentPayday.toDateString()}`
         );
 
-        // Collect all YOUR paychecks that fall in the month
-        const yourPaychecks = [];
-        while (yourCurrentPayday <= endOfMonth) {
+        // Collect all David paychecks that fall in the month
+        const DavidPaychecks = [];
+        while (DavidCurrentPayday <= endOfMonth) {
           if (
-            yourCurrentPayday >= startOfMonth &&
-            yourCurrentPayday <= endOfMonth
+            DavidCurrentPayday >= startOfMonth &&
+            DavidCurrentPayday <= endOfMonth
           ) {
             console.log(
-              `Found YOUR paycheck: ${yourCurrentPayday.toDateString()}`
+              `Found David paycheck: ${DavidCurrentPayday.toDateString()}`
             );
-            yourPaychecks.push(new Date(yourCurrentPayday));
+            DavidPaychecks.push(new Date(DavidCurrentPayday));
           }
-          yourCurrentPayday.setDate(yourCurrentPayday.getDate() + 14);
+          DavidCurrentPayday.setDate(DavidCurrentPayday.getDate() + 14);
         }
 
-        // Calculate wife's paychecks (Tuesdays)
-        // Wife gets paid on Tuesdays, you get paid on Thursdays
+        // Calculate Claudia's paychecks (Tuesdays)
+        // Claudia gets paid on Tuesdays, you get paid on Thursdays
         // They're on opposite biweekly schedules
-        const wifePaychecks = [];
+        const ClaudiaPaychecks = [];
 
-        // Start from your reference payday, but go to the OPPOSITE week's Tuesday
-        let wifeCurrentPayday = new Date(yourReferencePayday);
+        // Start from David reference payday, but go to the OPPOSITE week's Tuesday
+        let ClaudiaCurrentPayday = new Date(DavidReferencePayday);
 
         // First, go back 2 days to get from Thursday to Tuesday
-        wifeCurrentPayday.setDate(wifeCurrentPayday.getDate() - 2);
+        ClaudiaCurrentPayday.setDate(ClaudiaCurrentPayday.getDate() - 2);
 
         // Then go back 7 days to get to the OPPOSITE week (since she's paid on off-weeks from you)
-        wifeCurrentPayday.setDate(wifeCurrentPayday.getDate() - 7);
+        ClaudiaCurrentPayday.setDate(ClaudiaCurrentPayday.getDate() - 7);
 
         // Go back to find starting point
-        while (wifeCurrentPayday > startOfMonth) {
-          wifeCurrentPayday.setDate(wifeCurrentPayday.getDate() - 14);
+        while (ClaudiaCurrentPayday > startOfMonth) {
+          ClaudiaCurrentPayday.setDate(ClaudiaCurrentPayday.getDate() - 14);
         }
         console.log(
-          `Wife's starting search point: ${wifeCurrentPayday.toDateString()}`
+          `Claudia's starting search point: ${ClaudiaCurrentPayday.toDateString()}`
         );
 
-        // Collect all wife's paychecks that fall in the month
-        while (wifeCurrentPayday <= endOfMonth) {
+        // Collect all Claudia's paychecks that fall in the month
+        while (ClaudiaCurrentPayday <= endOfMonth) {
           if (
-            wifeCurrentPayday >= startOfMonth &&
-            wifeCurrentPayday <= endOfMonth
+            ClaudiaCurrentPayday >= startOfMonth &&
+            ClaudiaCurrentPayday <= endOfMonth
           ) {
             console.log(
-              `Found WIFE paycheck: ${wifeCurrentPayday.toDateString()}`
+              `Found Claudia paycheck: ${ClaudiaCurrentPayday.toDateString()}`
             );
-            wifePaychecks.push(new Date(wifeCurrentPayday));
+            ClaudiaPaychecks.push(new Date(ClaudiaCurrentPayday));
           }
-          wifeCurrentPayday.setDate(wifeCurrentPayday.getDate() + 14);
+          ClaudiaCurrentPayday.setDate(ClaudiaCurrentPayday.getDate() + 14);
         }
 
         // Combine all paychecks
         const allPaychecks = [];
 
-        yourPaychecks.forEach((date) => {
+        DavidPaychecks.forEach((date) => {
           allPaychecks.push({
             date: date,
-            amount: yourPay,
+            amount: DavidPay,
             person: "You",
             bills: [],
             totalAssigned: 0,
           });
         });
 
-        wifePaychecks.forEach((date) => {
+        ClaudiaPaychecks.forEach((date) => {
           allPaychecks.push({
             date: date,
-            amount: wifePay,
-            person: "Wife",
+            amount: ClaudiaPay,
+            person: "Claudia",
             bills: [],
             totalAssigned: 0,
           });
@@ -1305,7 +1463,7 @@
           year === today.getFullYear() && month === today.getMonth() + 1;
 
         // Calculate summary statistics
-        // Total income = sum of all paychecks in the month (4 total: you 2x, wife 2x)
+        // Total income = sum of all paychecks in the month (4 total: you 2x, Claudia 2x)
         const totalIncome = assignments.reduce((sum, p) => sum + p.amount, 0);
 
         // Remaining income = sum of paychecks that haven't been received yet (date >= today)
@@ -1380,22 +1538,22 @@
         console.log("");
 
         // Calculate how many paychecks for each person (total)
-        const yourPaychecksTotal = assignments.filter(
+        const DavidPaychecksTotal = assignments.filter(
           (p) => p.person === "You"
         ).length;
-        const wifePaychecksTotal = assignments.filter(
-          (p) => p.person === "Wife"
+        const ClaudiaPaychecksTotal = assignments.filter(
+          (p) => p.person === "Claudia"
         ).length;
 
         // Calculate remaining paychecks (not yet received)
-        const yourPaychecksRemaining = isCurrentMonth
+        const DavidPaychecksRemaining = isCurrentMonth
           ? assignments.filter((p) => p.person === "You" && p.date >= today)
               .length
-          : yourPaychecksTotal;
-        const wifePaychecksRemaining = isCurrentMonth
-          ? assignments.filter((p) => p.person === "Wife" && p.date >= today)
+          : DavidPaychecksTotal;
+        const ClaudiaPaychecksRemaining = isCurrentMonth
+          ? assignments.filter((p) => p.person === "Claudia" && p.date >= today)
               .length
-          : wifePaychecksTotal;
+          : ClaudiaPaychecksTotal;
 
         // Calculate surplus savings for this month
         const surplusBill = billsData.find(
@@ -1403,18 +1561,31 @@
         );
         const monthlySurplus = surplusBill ? surplusBill.amount : 0;
 
-        // Get accumulated savings from localStorage
-        let accumulatedSavings = parseFloat(
-          localStorage.getItem("surplusSavings") || "0"
-        );
+        // Get accumulated savings from cache
+        let accumulatedSavings = budgetDataCache.surplusSavings || 0;
+
+        // Calculate adjusted bank balance (subtracting paid bills)
+        const adjustedBankBalance = calculateAdjustedBankBalance();
+        const totalPaidBills = bankBalance - adjustedBankBalance;
 
         let html = `
                 <div class="summary">
                     <div class="summary-card">
-                        <div class="label">Current Bank Balance</div>
-                        <div class="value" style="color: #667eea;">$${bankBalance.toFixed(
+                        <div class="label">Current Checking Balance</div>
+                        <div class="value" style="color: #667eea;">$${adjustedBankBalance.toFixed(
                           2
                         )}</div>
+                        ${
+                          totalPaidBills > 0
+                            ? `
+                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
+                            Base: $${bankBalance.toFixed(
+                              2
+                            )} - Paid: $${totalPaidBills.toFixed(2)}
+                        </div>
+                        `
+                            : ""
+                        }
                     </div>
                     <div class="summary-card">
                         <div class="label">Total Monthly Income</div>
@@ -1422,7 +1593,7 @@
                           2
                         )}</div>
                         <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            You: ${yourPaychecksTotal}x | Wife: ${wifePaychecksTotal}x paychecks
+                            You: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks
                         </div>
                     </div>
                     ${
@@ -1434,7 +1605,7 @@
                           2
                         )}</div>
                         <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            You: ${yourPaychecksRemaining}x | Wife: ${wifePaychecksRemaining}x left
+                            You: ${DavidPaychecksRemaining}x | Claudia: ${ClaudiaPaychecksRemaining}x left
                         </div>
                     </div>
                     `
@@ -1491,7 +1662,7 @@
                     <div class="alert alert-danger">
                         <span class="icon">⚠️</span>
                         <div>
-                            <strong>Budget Deficit!</strong> Your expenses exceed income by $${Math.abs(
+                            <strong>Budget Deficit!</strong> David expenses exceed income by $${Math.abs(
                               netCashFlow
                             ).toFixed(2)}. 
                             Consider deferring non-essential payments or negotiating payment plans.
@@ -1506,7 +1677,7 @@
                             <strong>Budget Surplus!</strong> You have $${netCashFlow.toFixed(
                               2
                             )} remaining after all bills. 
-                            Consider applying this to your highest-interest debt.
+                            Consider applying this to David highest-interest debt.
                         </div>
                     </div>
                 `;
@@ -1556,7 +1727,7 @@
                                     <th>Due Date</th>
                                     <th>Amount</th>
                                     <th>Balance</th>
-                                    <th>Payment Type</th>
+                                    <th>Payment Status</th>
                                     <th>Priority</th>
                                 </tr>
                             </thead>
@@ -1588,6 +1759,18 @@
                 ? "Medium"
                 : "Low";
 
+            const priorityClass =
+              bill.priority === 1
+                ? "priority-high"
+                : bill.priority === 2
+                ? "priority-medium"
+                : "priority-low";
+
+            // Get saved payment status
+            const billKey = `${year}-${month}-${bill.name}`;
+            const paymentStatus =
+              budgetDataCache.paymentStatuses[billKey] || "NP";
+
             html += `
                         <tr>
                             <td>
@@ -1613,24 +1796,65 @@
                               { minimumFractionDigits: 2 }
                             )}</span></td>
                             <td>
-                                ${
-                                  bill.ach
-                                    ? '<span class="badge badge-ach">ACH</span>'
-                                    : ""
-                                }
-                                <span class="badge badge-${bill.type.toLowerCase()}">${
-              bill.type
-            }</span>
+                                <select class="payment-status-dropdown" 
+                                        data-bill-key="${billKey}"
+                                        data-bill-amount="${bill.amount}"
+                                        onchange="updatePaymentStatus(this)">
+                                    <option value="NP" ${
+                                      paymentStatus === "NP" ? "selected" : ""
+                                    }>NP - Not Paid</option>
+                                    <option value="PNC" ${
+                                      paymentStatus === "PNC" ? "selected" : ""
+                                    }>PNC - Paid (Not Cleared)</option>
+                                    <option value="PCL" ${
+                                      paymentStatus === "PCL" ? "selected" : ""
+                                    }>PCL - Paid & Cleared</option>
+                                </select>
                             </td>
-                            <td>${priorityLabel}</td>
+                            <td><span class="${priorityClass}">${priorityLabel}</span></td>
                         </tr>
                     `;
           });
 
+          // Add Misc row
+          const miscKey = `${year}-${month}-Misc-${index}`;
+          const miscAmount = budgetDataCache.miscExpenses[miscKey] || 0;
+
+          html += `
+                        <tr style="background: #fff9e6; border-top: 2px solid #ffc107;">
+                            <td colspan="3">
+                                <div class="bill-name" style="color: #856404;">💰 Misc/Unforeseen</div>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input type="number" 
+                                           id="misc-input-${miscKey}"
+                                           class="misc-amount-input" 
+                                           data-misc-key="${miscKey}"
+                                           value="0.00" 
+                                           step="0.01"
+                                           min="0"
+                                           style="flex: 1; padding: 0.5rem; border: 2px solid #ffc107; border-radius: 0.375rem; font-size: 0.875rem;">
+                                    <button type="button" onclick="submitMiscAmount('${miscKey}')" 
+                                            style="padding: 0.5rem 1rem; background: #ffc107; color: #856404; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; font-size: 0.875rem; white-space: nowrap;"
+                                            onmouseover="this.style.background='#e0a800'" 
+                                            onmouseout="this.style.background='#ffc107'">
+                                        Submit
+                                    </button>
+                                </div>
+                            </td>
+                            <td colspan="3" style="font-size: 0.875rem; color: #856404;">
+                                <em>Unforeseen expenses</em>
+                            </td>
+                        </tr>
+                    `;
+
+          const totalWithMisc = period.totalAssigned + miscAmount;
+
           html += `
                                 <tr class="totals-row">
                                     <td colspan="3"><strong>Subtotal</strong></td>
-                                    <td><strong class="amount">$${period.totalAssigned.toFixed(
+                                    <td><strong class="amount">$${totalWithMisc.toFixed(
                                       2
                                     )}</strong></td>
                                     <td colspan="3"></td>
@@ -1668,7 +1892,7 @@
               highestInterest.name
             }:</strong> Add the $${netCashFlow.toFixed(
               2
-            )} surplus to your payment of $${highestInterest.amount.toFixed(
+            )} surplus to David payment of $${highestInterest.amount.toFixed(
               2
             )} to pay down the balance of $${highestInterest.balance.toLocaleString(
               "en-US",
@@ -1719,13 +1943,220 @@
         return html;
       }
 
+      // Submit misc amount and update bank balance permanently
+      async function submitMiscAmount(miscKey) {
+        const inputElement = document.getElementById(`misc-input-${miscKey}`);
+        const newAmount = parseFloat(inputElement.value) || 0;
+
+        if (newAmount === 0) {
+          return; // Don't do anything if amount is 0
+        }
+
+        // Parse the miscKey to get year, month, and paycheck index
+        const parts = miscKey.split("-");
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]);
+        const paycheckIndex = parseInt(parts[3]);
+
+        // Get current misc expenses
+        const data = await fetchBudgetData();
+        const oldAmount = data.miscExpenses[miscKey] || 0;
+
+        // Add the new amount to the existing total for this misc key
+        const updatedAmount = oldAmount + newAmount;
+
+        // Save to API
+        await saveBudgetData("miscExpense", {
+          year,
+          month,
+          paycheckIndex,
+          amount: updatedAmount,
+        });
+
+        // Subtract the new amount from bank balance
+        const currentBankBalance =
+          parseFloat(document.getElementById("bankBalance").value) || 0;
+        const newBankBalance = currentBankBalance - newAmount;
+        document.getElementById("bankBalance").value =
+          newBankBalance.toFixed(2);
+
+        // Save the new bank balance to API
+        await saveBudgetData("bankBalance", {
+          value: newBankBalance.toFixed(2),
+        });
+
+        // Clear the input box
+        inputElement.value = "0.00";
+
+        // Recalculate and update displayed values
+        calculateBudget();
+      }
+
+      // Update payment status and recalculate bank balance
+      async function updatePaymentStatus(selectElement) {
+        const billKey = selectElement.getAttribute("data-bill-key");
+        const billAmount = parseFloat(
+          selectElement.getAttribute("data-bill-amount")
+        );
+        const newStatus = selectElement.value;
+
+        // Parse the billKey to get year, month, and bill name
+        const parts = billKey.split("-");
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]);
+        const billName = parts.slice(2).join("-");
+
+        // Save status to API
+        await saveBudgetData("paymentStatus", {
+          year,
+          month,
+          billName,
+          status: newStatus,
+        });
+
+        // Recalculate and update displayed bank balance
+        updateDisplayedBankBalance();
+      }
+
+      // Calculate adjusted bank balance based on payment statuses
+      function calculateAdjustedBankBalance() {
+        const baseBankBalance =
+          parseFloat(document.getElementById("bankBalance").value) || 0;
+        const savedStatuses = budgetDataCache.paymentStatuses;
+
+        let totalPaid = 0;
+
+        // Sum up all bills marked as PNC or PCL
+        Object.keys(savedStatuses).forEach((billKey) => {
+          const status = savedStatuses[billKey];
+          if (status === "PNC" || status === "PCL") {
+            // Extract bill name from key (format: "year-month-billname")
+            const parts = billKey.split("-");
+            const billName = parts.slice(2).join("-");
+
+            // Find the bill in billsData
+            const bill = billsData.find((b) => b.name === billName);
+            if (bill) {
+              totalPaid += bill.amount;
+            }
+          }
+        });
+
+        // Note: Misc expenses are now permanently subtracted from base balance
+        // when submitted, so we don't subtract them here
+
+        return baseBankBalance - totalPaid;
+      }
+
+      // Update the displayed bank balance in the summary card
+      function updateDisplayedBankBalance() {
+        const adjustedBalance = calculateAdjustedBankBalance();
+        const baseBankBalance =
+          parseFloat(document.getElementById("bankBalance").value) || 0;
+        const totalPaid = baseBankBalance - adjustedBalance;
+
+        // Find and update the bank balance display
+        const bankBalanceCard = document.querySelector(
+          '.summary-card .label:contains("Current Checking Balance")'
+        );
+        if (bankBalanceCard) {
+          const valueElement = bankBalanceCard.nextElementSibling;
+          if (valueElement) {
+            valueElement.innerHTML = `$${adjustedBalance.toFixed(2)}`;
+
+            // Add a subtitle showing the adjustment
+            if (totalPaid > 0) {
+              const subtitle = valueElement.nextElementSibling;
+              if (subtitle && subtitle.style.fontSize === "0.75rem") {
+                subtitle.innerHTML = `Base: $${baseBankBalance.toFixed(
+                  2
+                )} - Paid: $${totalPaid.toFixed(2)}`;
+              } else {
+                valueElement.insertAdjacentHTML(
+                  "afterend",
+                  `<div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
+                    Base: $${baseBankBalance.toFixed(
+                      2
+                    )} - Paid: $${totalPaid.toFixed(2)}
+                  </div>`
+                );
+              }
+            }
+          }
+        }
+
+        // Recalculate budget to update projected balance
+        calculateBudget();
+      }
+
+      // Update payday label based on selected date
+      function updatePaydayLabel() {
+        const paydayInput = document.getElementById("DavidPayday");
+        const paydayLabel = document.getElementById("paydayLabel");
+        const paydayWarning = document.getElementById("paydayWarning");
+
+        if (!paydayInput.value) {
+          paydayLabel.textContent = "Next Payday";
+          paydayWarning.style.display = "none";
+          return;
+        }
+
+        const selectedDate = new Date(paydayInput.value + "T00:00:00");
+        const dayOfWeek = selectedDate.getDay(); // 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+
+        if (dayOfWeek === 4) {
+          // Thursday - David's payday
+          paydayLabel.textContent = "David's Next Payday (Thursday - Biweekly)";
+          paydayWarning.style.display = "none";
+        } else if (dayOfWeek === 2) {
+          // Tuesday - Claudia's payday
+          paydayLabel.textContent =
+            "Claudia's Next Payday (Tuesday - Biweekly)";
+          paydayWarning.textContent =
+            "⚠️ Note: This is Claudia's payday (Tuesday). Enter David's next Thursday payday for accurate calculations.";
+          paydayWarning.style.display = "block";
+        } else {
+          // Invalid day
+          const days = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ];
+          paydayLabel.textContent = "Next Payday";
+          paydayWarning.textContent = `⚠️ Invalid payday: ${days[dayOfWeek]}. Please select David's Thursday payday or Claudia's Tuesday payday.`;
+          paydayWarning.style.display = "block";
+        }
+      }
+
       // Auto-calculate on page load
-      window.addEventListener("DOMContentLoaded", () => {
+      window.addEventListener("DOMContentLoaded", async () => {
+        // Load saved data from API
+        const data = await fetchBudgetData();
+
         // Load saved adjustments first
-        loadSavedAdjustments();
+        await loadSavedAdjustments();
+
+        // Load saved bank balance from API
+        if (data.bankBalance !== null) {
+          document.getElementById("bankBalance").value = data.bankBalance;
+        }
+
+        // Update payday label on load
+        updatePaydayLabel();
 
         // Then calculate budget
         calculateBudget();
+
+        // Update label when payday changes
+        document
+          .getElementById("DavidPayday")
+          .addEventListener("change", () => {
+            updatePaydayLabel();
+          });
 
         // Auto-recalculate when month/year changes
         document.getElementById("monthYear").addEventListener("change", () => {
