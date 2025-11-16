@@ -409,6 +409,15 @@
 				color: #28a745;
 			}
 
+			.payment-status-dropdown option[value="REMOVE"] {
+				color: #004085;
+				font-weight: bold;
+			}
+
+			.bill-row-removed {
+				display: none !important;
+			}
+
 			/* Apply colors to the select element based on selected value */
 			.payment-status-dropdown[data-status="NP"] {
 				color: #dc3545;
@@ -1510,16 +1519,22 @@
 			}
 
 			async function addNewBill() {
-				const form = document.getElementById("addBillForm");
 				const billData = {
-					name: form.billName.value.trim(),
-					category: form.billCategory.value,
-					amount: parseFloat(form.billAmount.value) || 0,
-					balance: parseFloat(form.billBalance.value) || 0,
-					dueDay: parseInt(form.billDueDay.value) || 1,
-					ach: form.billACH.checked,
-					type: form.billType.value,
-					priority: parseInt(form.billPriority.value) || 1,
+					name: document.getElementById("newBillName").value.trim(),
+					category: document.getElementById("newBillCategory").value,
+					amount:
+						parseFloat(document.getElementById("newBillAmount").value) ||
+						0,
+					balance:
+						parseFloat(document.getElementById("newBillBalance").value) ||
+						0,
+					dueDay:
+						parseInt(document.getElementById("newBillDueDay").value) || 1,
+					ach: document.getElementById("newBillACH").checked,
+					type: document.getElementById("newBillType").value,
+					priority:
+						parseInt(document.getElementById("newBillPriority").value) ||
+						1,
 				};
 
 				// Validate inputs
@@ -2305,8 +2320,14 @@
 						const paymentStatus =
 							budgetDataCache.paymentStatuses[billKey] || "NP";
 
+						// Add class to hide row if status is REMOVE
+						const rowClass =
+							paymentStatus === "REMOVE"
+								? 'class="bill-row-removed"'
+								: "";
+
 						html += `
-                        <tr>
+                        <tr ${rowClass}>
                             <td>
                                 <div class="bill-name">${bill.name}</div>
                                 ${
@@ -2344,6 +2365,11 @@
                                     <option value="PCL" ${
 													paymentStatus === "PCL" ? "selected" : ""
 												}>PCL - Paid & Cleared</option>
+                                    <option value="REMOVE" ${
+													paymentStatus === "REMOVE"
+														? "selected"
+														: ""
+												}>Remove</option>
                                 </select>
                             </td>
                             <td><span class="${priorityClass}">${priorityLabel}</span></td>
@@ -2776,8 +2802,13 @@
 				// Update local cache immediately
 				budgetDataCache.paymentStatuses[billKey] = newStatus;
 
-				// Recalculate and update displayed bank balance
-				updateDisplayedBankBalance();
+				// If status is REMOVE, trigger full re-render to hide the row
+				if (newStatus === "REMOVE") {
+					calculateBudget();
+				} else {
+					// Otherwise just update the displayed bank balance
+					updateDisplayedBankBalance();
+				}
 			}
 
 			// Calculate adjusted bank balance based on payment statuses
@@ -2830,7 +2861,7 @@
 					splitBillsMap[bill.name] = amountPerPeriod;
 				});
 
-				// Sum up all bills marked as PNC or PCL
+				// Sum up all bills marked as PNC or PCL (exclude REMOVE status)
 				Object.keys(savedStatuses).forEach((billKey) => {
 					const status = savedStatuses[billKey];
 					if (status === "PNC" || status === "PCL") {
@@ -3035,6 +3066,15 @@
 					.getElementById("monthYear")
 					.addEventListener("change", () => {
 						calculateBudget();
+					});
+
+				// Save bank balance when manually changed
+				document
+					.getElementById("bankBalance")
+					.addEventListener("blur", async () => {
+						const newBalance =
+							document.getElementById("bankBalance").value;
+						await saveBudgetData("bankBalance", { value: newBalance });
 					});
 			});
 		</script>
