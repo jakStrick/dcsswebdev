@@ -3011,6 +3011,14 @@
         document.getElementById("monthYear").addEventListener("change", () => {
           calculateBudget();
         });
+
+        // Save bank balance when manually changed
+        document
+          .getElementById("bankBalance")
+          .addEventListener("blur", async () => {
+            const newBalance = document.getElementById("bankBalance").value;
+            await saveBudgetData("bankBalance", { value: newBalance });
+          });
       });
     </script>
   </body>
