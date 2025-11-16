@@ -1617,6 +1617,19 @@
 				const adjustedBankBalance = calculateAdjustedBankBalance();
 				const totalPaidBills = bankBalance - adjustedBankBalance;
 
+				// Calculate total misc spending for current month
+				const currentYear = selectedDate.getFullYear();
+				const currentMonth = selectedDate.getMonth() + 1;
+				let totalMiscSpending = 0;
+				Object.keys(budgetDataCache.miscExpenses).forEach((key) => {
+					const parts = key.split("-");
+					const keyYear = parseInt(parts[0]);
+					const keyMonth = parseInt(parts[1]);
+					if (keyYear === currentYear && keyMonth === currentMonth) {
+						totalMiscSpending += budgetDataCache.miscExpenses[key] || 0;
+					}
+				});
+
 				let html = `
                 <div class="summary">
                     <div class="summary-card">
@@ -1689,6 +1702,18 @@
 									"en-US",
 									{ minimumFractionDigits: 2 }
 								)}</div>
+                    </div>
+                    <div class="summary-card" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #856404;">
+                        <div class="label" style="color: #5a3e07; font-weight: 600;">💰 Monthly Misc Spending</div>
+                        <div class="value" style="color: #5a3e07; font-weight: 700;">$${totalMiscSpending.toFixed(
+									2
+								)}</div>
+                        <div style="font-size: 0.75rem; color: #6d4c0d; margin-top: 0.25rem;">
+                            ${selectedDate.toLocaleString("default", {
+											month: "long",
+											year: "numeric",
+										})}
+                        </div>
                     </div>
                     <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                         <div class="label" style="color: rgba(255,255,255,0.9);">Surplus Savings Balance</div>
