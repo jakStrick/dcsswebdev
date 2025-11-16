@@ -689,7 +689,7 @@
 							);
 							misc[
 								`${data.year}-${data.month}-Misc-${data.paycheckIndex}`
-							] = data.amount;
+							] = data.data || data.amount; // Support both old (amount) and new (data object) format
 							localStorage.setItem("miscExpenses", JSON.stringify(misc));
 							break;
 						case "surplusSavings":
@@ -1647,7 +1647,12 @@
 					const keyYear = parseInt(parts[0]);
 					const keyMonth = parseInt(parts[1]);
 					if (keyYear === year && keyMonth === month) {
-						totalMiscSpending += budgetDataCache.miscExpenses[key] || 0;
+						const miscData = budgetDataCache.miscExpenses[key];
+						// Handle both old format (number) and new format (object with total)
+						totalMiscSpending +=
+							typeof miscData === "number"
+								? miscData
+								: miscData.total || 0;
 					}
 				});
 
@@ -1916,33 +1921,91 @@
 
 					// Add Misc row
 					const miscKey = `${year}-${month}-Misc-${index}`;
-					const miscAmount = budgetDataCache.miscExpenses[miscKey] || 0;
+					const miscData = budgetDataCache.miscExpenses[miscKey] || {
+						total: 0,
+						entries: [],
+					};
+					const miscAmount = miscData.total || 0;
 
 					html += `
                         <tr style="background: #fff9e6; border-top: 2px solid #ffc107;">
-                            <td colspan="3">
-                                <div class="bill-name" style="color: #856404;">💰 Misc/Unforeseen</div>
-                            </td>
-                            <td>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <input type="number" 
-                                           id="misc-input-${miscKey}"
-                                           class="misc-amount-input" 
-                                           data-misc-key="${miscKey}"
-                                           value="0.00" 
-                                           step="0.01"
-                                           min="0"
-                                           style="flex: 1; padding: 0.5rem; border: 2px solid #ffc107; border-radius: 0.375rem; font-size: 0.875rem;">
-                                    <button type="button" onclick="submitMiscAmount('${miscKey}')" 
-                                            style="padding: 0.5rem 1rem; background: #ffc107; color: #856404; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; font-size: 0.875rem; white-space: nowrap;"
-                                            onmouseover="this.style.background='#e0a800'" 
-                                            onmouseout="this.style.background='#ffc107'">
-                                        Submit
-                                    </button>
+                            <td colspan="7">
+                                <div style="padding: 0.5rem;">
+                                    <div class="bill-name" style="color: #856404; margin-bottom: 0.75rem;">
+                                        💰 Misc/Unforeseen - Week ${index + 1}
+                                        ${
+															miscAmount > 0
+																? `<span style="font-weight: 700; margin-left: 0.5rem;">Total: $${miscAmount.toFixed(
+																		2
+																  )}</span>`
+																: ""
+														}
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap;">
+                                        <input type="number" 
+                                               id="misc-input-${miscKey}"
+                                               class="misc-amount-input" 
+                                               data-misc-key="${miscKey}"
+                                               value="0.00" 
+                                               step="0.01"
+                                               min="0"
+                                               placeholder="Amount"
+                                               style="width: 120px; padding: 0.5rem; border: 2px solid #ffc107; border-radius: 0.375rem; font-size: 0.875rem;">
+                                        <input type="text"
+                                               id="misc-comment-${miscKey}"
+                                               placeholder="What was this for? (e.g., Gas, Groceries)"
+                                               style="flex: 1; min-width: 200px; padding: 0.5rem; border: 2px solid #ffc107; border-radius: 0.375rem; font-size: 0.875rem;">
+                                        <button type="button" onclick="submitMiscAmount('${miscKey}')" 
+                                                style="padding: 0.5rem 1rem; background: #ffc107; color: #856404; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; font-size: 0.875rem; white-space: nowrap;"
+                                                onmouseover="this.style.background='#e0a800'" 
+                                                onmouseout="this.style.background='#ffc107'">
+                                            Add Expense
+                                        </button>
+                                    </div>
+                                    ${
+													miscData.entries &&
+													miscData.entries.length > 0
+														? `
+                                        <div style="margin-top: 0.75rem;">
+                                            <button type="button" 
+                                                    onclick="toggleMiscHistory('${miscKey}')"
+                                                    style="background: none; border: none; color: #856404; cursor: pointer; font-size: 0.875rem; text-decoration: underline; padding: 0;">
+                                                📋 View Expense History (${
+																	miscData.entries.length
+																} ${
+																miscData.entries.length === 1
+																	? "entry"
+																	: "entries"
+														  })
+                                            </button>
+                                            <div id="misc-history-${miscKey}" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(255, 255, 255, 0.5); border-radius: 0.375rem; border: 1px solid #ffc107;">
+                                                ${miscData.entries
+																	.map(
+																		(entry, idx) => `
+                                                    <div style="display: flex; justify-content: space-between; padding: 0.25rem 0; border-bottom: 1px solid rgba(255, 193, 7, 0.3);">
+                                                        <span style="color: #5a3e07; font-size: 0.875rem;">
+                                                            <strong>$${entry.amount.toFixed(
+																					2
+																				)}</strong> - ${
+																			entry.comment ||
+																			"No description"
+																		}
+                                                        </span>
+                                                        <span style="color: #6d4c0d; font-size: 0.75rem;">
+                                                            ${new Date(
+																					entry.timestamp
+																				).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                `
+																	)
+																	.join("")}
+                                            </div>
+                                        </div>
+                                    `
+														: ""
+												}
                                 </div>
-                            </td>
-                            <td colspan="3" style="font-size: 0.875rem; color: #856404;">
-                                <em>Unforeseen expenses</em>
                             </td>
                         </tr>
                     `;
@@ -2050,10 +2113,21 @@
 				const inputElement = document.getElementById(
 					`misc-input-${miscKey}`
 				);
+				const commentElement = document.getElementById(
+					`misc-comment-${miscKey}`
+				);
 				const newAmount = parseFloat(inputElement.value) || 0;
+				const comment = commentElement.value.trim();
 
 				if (newAmount === 0) {
-					return; // Don't do anything if amount is 0
+					alert("Please enter an amount greater than 0.");
+					return;
+				}
+
+				if (!comment) {
+					if (!confirm("No description provided. Continue anyway?")) {
+						return;
+					}
 				}
 
 				// Parse the miscKey to get year, month, and paycheck index
@@ -2064,18 +2138,34 @@
 
 				// Get current misc expenses
 				const data = await fetchBudgetData();
-				const oldAmount = data.miscExpenses[miscKey] || 0;
+				const currentData = data.miscExpenses[miscKey] || {
+					total: 0,
+					entries: [],
+				};
 
-				// Add the new amount to the existing total for this misc key
-				const updatedAmount = oldAmount + newAmount;
+				// Create new entry
+				const newEntry = {
+					amount: newAmount,
+					comment: comment || "No description",
+					timestamp: new Date().toISOString(),
+				};
+
+				// Update the data structure
+				const updatedData = {
+					total: (currentData.total || 0) + newAmount,
+					entries: [...(currentData.entries || []), newEntry],
+				};
 
 				// Save to API
 				await saveBudgetData("miscExpense", {
 					year,
 					month,
 					paycheckIndex,
-					amount: updatedAmount,
+					data: updatedData,
 				});
+
+				// Update cache
+				budgetDataCache.miscExpenses[miscKey] = updatedData;
 
 				// Subtract the new amount from bank balance
 				const currentBankBalance =
@@ -2089,11 +2179,23 @@
 					value: newBankBalance.toFixed(2),
 				});
 
-				// Clear the input box
+				// Clear the input boxes
 				inputElement.value = "0.00";
+				commentElement.value = "";
 
 				// Recalculate and update displayed values
 				calculateBudget();
+			}
+
+			// Toggle misc expense history visibility
+			function toggleMiscHistory(miscKey) {
+				const historyElement = document.getElementById(
+					`misc-history-${miscKey}`
+				);
+				if (historyElement) {
+					historyElement.style.display =
+						historyElement.style.display === "none" ? "block" : "none";
+				}
 			}
 
 			// Add deposit to bank balance
