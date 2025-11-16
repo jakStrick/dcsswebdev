@@ -484,7 +484,50 @@
 							name="monthYear"
 							value="2025-11"
 							style="width: 100%"
-							aria-label="Select month and year" />
+							aria-label="Select month and year"
+							onfocus="checkMonthSupport(this)" />
+						<!-- Firefox fallback -->
+						<div
+							id="monthYearFallback"
+							style="display: none; flex-direction: row; gap: 0.5rem">
+							<select
+								id="monthSelect"
+								onchange="updateMonthYear()"
+								style="
+									flex: 1;
+									padding: 0.75rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.5rem;
+									font-size: 1rem;
+								">
+								<option value="01">January</option>
+								<option value="02">February</option>
+								<option value="03">March</option>
+								<option value="04">April</option>
+								<option value="05">May</option>
+								<option value="06">June</option>
+								<option value="07">July</option>
+								<option value="08">August</option>
+								<option value="09">September</option>
+								<option value="10">October</option>
+								<option value="11" selected>November</option>
+								<option value="12">December</option>
+							</select>
+							<input
+								type="number"
+								id="yearSelect"
+								onchange="updateMonthYear()"
+								value="2025"
+								min="2020"
+								max="2050"
+								style="
+									width: 100px;
+									padding: 0.75rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.5rem;
+									font-size: 1rem;
+								" />
+						</div>
 					</div>
 				</div>
 				<div class="btn-group">
@@ -2418,8 +2461,40 @@
 				}
 			}
 
+			// Firefox month input fallback functions
+			function checkMonthSupport(input) {
+				// Check if browser supports type="month"
+				if (input.type !== "month") {
+					// Browser doesn't support month input (Firefox)
+					document.getElementById("monthYear").style.display = "none";
+					document.getElementById("monthYearFallback").style.display =
+						"flex";
+
+					// Sync initial values from main input to fallback
+					const [year, month] = document
+						.getElementById("monthYear")
+						.value.split("-");
+					document.getElementById("yearSelect").value = year;
+					document.getElementById("monthSelect").value = month;
+				}
+			}
+
+			function updateMonthYear() {
+				// Called when fallback inputs change - sync to main input
+				const year = document.getElementById("yearSelect").value;
+				const month = document.getElementById("monthSelect").value;
+				document.getElementById("monthYear").value = `${year}-${month}`;
+
+				// Trigger recalculation
+				calculateBudget();
+			}
+
 			// Auto-calculate on page load
 			window.addEventListener("DOMContentLoaded", async () => {
+				// Check if browser supports month input and show fallback if needed
+				const monthInput = document.getElementById("monthYear");
+				checkMonthSupport(monthInput);
+
 				// Load and cache all budget data from API
 				await refreshBudgetDataCache();
 
