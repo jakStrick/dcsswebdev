@@ -1483,22 +1483,9 @@
 				const isCurrentMonth =
 					year === today.getFullYear() && month === today.getMonth() + 1;
 
-				// Filter bills with non-zero amounts
+				// Filter bills with non-zero amounts only
+				// Keep all bills with amount > 0 regardless of due date
 				let activeBills = billsData.filter((bill) => bill.amount > 0);
-
-				// If viewing current month, only show bills that haven't been paid yet (due date >= today)
-				// Exception: Budget items always show (they're ongoing monthly expenses)
-				if (isCurrentMonth) {
-					activeBills = activeBills.filter((bill) => {
-						// Always include budget items (groceries, gas, etc.)
-						if (bill.category === "Budget") {
-							return true;
-						}
-						// For other bills, only show if due date hasn't passed
-						const dueDate = new Date(year, month - 1, bill.dueDay);
-						return dueDate >= today;
-					});
-				}
 
 				// Sort bills by priority (1 = highest) then by due date
 				const sortedBills = [...activeBills].sort((a, b) => {
