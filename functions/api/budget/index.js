@@ -15,6 +15,7 @@ export async function onRequestGet(context) {
 			miscExpenses,
 			surplusSavings,
 			deposits,
+			customBills,
 		] = await Promise.all([
 			env.DB.prepare(
 				"SELECT setting_key, setting_value FROM user_settings WHERE user_id = ?"
@@ -41,6 +42,11 @@ export async function onRequestGet(context) {
 				.first(),
 			env.DB.prepare(
 				"SELECT year, month, data FROM deposits WHERE user_id = ?"
+			)
+				.bind(userId)
+				.all(),
+			env.DB.prepare(
+				"SELECT id, name, category, amount, balance, due_day, ach, type, priority, adjustable, deleted FROM bills WHERE user_id = ?"
 			)
 				.bind(userId)
 				.all(),
@@ -90,6 +96,21 @@ export async function onRequestGet(context) {
 			}
 		});
 
+		const customBillsArray = customBills.results.map((row) => ({
+			id: row.id,
+			name: row.name,
+			category: row.category,
+			amount: row.amount,
+			balance: row.balance,
+			dueDay: row.due_day,
+			ach: row.ach === 1,
+			type: row.type,
+			priority: row.priority,
+			adjustable: row.adjustable === 1,
+			deleted: row.deleted === 1,
+			custom: true,
+		}));
+
 		return new Response(
 			JSON.stringify({
 				success: true,
@@ -100,6 +121,7 @@ export async function onRequestGet(context) {
 					miscExpenses: miscExpensesObj,
 					surplusSavings: surplusSavings?.amount || 0,
 					deposits: depositsObj,
+					customBills: customBillsArray,
 					bankBalance: settingsObj.bankBalance || null,
 				},
 			}),
@@ -207,6 +229,45 @@ export async function onRequestPost(context) {
 					"INSERT OR REPLACE INTO surplus_savings (user_id, amount, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)"
 				)
 					.bind(userId, data.amount)
+					.run();
+				break;
+
+			case "addBill":
+				const {
+					name,
+					category,
+					amount,
+					balance,
+					dueDay,
+					ach,
+					type,
+					priority,
+					adjustable,
+				} = data;
+				await env.DB.prepare(
+					"INSERT INTO bills (user_id, name, category, amount, balance, due_day, ach, type, priority, adjustable, deleted, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+				)
+					.bind(
+						userId,
+						name,
+						category,
+						amount,
+						balance || 0,
+						dueDay,
+						ach ? 1 : 0,
+						type,
+						priority,
+						adjustable ? 1 : 0
+					)
+					.run();
+				break;
+
+			case "deleteBill":
+				const { billId } = data;
+				await env.DB.prepare(
+					"UPDATE bills SET deleted = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?"
+				)
+					.bind(billId, userId)
 					.run();
 				break;
 

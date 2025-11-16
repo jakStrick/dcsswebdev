@@ -406,6 +406,37 @@
 				color: #28a745;
 			}
 
+			/* Apply colors to the select element based on selected value */
+			.payment-status-dropdown[data-status="NP"] {
+				color: #dc3545;
+				font-weight: 600;
+			}
+
+			.payment-status-dropdown[data-status="PNC"] {
+				color: #ffc107;
+				font-weight: 600;
+			}
+
+			.payment-status-dropdown[data-status="PCL"] {
+				color: #28a745;
+				font-weight: 600;
+			}
+
+			.btn-delete-bill {
+				background: transparent;
+				border: none;
+				font-size: 1.2rem;
+				cursor: pointer;
+				opacity: 0.6;
+				transition: opacity 0.2s, transform 0.2s;
+				padding: 0.25rem 0.5rem;
+			}
+
+			.btn-delete-bill:hover {
+				opacity: 1;
+				transform: scale(1.2);
+			}
+
 			@media print {
 				body {
 					background: white;
@@ -542,9 +573,188 @@
 						onclick="toggleSavingsManager()">
 						Manage Savings
 					</button>
+					<button class="btn btn-success" onclick="showAddBillForm()">
+						➕ Add Bill
+					</button>
 					<button class="btn btn-secondary" onclick="window.print()">
 						Print Report
 					</button>
+				</div>
+			</div>
+
+			<!-- Add Bill Modal -->
+			<div
+				id="addBillModal"
+				style="
+					display: none;
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background: rgba(0, 0, 0, 0.5);
+					z-index: 1000;
+					justify-content: center;
+					align-items: center;
+				">
+				<div
+					style="
+						background: white;
+						padding: 2rem;
+						border-radius: 0.5rem;
+						max-width: 500px;
+						width: 90%;
+						max-height: 90vh;
+						overflow-y: auto;
+					">
+					<h3 style="margin-top: 0">Add New Bill</h3>
+					<form id="addBillForm" onsubmit="return false;">
+						<div style="margin-bottom: 1rem">
+							<label style="display: block; margin-bottom: 0.5rem"
+								>Bill Name:</label
+							>
+							<input
+								type="text"
+								id="newBillName"
+								required
+								style="
+									width: 100%;
+									padding: 0.5rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.375rem;
+								" />
+						</div>
+						<div style="margin-bottom: 1rem">
+							<label style="display: block; margin-bottom: 0.5rem"
+								>Category:</label
+							>
+							<select
+								id="newBillCategory"
+								required
+								style="
+									width: 100%;
+									padding: 0.5rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.375rem;
+								">
+								<option value="Main">Main</option>
+								<option value="Credit Card">Credit Card</option>
+								<option value="Utilities">Utilities</option>
+								<option value="Budget">Budget</option>
+							</select>
+						</div>
+						<div style="margin-bottom: 1rem">
+							<label style="display: block; margin-bottom: 0.5rem"
+								>Amount:</label
+							>
+							<input
+								type="number"
+								id="newBillAmount"
+								step="0.01"
+								required
+								style="
+									width: 100%;
+									padding: 0.5rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.375rem;
+								" />
+						</div>
+						<div style="margin-bottom: 1rem">
+							<label style="display: block; margin-bottom: 0.5rem"
+								>Balance:</label
+							>
+							<input
+								type="number"
+								id="newBillBalance"
+								step="0.01"
+								value="0"
+								style="
+									width: 100%;
+									padding: 0.5rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.375rem;
+								" />
+						</div>
+						<div style="margin-bottom: 1rem">
+							<label style="display: block; margin-bottom: 0.5rem"
+								>Due Day (1-31):</label
+							>
+							<input
+								type="number"
+								id="newBillDueDay"
+								min="1"
+								max="31"
+								required
+								style="
+									width: 100%;
+									padding: 0.5rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.375rem;
+								" />
+						</div>
+						<div style="margin-bottom: 1rem">
+							<label style="display: block; margin-bottom: 0.5rem"
+								>Type:</label
+							>
+							<select
+								id="newBillType"
+								required
+								style="
+									width: 100%;
+									padding: 0.5rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.375rem;
+								">
+								<option value="CL">CL - Credit Line</option>
+								<option value="UP">UP - Utility/Payment</option>
+								<option value="N">N - Non-debt</option>
+							</select>
+						</div>
+						<div style="margin-bottom: 1rem">
+							<label style="display: block; margin-bottom: 0.5rem"
+								>Priority (1-4):</label
+							>
+							<input
+								type="number"
+								id="newBillPriority"
+								min="1"
+								max="4"
+								value="2"
+								required
+								style="
+									width: 100%;
+									padding: 0.5rem;
+									border: 2px solid #dee2e6;
+									border-radius: 0.375rem;
+								" />
+						</div>
+						<div style="margin-bottom: 1rem">
+							<label
+								style="display: flex; align-items: center; gap: 0.5rem">
+								<input type="checkbox" id="newBillACH" />
+								Auto-pay (ACH)
+							</label>
+						</div>
+						<div
+							style="
+								display: flex;
+								gap: 0.5rem;
+								justify-content: flex-end;
+							">
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideAddBillForm()">
+								Cancel
+							</button>
+							<button
+								type="button"
+								class="btn btn-primary"
+								onclick="addNewBill()">
+								Add Bill
+							</button>
+						</div>
+					</form>
 				</div>
 			</div>
 
@@ -773,6 +983,7 @@
 				miscExpenses: {},
 				surplusSavings: 0,
 				deposits: {},
+				customBills: [],
 			};
 
 			async function refreshBudgetDataCache() {
@@ -782,6 +993,7 @@
 					miscExpenses: data.miscExpenses || {},
 					surplusSavings: data.surplusSavings || 0,
 					deposits: data.deposits || {},
+					customBills: data.customBills || [],
 				};
 				return budgetDataCache;
 			}
@@ -1291,6 +1503,68 @@
 				calculateBudget();
 			}
 
+			// Bill management functions
+			function showAddBillForm() {
+				document.getElementById("addBillModal").style.display = "flex";
+			}
+
+			function hideAddBillForm() {
+				document.getElementById("addBillModal").style.display = "none";
+				document.getElementById("addBillForm").reset();
+			}
+
+			async function addNewBill() {
+				const form = document.getElementById("addBillForm");
+				const billData = {
+					name: form.billName.value.trim(),
+					category: form.billCategory.value,
+					amount: parseFloat(form.billAmount.value) || 0,
+					balance: parseFloat(form.billBalance.value) || 0,
+					dueDay: parseInt(form.billDueDay.value) || 1,
+					ach: form.billACH.checked,
+					type: form.billType.value,
+					priority: parseInt(form.billPriority.value) || 1,
+				};
+
+				// Validate inputs
+				if (!billData.name) {
+					alert("Please enter a bill name");
+					return;
+				}
+				if (billData.amount <= 0) {
+					alert("Please enter a valid amount");
+					return;
+				}
+
+				try {
+					await saveBudgetData("addBill", billData);
+					await refreshBudgetDataCache();
+					calculateBudget();
+					hideAddBillForm();
+					alert("Bill added successfully!");
+				} catch (error) {
+					alert("Failed to add bill: " + error.message);
+				}
+			}
+
+			async function deleteBill(billId) {
+				if (
+					!confirm(
+						"Archive this bill? It will be hidden from budget but kept for tax records."
+					)
+				) {
+					return;
+				}
+
+				try {
+					await saveBudgetData("deleteBill", { billId });
+					await refreshBudgetDataCache();
+					calculateBudget();
+				} catch (error) {
+					alert("Failed to delete bill: " + error.message);
+				}
+			}
+
 			async function resetSavings() {
 				if (
 					confirm(
@@ -1483,9 +1757,17 @@
 				const isCurrentMonth =
 					year === today.getFullYear() && month === today.getMonth() + 1;
 
+				// Merge hardcoded bills with custom bills from database (excluding soft-deleted)
+				const allBills = [
+					...billsData,
+					...budgetDataCache.customBills
+						.filter((bill) => !bill.deleted)
+						.map((bill) => ({ ...bill, custom: true })),
+				];
+
 				// Filter bills with non-zero amounts only
 				// Keep all bills with amount > 0 regardless of due date
-				let activeBills = billsData.filter((bill) => bill.amount > 0);
+				let activeBills = allBills.filter((bill) => bill.amount > 0);
 
 				// Sort bills by priority (1 = highest) then by due date
 				const sortedBills = [...activeBills].sort((a, b) => {
@@ -1580,11 +1862,15 @@
 					year === today.getFullYear() && month === today.getMonth() + 1;
 
 				// Calculate summary statistics
-				// Total income = sum of all paychecks in the month (4 total: you 2x, Claudia 2x)
-				const totalIncome = assignments.reduce(
+				// Rental income (received on 1st of every month)
+				const rentalIncome = 2940.0;
+
+				// Total income = sum of all paychecks in the month (4 total: you 2x, Claudia 2x) + rental income
+				const paychecksIncome = assignments.reduce(
 					(sum, p) => sum + p.amount,
 					0
 				);
+				const totalIncome = paychecksIncome + rentalIncome;
 
 				// Remaining income = sum of paychecks that haven't been received yet (date >= today)
 				const remainingIncome = isCurrentMonth
@@ -1603,8 +1889,15 @@
 
 				const netCashFlow = remainingIncome - totalExpenses;
 				const totalDebt = billsData.reduce((sum, b) => sum + b.balance, 0);
+
+				// Calculate adjusted bank balance (subtracting paid bills) - needed for projectedBalance
+				const adjustedBankBalance = calculateAdjustedBankBalance();
+				const totalPaidBills = bankBalance - adjustedBankBalance;
+
+				// Projected balance should use adjusted balance (not raw balance)
+				// because adjusted balance already accounts for paid bills
 				const projectedBalance =
-					bankBalance + remainingIncome - totalExpenses;
+					adjustedBankBalance + remainingIncome - totalExpenses;
 
 				console.log("=== CALCULATION BREAKDOWN ===");
 				console.log("Is Current Month:", isCurrentMonth);
@@ -1627,7 +1920,12 @@
 				);
 				console.log("");
 				console.log("--- RESULTS ---");
-				console.log("Bank Balance (starting):", bankBalance.toFixed(2));
+				console.log("Bank Balance (raw):", bankBalance.toFixed(2));
+				console.log(
+					"Bank Balance (adjusted after paid bills):",
+					adjustedBankBalance.toFixed(2)
+				);
+				console.log("Total Paid Bills:", totalPaidBills.toFixed(2));
 				console.log("");
 				console.log("NET CASH FLOW = Remaining Income - Total Expenses");
 				console.log(
@@ -1637,10 +1935,10 @@
 				);
 				console.log("");
 				console.log(
-					"PROJECTED BALANCE = Bank Balance + Remaining Income - Total Expenses"
+					"PROJECTED BALANCE = Adjusted Bank Balance + Remaining Income - Remaining Expenses"
 				);
 				console.log(
-					`PROJECTED BALANCE = ${bankBalance.toFixed(
+					`PROJECTED BALANCE = ${adjustedBankBalance.toFixed(
 						2
 					)} + ${remainingIncome.toFixed(2)} - ${totalExpenses.toFixed(
 						2
@@ -1648,7 +1946,7 @@
 				);
 				console.log("");
 				console.log(
-					"DIFFERENCE = Projected Balance - Net Cash Flow = Bank Balance"
+					"DIFFERENCE = Projected Balance - Net Cash Flow = Adjusted Bank Balance"
 				);
 				console.log(
 					`DIFFERENCE = ${projectedBalance.toFixed(
@@ -1688,10 +1986,6 @@
 
 				// Get accumulated savings from cache
 				let accumulatedSavings = budgetDataCache.surplusSavings || 0;
-
-				// Calculate adjusted bank balance (subtracting paid bills)
-				const adjustedBankBalance = calculateAdjustedBankBalance();
-				const totalPaidBills = bankBalance - adjustedBankBalance;
 
 				// Calculate total misc spending for current month/year being viewed
 				let totalMiscSpending = 0;
@@ -1745,7 +2039,16 @@
 									2
 								)}</div>
                         <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            David: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks
+                            David: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks + Rental
+                        </div>
+                    </div>
+                    <div class="summary-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                        <div class="label" style="color: rgba(255,255,255,0.9); font-weight: 600;">🏠 Rental Income</div>
+                        <div class="value" style="color: white; font-weight: 700;">$${rentalIncome.toFixed(
+									2
+								)}</div>
+                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem;">
+                            Received on 1st of month
                         </div>
                     </div>
                     ${
@@ -1960,6 +2263,7 @@
                                     <th>Balance</th>
                                     <th>Payment Status</th>
                                     <th>Priority</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1998,7 +2302,10 @@
 								: "priority-low";
 
 						// Get saved payment status
-						const billKey = `${year}-${month}-${bill.name}`;
+						// For split bills, include the period index in the key
+						const billKey = bill.splitItem
+							? `${year}-${month}-${bill.name}-${index}`
+							: `${year}-${month}-${bill.name}`;
 						const paymentStatus =
 							budgetDataCache.paymentStatuses[billKey] || "NP";
 
@@ -2030,6 +2337,7 @@
                                 <select class="payment-status-dropdown" 
                                         data-bill-key="${billKey}"
                                         data-bill-amount="${bill.amount}"
+                                        data-status="${paymentStatus}"
                                         onchange="updatePaymentStatus(this)">
                                     <option value="NP" ${
 													paymentStatus === "NP" ? "selected" : ""
@@ -2043,6 +2351,13 @@
                                 </select>
                             </td>
                             <td><span class="${priorityClass}">${priorityLabel}</span></td>
+                            <td>
+                                ${
+												bill.custom
+													? `<button class="btn-delete-bill" onclick="deleteBill(${bill.id})" title="Archive Bill">🗑️</button>`
+													: ""
+											}
+                            </td>
                         </tr>
                     `;
 					});
@@ -2445,6 +2760,9 @@
 				);
 				const newStatus = selectElement.value;
 
+				// Update data-status attribute to change color
+				selectElement.setAttribute("data-status", newStatus);
+
 				// Parse the billKey to get year, month, and bill name
 				const parts = billKey.split("-");
 				const year = parseInt(parts[0]);
@@ -2474,18 +2792,86 @@
 
 				let totalPaid = 0;
 
+				// Get current month/year selection
+				const monthYearInput = document.getElementById("monthYear").value;
+				const [selectedYear, selectedMonth] = monthYearInput
+					.split("-")
+					.map(Number);
+
+				// Build a map of split bills and their per-period amounts
+				const splitBillsMap = {};
+				const budgetItemsToSplit = billsData.filter(
+					(bill) =>
+						bill.category === "Budget" &&
+						(bill.name === "Groceries" ||
+							bill.name === "Lunch/Eating Out" ||
+							bill.name === "Gas (2 Vehicles)")
+				);
+
+				// Get payday to calculate pay periods
+				const DavidPaydayInput =
+					document.getElementById("DavidPayday").value;
+				const DavidPayday = new Date(DavidPaydayInput);
+				const DavidPay = parseFloat(
+					document.getElementById("DavidPay").value
+				);
+				const ClaudiaPay = parseFloat(
+					document.getElementById("ClaudiaPay").value
+				);
+
+				// Get pay periods for the selected month to calculate split amounts
+				const payPeriods = calculatePayPeriods(
+					DavidPayday,
+					selectedYear,
+					selectedMonth,
+					DavidPay,
+					ClaudiaPay
+				);
+				const numPeriods = payPeriods.length;
+
+				budgetItemsToSplit.forEach((bill) => {
+					const amountPerPeriod = bill.amount / numPeriods;
+					splitBillsMap[bill.name] = amountPerPeriod;
+				});
+
 				// Sum up all bills marked as PNC or PCL
 				Object.keys(savedStatuses).forEach((billKey) => {
 					const status = savedStatuses[billKey];
 					if (status === "PNC" || status === "PCL") {
-						// Extract bill name from key (format: "year-month-billname")
+						// Extract bill name from key (format: "year-month-billname" or "year-month-billname-periodIndex")
 						const parts = billKey.split("-");
 						const billName = parts.slice(2).join("-");
 
-						// Find the bill in billsData
-						const bill = billsData.find((b) => b.name === billName);
+						// Check if this is a split bill with period index
+						let actualBillName = billName;
+						let hasPeriodIndex = false;
+
+						// For split bills, the key includes the period index at the end
+						// Example: "2025-1-Groceries-0", "2025-1-Groceries-1", etc.
+						budgetItemsToSplit.forEach((bill) => {
+							if (billName.startsWith(bill.name + "-")) {
+								actualBillName = bill.name;
+								hasPeriodIndex = true;
+							}
+						});
+
+						// Find the bill in billsData or customBills
+						let bill = billsData.find((b) => b.name === actualBillName);
+						if (!bill) {
+							// Check custom bills
+							bill = budgetDataCache.customBills
+								.filter((b) => !b.deleted)
+								.find((b) => b.name === actualBillName);
+						}
+
 						if (bill) {
-							totalPaid += bill.amount;
+							// For split budget items, only subtract the per-period amount
+							if (splitBillsMap[actualBillName]) {
+								totalPaid += splitBillsMap[actualBillName];
+							} else {
+								// For regular bills, subtract the full amount
+								totalPaid += bill.amount;
+							}
 						}
 					}
 				});
