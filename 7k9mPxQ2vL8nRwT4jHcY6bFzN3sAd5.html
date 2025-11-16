@@ -2742,8 +2742,13 @@
         // Update local cache immediately
         budgetDataCache.paymentStatuses[billKey] = newStatus;
 
-        // Recalculate and update displayed bank balance
-        updateDisplayedBankBalance();
+        // If status is REMOVE, trigger full re-render to hide the row
+        if (newStatus === "REMOVE") {
+          calculateBudget();
+        } else {
+          // Otherwise just update the displayed bank balance
+          updateDisplayedBankBalance();
+        }
       }
 
       // Calculate adjusted bank balance based on payment statuses
