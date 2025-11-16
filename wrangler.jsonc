@@ -1,6 +1,7 @@
 {
 	"name": "dcsswebdev",
 	"compatibility_date": "2025-10-13",
+	"pages_build_output_dir": ".",
 	// D1 Database configuration for Pages
 	"d1_databases": [
 		{
