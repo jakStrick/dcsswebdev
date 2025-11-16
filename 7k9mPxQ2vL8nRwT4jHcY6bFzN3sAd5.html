@@ -96,7 +96,7 @@
 			}
 
 			.btn {
-				padding: 0.875rem 2rem;
+				padding: 0.875rem 1rem;
 				border: none;
 				border-radius: 0.5rem;
 				font-size: 1rem;
@@ -107,13 +107,16 @@
 				letter-spacing: 0.5px;
 			}
 
+			.btn:hover {
+				transform: translateY(-2px);
+			}
+
 			.btn-primary {
 				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 				color: white;
 			}
 
 			.btn-primary:hover {
-				transform: translateY(-2px);
 				box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
 			}
 
@@ -494,17 +497,6 @@
 								value="1406.88"
 								step="0.01"
 								style="flex: 1" />
-							<button
-								class="btn btn-success"
-								onclick="addDeposit()"
-								style="
-									padding: 0.75rem 1rem;
-									white-space: nowrap;
-									background: #28a745;
-									border: none;
-								">
-								💵 Add Deposit
-							</button>
 						</div>
 					</div>
 					<div class="control-item">
@@ -565,6 +557,13 @@
 					<button class="btn btn-primary" onclick="calculateBudget()">
 						Calculate Alignment
 					</button>
+
+					<button class="btn btn-success" onclick="showAddBillForm()">
+						➕ Add Expense
+					</button>
+					<button class="btn btn-success" onclick="addDeposit()">
+						💵 Add Deposit
+					</button>
 					<button class="btn btn-secondary" onclick="toggleAdjustments()">
 						Adjust Bills
 					</button>
@@ -572,9 +571,6 @@
 						class="btn btn-secondary"
 						onclick="toggleSavingsManager()">
 						Manage Savings
-					</button>
-					<button class="btn btn-success" onclick="showAddBillForm()">
-						➕ Add Bill
 					</button>
 					<button class="btn btn-secondary" onclick="window.print()">
 						Print Report
