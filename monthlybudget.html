@@ -690,6 +690,9 @@
 						surplusSavings: parseFloat(
 							localStorage.getItem("surplusSavings") || "0"
 						),
+						deposits: JSON.parse(
+							localStorage.getItem("deposits") || "{}"
+						),
 						bankBalance: localStorage.getItem("bankBalance"),
 					};
 				}
@@ -746,6 +749,13 @@
 							] = data.data || data.amount; // Support both old (amount) and new (data object) format
 							localStorage.setItem("miscExpenses", JSON.stringify(misc));
 							break;
+						case "deposit":
+							const deposits = JSON.parse(
+								localStorage.getItem("deposits") || "{}"
+							);
+							deposits[`${data.year}-${data.month}`] = data.data;
+							localStorage.setItem("deposits", JSON.stringify(deposits));
+							break;
 						case "surplusSavings":
 							localStorage.setItem(
 								"surplusSavings",
@@ -762,6 +772,7 @@
 				paymentStatuses: {},
 				miscExpenses: {},
 				surplusSavings: 0,
+				deposits: {},
 			};
 
 			async function refreshBudgetDataCache() {
@@ -770,6 +781,7 @@
 					paymentStatuses: data.paymentStatuses || {},
 					miscExpenses: data.miscExpenses || {},
 					surplusSavings: data.surplusSavings || 0,
+					deposits: data.deposits || {},
 				};
 				return budgetDataCache;
 			}
@@ -1710,6 +1722,17 @@
 					}
 				});
 
+				// Calculate total deposits for current month/year being viewed
+				let totalMonthlyDeposits = 0;
+				const depositsKey = `${year}-${month}`;
+				if (
+					budgetDataCache.deposits &&
+					budgetDataCache.deposits[depositsKey]
+				) {
+					const depositData = budgetDataCache.deposits[depositsKey];
+					totalMonthlyDeposits = depositData.total || 0;
+				}
+
 				let html = `
                 <div class="summary">
                     <div class="summary-card">
@@ -1798,6 +1821,21 @@
 										)}
                         </div>
                     </div>
+                    <div class="summary-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
+                        <div class="label" style="color: rgba(255,255,255,0.9); font-weight: 600;">💵 Monthly Deposits</div>
+                        <div class="value" style="color: white; font-weight: 700;">$${totalMonthlyDeposits.toFixed(
+									2
+								)}</div>
+                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem;">
+                            ${new Date(year, month - 1).toLocaleString(
+											"default",
+											{
+												month: "long",
+												year: "numeric",
+											}
+										)}
+                        </div>
+                    </div>
                     <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                         <div class="label" style="color: rgba(255,255,255,0.9);">Surplus Savings Balance</div>
                         <div class="value" style="color: white;">$${accumulatedSavings.toLocaleString(
@@ -1809,6 +1847,55 @@
                         </div>
                     </div>
                 </div>
+
+                ${
+							totalMonthlyDeposits > 0 &&
+							budgetDataCache.deposits[depositsKey]?.entries
+								? `
+                <div style="margin: 1.5rem 0; padding: 1rem; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 0.5rem; border: 2px solid #28a745;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <h3 style="margin: 0; color: #1b5e20; font-size: 1.125rem;">💵 Deposit History - ${new Date(
+									year,
+									month - 1
+								).toLocaleString("default", {
+									month: "long",
+									year: "numeric",
+								})}</h3>
+                        <span style="font-weight: 700; color: #1b5e20; font-size: 1.25rem;">$${totalMonthlyDeposits.toFixed(
+									2
+								)}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        ${budgetDataCache.deposits[depositsKey].entries
+									.sort(
+										(a, b) =>
+											new Date(b.timestamp) - new Date(a.timestamp)
+									)
+									.map(
+										(entry) => `
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: white; border-radius: 0.375rem; border: 1px solid #a5d6a7;">
+                                <div style="flex: 1;">
+                                    <span style="font-weight: 600; color: #1b5e20; font-size: 1rem;">$${entry.amount.toFixed(
+													2
+												)}</span>
+                                    <span style="color: #2e7d32; margin-left: 0.75rem; font-size: 0.9rem;">${
+													entry.comment || "No description"
+												}</span>
+                                </div>
+                                <span style="color: #558b2f; font-size: 0.875rem; white-space: nowrap; margin-left: 1rem;">
+                                    ${new Date(
+													entry.timestamp
+												).toLocaleString()}
+                                </span>
+                            </div>
+                        `
+									)
+									.join("")}
+                    </div>
+                </div>
+                `
+								: ""
+						}
 
                 <div class="content">
             `;
@@ -2286,6 +2373,53 @@
 					return;
 				}
 
+				// Ask for deposit description
+				const comment = prompt(
+					"What is this deposit for? (e.g., Cash tips, Gift, Side income)"
+				);
+
+				if (comment === null) {
+					return; // User cancelled
+				}
+
+				// Get current month/year
+				const monthYearValue = document.getElementById("monthYear").value;
+				const [year, month] = monthYearValue.split("-").map(Number);
+
+				// Get current deposits data
+				const data = await fetchBudgetData();
+				const depositsKey = `${year}-${month}`;
+				const currentData = data.deposits?.[depositsKey] || {
+					total: 0,
+					entries: [],
+				};
+
+				// Create new deposit entry
+				const newEntry = {
+					amount: amount,
+					comment: comment || "No description",
+					timestamp: new Date().toISOString(),
+				};
+
+				// Update deposits data structure
+				const updatedData = {
+					total: (currentData.total || 0) + amount,
+					entries: [...(currentData.entries || []), newEntry],
+				};
+
+				// Save to API
+				await saveBudgetData("deposit", {
+					year,
+					month,
+					data: updatedData,
+				});
+
+				// Update cache immediately
+				if (!budgetDataCache.deposits) {
+					budgetDataCache.deposits = {};
+				}
+				budgetDataCache.deposits[depositsKey] = updatedData;
+
 				// Get current bank balance
 				const currentBankBalance =
 					parseFloat(document.getElementById("bankBalance").value) || 0;
@@ -2304,8 +2438,13 @@
 				alert(
 					`✅ Deposit of $${amount.toFixed(
 						2
-					)} added!\nNew balance: $${newBankBalance.toFixed(2)}`
+					)} added!\n${comment}\nNew balance: $${newBankBalance.toFixed(
+						2
+					)}`
 				);
+
+				// Refresh from API to ensure cache is in sync
+				await refreshBudgetDataCache();
 
 				// Recalculate and update displayed values
 				calculateBudget();
