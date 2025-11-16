@@ -79,6 +79,11 @@
 				transition: border-color 0.3s;
 			}
 
+			.control-item input[type="month"] {
+				min-width: 180px;
+				cursor: pointer;
+			}
+
 			.control-item input:focus {
 				outline: none;
 				border-color: #667eea;
@@ -472,8 +477,13 @@
 						</div>
 					</div>
 					<div class="control-item">
-						<label>Month/Year</label>
-						<input type="month" id="monthYear" value="2025-11" />
+						<label for="monthYear">Month/Year</label>
+						<input
+							type="month"
+							id="monthYear"
+							name="monthYear"
+							value="2025-11"
+							aria-label="Select month and year" />
 					</div>
 				</div>
 				<div class="btn-group">
