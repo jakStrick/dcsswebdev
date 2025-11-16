@@ -121,6 +121,15 @@
 				background: #5a6268;
 			}
 
+			.btn-success {
+				background: #28a745;
+				color: white;
+			}
+
+			.btn-success:hover {
+				background: #218838;
+			}
+
 			.summary {
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -442,11 +451,25 @@
 					</div>
 					<div class="control-item">
 						<label>Current Checking Balance</label>
-						<input
-							type="number"
-							id="bankBalance"
-							value="1406.88"
-							step="0.01" />
+						<div style="display: flex; gap: 0.5rem; align-items: center">
+							<input
+								type="number"
+								id="bankBalance"
+								value="1406.88"
+								step="0.01"
+								style="flex: 1" />
+							<button
+								class="btn btn-success"
+								onclick="addDeposit()"
+								style="
+									padding: 0.75rem 1rem;
+									white-space: nowrap;
+									background: #28a745;
+									border: none;
+								">
+								💵 Add Deposit
+							</button>
+						</div>
 					</div>
 					<div class="control-item">
 						<label>Month/Year</label>
@@ -1617,15 +1640,13 @@
 				const adjustedBankBalance = calculateAdjustedBankBalance();
 				const totalPaidBills = bankBalance - adjustedBankBalance;
 
-				// Calculate total misc spending for current month
-				const currentYear = selectedDate.getFullYear();
-				const currentMonth = selectedDate.getMonth() + 1;
+				// Calculate total misc spending for current month/year being viewed
 				let totalMiscSpending = 0;
 				Object.keys(budgetDataCache.miscExpenses).forEach((key) => {
 					const parts = key.split("-");
 					const keyYear = parseInt(parts[0]);
 					const keyMonth = parseInt(parts[1]);
-					if (keyYear === currentYear && keyMonth === currentMonth) {
+					if (keyYear === year && keyMonth === month) {
 						totalMiscSpending += budgetDataCache.miscExpenses[key] || 0;
 					}
 				});
@@ -1709,10 +1730,13 @@
 									2
 								)}</div>
                         <div style="font-size: 0.75rem; color: #6d4c0d; margin-top: 0.25rem;">
-                            ${selectedDate.toLocaleString("default", {
-											month: "long",
-											year: "numeric",
-										})}
+                            ${new Date(year, month - 1).toLocaleString(
+											"default",
+											{
+												month: "long",
+												year: "numeric",
+											}
+										)}
                         </div>
                     </div>
                     <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
@@ -2067,6 +2091,46 @@
 
 				// Clear the input box
 				inputElement.value = "0.00";
+
+				// Recalculate and update displayed values
+				calculateBudget();
+			}
+
+			// Add deposit to bank balance
+			async function addDeposit() {
+				const depositAmount = prompt("Enter deposit amount:");
+
+				if (depositAmount === null || depositAmount === "") {
+					return; // User cancelled or entered nothing
+				}
+
+				const amount = parseFloat(depositAmount);
+
+				if (isNaN(amount) || amount <= 0) {
+					alert("Please enter a valid positive number.");
+					return;
+				}
+
+				// Get current bank balance
+				const currentBankBalance =
+					parseFloat(document.getElementById("bankBalance").value) || 0;
+
+				// Add the deposit
+				const newBankBalance = currentBankBalance + amount;
+				document.getElementById("bankBalance").value =
+					newBankBalance.toFixed(2);
+
+				// Save the new bank balance to API
+				await saveBudgetData("bankBalance", {
+					value: newBankBalance.toFixed(2),
+				});
+
+				// Show confirmation
+				alert(
+					`✅ Deposit of $${amount.toFixed(
+						2
+					)} added!\nNew balance: $${newBankBalance.toFixed(2)}`
+				);
 
 				// Recalculate and update displayed values
 				calculateBudget();
