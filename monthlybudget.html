@@ -2164,7 +2164,7 @@
 					data: updatedData,
 				});
 
-				// Update cache
+				// Update cache immediately
 				budgetDataCache.miscExpenses[miscKey] = updatedData;
 
 				// Subtract the new amount from bank balance
@@ -2182,6 +2182,9 @@
 				// Clear the input boxes
 				inputElement.value = "0.00";
 				commentElement.value = "";
+
+				// Refresh cache from API to ensure we have latest data
+				await refreshBudgetDataCache();
 
 				// Recalculate and update displayed values
 				calculateBudget();
