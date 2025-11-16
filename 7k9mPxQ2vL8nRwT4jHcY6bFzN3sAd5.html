@@ -1495,16 +1495,18 @@
       }
 
       async function addNewBill() {
-        const form = document.getElementById("addBillForm");
         const billData = {
-          name: form.billName.value.trim(),
-          category: form.billCategory.value,
-          amount: parseFloat(form.billAmount.value) || 0,
-          balance: parseFloat(form.billBalance.value) || 0,
-          dueDay: parseInt(form.billDueDay.value) || 1,
-          ach: form.billACH.checked,
-          type: form.billType.value,
-          priority: parseInt(form.billPriority.value) || 1,
+          name: document.getElementById("newBillName").value.trim(),
+          category: document.getElementById("newBillCategory").value,
+          amount:
+            parseFloat(document.getElementById("newBillAmount").value) || 0,
+          balance:
+            parseFloat(document.getElementById("newBillBalance").value) || 0,
+          dueDay: parseInt(document.getElementById("newBillDueDay").value) || 1,
+          ach: document.getElementById("newBillACH").checked,
+          type: document.getElementById("newBillType").value,
+          priority:
+            parseInt(document.getElementById("newBillPriority").value) || 1,
         };
 
         // Validate inputs
