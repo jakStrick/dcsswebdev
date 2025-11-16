@@ -2861,10 +2861,10 @@
 					splitBillsMap[bill.name] = amountPerPeriod;
 				});
 
-				// Sum up all bills marked as PNC or PCL (exclude REMOVE status)
+				// Sum up all bills marked as PCL only (only deduct when cleared)
 				Object.keys(savedStatuses).forEach((billKey) => {
 					const status = savedStatuses[billKey];
-					if (status === "PNC" || status === "PCL") {
+					if (status === "PCL") {
 						// Extract bill name from key (format: "year-month-billname" or "year-month-billname-periodIndex")
 						const parts = billKey.split("-");
 						const billName = parts.slice(2).join("-");
