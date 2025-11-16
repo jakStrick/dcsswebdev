@@ -1921,10 +1921,26 @@
 
 					// Add Misc row
 					const miscKey = `${year}-${month}-Misc-${index}`;
-					const miscData = budgetDataCache.miscExpenses[miscKey] || {
-						total: 0,
-						entries: [],
-					};
+					const rawMiscData = budgetDataCache.miscExpenses[miscKey];
+
+					// Ensure proper data structure - handle both old (number) and new (object) format
+					let miscData;
+					if (typeof rawMiscData === "number") {
+						// Old format: just a number
+						miscData = { total: rawMiscData, entries: [] };
+					} else if (rawMiscData && typeof rawMiscData === "object") {
+						// New format: object with total and entries
+						miscData = {
+							total: rawMiscData.total || 0,
+							entries: Array.isArray(rawMiscData.entries)
+								? rawMiscData.entries
+								: [],
+						};
+					} else {
+						// No data
+						miscData = { total: 0, entries: [] };
+					}
+
 					const miscAmount = miscData.total || 0;
 
 					html += `

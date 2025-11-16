@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS misc_expenses (
     month INTEGER NOT NULL,
     paycheck_index INTEGER NOT NULL,
     amount REAL NOT NULL DEFAULT 0,
+    data TEXT, -- JSON string containing { total, entries: [{amount, comment, timestamp}] }
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, year, month, paycheck_index)
 );
