@@ -2864,7 +2864,7 @@
 				// Sum up all bills marked as PCL only (only deduct when cleared)
 				Object.keys(savedStatuses).forEach((billKey) => {
 					const status = savedStatuses[billKey];
-					if (status === "PNC") {
+					if (status === "PNC" || status === "PCL") {
 						// Extract bill name from key (format: "year-month-billname" or "year-month-billname-periodIndex")
 						const parts = billKey.split("-");
 						const billName = parts.slice(2).join("-");
