@@ -2894,10 +2894,10 @@
 						if (bill) {
 							// For split budget items, only subtract the per-period amount
 							if (splitBillsMap[actualBillName]) {
-								totalPaid += splitBillsMap[actualBillName];
+								totalPaid += Math.abs(splitBillsMap[actualBillName]);
 							} else {
 								// For regular bills, subtract the full amount
-								totalPaid += bill.amount;
+								totalPaid += Math.abs(bill.amount);
 							}
 						}
 					}
