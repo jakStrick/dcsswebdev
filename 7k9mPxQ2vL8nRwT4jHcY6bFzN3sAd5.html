@@ -2029,23 +2029,7 @@
 
 				let html = `
                 <div class="summary">
-                    <div class="summary-card">
-                        <div class="label">Current Checking Balance</div>
-                        <div class="value" style="color: #667eea;">$${adjustedBankBalance.toFixed(
-									2
-								)}</div>
-                        ${
-									totalPaidBills > 0
-										? `
-                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            Base: $${bankBalance.toFixed(
-											2
-										)} - Paid: $${totalPaidBills.toFixed(2)}
-                        </div>
-                        `
-										: ""
-								}
-                    </div>
+                    
                     <div class="summary-card">
                         <div class="label">Total Monthly Income</div>
                         <div class="value positive">$${totalIncome.toFixed(
@@ -2068,7 +2052,24 @@
 								isCurrentMonth
 									? `
                     <div class="summary-card">
-                        <div class="label">Remaining Income</div>
+                        <div class="label">Current Checking Balance</div>
+                        <div class="value" style="color: #667eea;">$${adjustedBankBalance.toFixed(
+									2
+								)}</div>
+                        ${
+									totalPaidBills > 0
+										? `
+                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
+                            Base: $${bankBalance.toFixed(
+											2
+										)} - Paid: $${totalPaidBills.toFixed(2)}
+                        </div>
+                        `
+										: ""
+								}
+                    </div>
+									<div class="summary-card">
+                        <div class="label">Remaining Monthly Income</div>
                         <div class="value positive">$${remainingIncome.toFixed(
 									2
 								)}</div>
@@ -2125,7 +2126,7 @@
                         </div>
                     </div>
                     <div class="summary-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
-                        <div class="label" style="color: rgba(255,255,255,0.9); font-weight: 600;">💵 Monthly Deposits</div>
+                        <div class="label" style="color: rgba(255,255,255,0.9); font-weight: 600;">💵 Monthly Other Deposits</div>
                         <div class="value" style="color: white; font-weight: 700;">$${totalMonthlyDeposits.toFixed(
 									2
 								)}</div>
