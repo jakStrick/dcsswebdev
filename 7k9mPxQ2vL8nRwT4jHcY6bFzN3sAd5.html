@@ -140,31 +140,33 @@
 
 			.summary {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-				gap: 1.5rem;
-				padding: 2rem;
-				background: #f8f9fa;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 1rem;
+				max-width: 1400px;
+				width: 100%;
+				margin: 1rem auto;
 			}
 
 			.summary-card {
-				background: white;
 				padding: 1.5rem;
 				border-radius: 0.75rem;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 				text-align: center;
+				transition: all 0.3s ease;
+				cursor: pointer;
 			}
 
 			.summary-card .label {
 				font-size: 0.875rem;
-				color: #6c757d;
-				margin-bottom: 0.5rem;
 				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				margin-bottom: 0.5rem;
 			}
 
 			.summary-card .value {
 				font-size: 1.75rem;
-				font-weight: bold;
-				color: #212529;
+				font-weight: 700;
 			}
 
 			.summary-card.positive .value {
@@ -179,8 +181,14 @@
 				color: #ffc107;
 			}
 
+			.summary-card:hover {
+				transform: translateY(-8px) scale(1.02);
+				filter: brightness(1.15);
+				box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+			}
+
 			.content {
-				padding: 2rem;
+				padding: 0.5rem;
 			}
 
 			.paycheck-section {
@@ -1018,7 +1026,7 @@
 					priority: 1,
 				},
 				{
-					name: "Rent",
+					name: "Rent 17692",
 					category: "Main",
 					amount: 2395.0,
 					balance: 0,
@@ -2028,129 +2036,112 @@
 				}
 
 				let html = `
-                <div class="summary">
-                    
-                    <div class="summary-card">
-                        <div class="label">Total Monthly Income</div>
-                        <div class="value positive">$${totalIncome.toFixed(
-									2
-								)}</div>
-                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            David: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks + Rental
-                        </div>
-                    </div>
-                    <div class="summary-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
-                        <div class="label" style="color: rgba(255,255,255,0.9); font-weight: 600;">🏠 Rental Income</div>
-                        <div class="value" style="color: white; font-weight: 700;">$${rentalIncome.toFixed(
-									2
-								)}</div>
-                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem;">
-                            Received on 1st of month
-                        </div>
-                    </div>
-                    ${
-								isCurrentMonth
-									? `
-                    <div class="summary-card">
-                        <div class="label">Current Checking Balance</div>
-                        <div class="value" style="color: #667eea;">$${adjustedBankBalance.toFixed(
-									2
-								)}</div>
-                        ${
-									totalPaidBills > 0
-										? `
-                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            Base: $${bankBalance.toFixed(
-											2
-										)} - Paid: $${totalPaidBills.toFixed(2)}
-                        </div>
-                        `
-										: ""
-								}
-                    </div>
-									<div class="summary-card">
-                        <div class="label">Remaining Monthly Income</div>
-                        <div class="value positive">$${remainingIncome.toFixed(
-									2
-								)}</div>
-                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            David: ${DavidPaychecksRemaining}x | Claudia: ${ClaudiaPaychecksRemaining}x left
-                        </div>
-                    </div>
-                    `
-									: ""
-							}
-                    <div class="summary-card">
-                        <div class="label">${
-									isCurrentMonth ? "Remaining " : "Total "
-								}Bills</div>
-                        <div class="value negative">$${totalExpenses.toFixed(
-									2
-								)}</div>
-                    </div>
-                    <div class="summary-card ${
-								netCashFlow >= 0 ? "positive" : "negative"
-							}">
-                        <div class="label">Net Cash Flow</div>
-                        <div class="value">$${netCashFlow.toFixed(2)}</div>
-                    </div>
-                    <div class="summary-card ${
-								projectedBalance >= 0 ? "positive" : "negative"
-							}">
-                        <div class="label">Projected Balance</div>
-                        <div class="value">$${projectedBalance.toFixed(2)}</div>
-                        <div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                            After all bills paid
-                        </div>
-                    </div>
-                    <div class="summary-card warning">
-                        <div class="label">Total Debt</div>
-                        <div class="value">$${totalDebt.toLocaleString(
-									"en-US",
-									{ minimumFractionDigits: 2 }
-								)}</div>
-                    </div>
-                    <div class="summary-card" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); color: #856404;">
-                        <div class="label" style="color: #5a3e07; font-weight: 600;">💰 Monthly Misc Spending</div>
-                        <div class="value" style="color: #5a3e07; font-weight: 700;">$${totalMiscSpending.toFixed(
-									2
-								)}</div>
-                        <div style="font-size: 0.75rem; color: #6d4c0d; margin-top: 0.25rem;">
-                            ${new Date(year, month - 1).toLocaleString(
-											"default",
-											{
-												month: "long",
-												year: "numeric",
-											}
-										)}
-                        </div>
-                    </div>
-                    <div class="summary-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
-                        <div class="label" style="color: rgba(255,255,255,0.9); font-weight: 600;">💵 Monthly Other Deposits</div>
-                        <div class="value" style="color: white; font-weight: 700;">$${totalMonthlyDeposits.toFixed(
-									2
-								)}</div>
-                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem;">
-                            ${new Date(year, month - 1).toLocaleString(
-											"default",
-											{
-												month: "long",
-												year: "numeric",
-											}
-										)}
-                        </div>
-                    </div>
-                    <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                        <div class="label" style="color: rgba(255,255,255,0.9);">Surplus Savings Balance</div>
-                        <div class="value" style="color: white;">$${accumulatedSavings.toLocaleString(
-									"en-US",
-									{ minimumFractionDigits: 2 }
-								)}</div>
-                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.8); margin-top: 0.25rem;">
-                            This month: $${monthlySurplus.toFixed(2)}
-                        </div>
-                    </div>
-                </div>
+                	
+				<div class="summary">
+					<div class="summary-card" style="background: #4CAF50; color: white;">
+						<div class="label" style="color: white;">Total Monthly Income</div>
+						<div class="value" style="color: white;">${totalIncome.toFixed(2)}</div>
+						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+							David: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks + Rental
+						</div>
+					</div>
+					<div class="summary-card" style="background: #E91E63; color: white;">
+						<div class="label" style="color: white; font-weight: 600;">🏠 Rental Income</div>
+						<div class="value" style="color: white; font-weight: 700;">${rentalIncome.toFixed(
+							2
+						)}</div>
+						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+							Received on 1st of month
+						</div>
+					</div>
+					${
+						isCurrentMonth
+							? `
+					<div class="summary-card" style="background: #5C9FD8; color: white;">
+						<div class="label" style="color: white;">Current Checking Balance</div>
+						<div class="value" style="color: white;">${adjustedBankBalance.toFixed(2)}</div>
+						${
+							totalPaidBills > 0
+								? `
+						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+							Base: ${bankBalance.toFixed(2)} - Paid: ${totalPaidBills.toFixed(2)}
+						</div>
+						`
+								: ""
+						}
+					</div>
+					<div class="summary-card" style="background: #FF9800; color: white;">
+						<div class="label" style="color: white;">Remaining Monthly Income</div>
+						<div class="value" style="color: white;">${remainingIncome.toFixed(2)}</div>
+						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+							David: ${DavidPaychecksRemaining}x | Claudia: ${ClaudiaPaychecksRemaining}x left
+						</div>
+					</div>
+					`
+							: ""
+					}
+					<div class="summary-card" style="background: #CE6BA4; color: white;">
+						<div class="label" style="color: white;">${
+							isCurrentMonth ? "Remaining " : "Total "
+						}Bills</div>
+						<div class="value" style="color: white;">${totalExpenses.toFixed(2)}</div>
+					</div>
+					<div class="summary-card" style="background: ${
+						netCashFlow >= 0 ? "#4CAF50" : "#E91E63"
+					}; color: white;">
+						<div class="label" style="color: white;">Net Cash Flow</div>
+						<div class="value" style="color: white;">${netCashFlow.toFixed(2)}</div>
+					</div>
+					<div class="summary-card" style="background: ${
+						projectedBalance >= 0 ? "#66BB6A" : "#E91E63"
+					}; color: white;">
+						<div class="label" style="color: white;">Projected Balance</div>
+						<div class="value" style="color: white;">${projectedBalance.toFixed(2)}</div>
+						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+							After all bills paid
+						</div>
+					</div>
+					<div class="summary-card" style="background: #FF7043; color: white;">
+						<div class="label" style="color: white;">Total Debt</div>
+						<div class="value" style="color: white;">${totalDebt.toLocaleString("en-US", {
+							minimumFractionDigits: 2,
+						})}</div>
+					</div>
+					<div class="summary-card" style="background: #FDD835; color: white;">
+						<div class="label" style="color: white; font-weight: 600;">💰 Monthly Misc Spending</div>
+						<div class="value" style="color: white; font-weight: 700;">${totalMiscSpending.toFixed(
+							2
+						)}</div>
+						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+							${new Date(year, month - 1).toLocaleString("default", {
+								month: "long",
+								year: "numeric",
+							})}
+						</div>
+					</div>
+					<div class="summary-card" style="background: #26A69A; color: white;">
+						<div class="label" style="color: white; font-weight: 600;">💵 Monthly Other Deposits</div>
+						<div class="value" style="color: white; font-weight: 700;">${totalMonthlyDeposits.toFixed(
+							2
+						)}</div>
+						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+							${new Date(year, month - 1).toLocaleString("default", {
+								month: "long",
+								year: "numeric",
+							})}
+						</div>
+					</div>
+					<div class="summary-card" style="background: #9C27B0; color: white;">
+						<div class="label" style="color: white;">Surplus Savings Balance</div>
+						<div class="value" style="color: white;">${accumulatedSavings.toLocaleString(
+							"en-US",
+							{ minimumFractionDigits: 2 }
+						)}</div>
+						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+							This month: ${monthlySurplus.toFixed(2)}
+						</div>
+					</div>
+				</div>
 
                 ${
 							totalMonthlyDeposits > 0 &&
