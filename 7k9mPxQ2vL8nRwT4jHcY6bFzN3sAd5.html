@@ -2039,15 +2039,15 @@
                 	
 				<div class="summary">
 					<div class="summary-card" style="background: #4CAF50; color: white;">
-						<div class="label" style="color: white;">Total Monthly Income</div>
-						<div class="value" style="color: white;">${totalIncome.toFixed(2)}</div>
+						<div class="label" style="color: white; font-weight: 600;">💵 Total Monthly Income</div>
+						<div class="value" style="color: white;">$${totalIncome.toFixed(2)}</div>
 						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
 							David: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks + Rental
 						</div>
 					</div>
 					<div class="summary-card" style="background: #E91E63; color: white;">
 						<div class="label" style="color: white; font-weight: 600;">🏠 Rental Income</div>
-						<div class="value" style="color: white; font-weight: 700;">${rentalIncome.toFixed(
+						<div class="value" style="color: white; font-weight: 700;">$${rentalIncome.toFixed(
 							2
 						)}</div>
 						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
@@ -2058,21 +2058,23 @@
 						isCurrentMonth
 							? `
 					<div class="summary-card" style="background: #5C9FD8; color: white;">
-						<div class="label" style="color: white;">Current Checking Balance</div>
-						<div class="value" style="color: white;">${adjustedBankBalance.toFixed(2)}</div>
+						<div class="label" style="color: white; font-weight: 600;">🏦 Current Checking Balance</div>
+						<div class="value" style="color: white;">$${adjustedBankBalance.toFixed(
+							2
+						)}</div>
 						${
 							totalPaidBills > 0
 								? `
 						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							Base: ${bankBalance.toFixed(2)} - Paid: ${totalPaidBills.toFixed(2)}
+							Base: $${bankBalance.toFixed(2)} - Paid: $${totalPaidBills.toFixed(2)}
 						</div>
 						`
 								: ""
 						}
 					</div>
 					<div class="summary-card" style="background: #FF9800; color: white;">
-						<div class="label" style="color: white;">Remaining Monthly Income</div>
-						<div class="value" style="color: white;">${remainingIncome.toFixed(2)}</div>
+						<div class="label" style="color: white; font-weight: 600;">💸 Remaining Monthly Income</div>
+						<div class="value" style="color: white;">$${remainingIncome.toFixed(2)}</div>
 						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
 							David: ${DavidPaychecksRemaining}x | Claudia: ${ClaudiaPaychecksRemaining}x left
 						</div>
@@ -2081,35 +2083,35 @@
 							: ""
 					}
 					<div class="summary-card" style="background: #CE6BA4; color: white;">
-						<div class="label" style="color: white;">${
+						<div class="label" style="color: white; font-weight: 600;">📋 ${
 							isCurrentMonth ? "Remaining " : "Total "
 						}Bills</div>
-						<div class="value" style="color: white;">${totalExpenses.toFixed(2)}</div>
+						<div class="value" style="color: white;">$${totalExpenses.toFixed(2)}</div>
 					</div>
 					<div class="summary-card" style="background: ${
 						netCashFlow >= 0 ? "#4CAF50" : "#E91E63"
 					}; color: white;">
-						<div class="label" style="color: white;">Net Cash Flow</div>
-						<div class="value" style="color: white;">${netCashFlow.toFixed(2)}</div>
+						<div class="label" style="color: white; font-weight: 600;">💹 Net Cash Flow</div>
+						<div class="value" style="color: white;">$${netCashFlow.toFixed(2)}</div>
 					</div>
 					<div class="summary-card" style="background: ${
 						projectedBalance >= 0 ? "#66BB6A" : "#E91E63"
 					}; color: white;">
-						<div class="label" style="color: white;">Projected Balance</div>
-						<div class="value" style="color: white;">${projectedBalance.toFixed(2)}</div>
+						<div class="label" style="color: white; font-weight: 600;">📊 Projected Balance</div>
+						<div class="value" style="color: white;">$${projectedBalance.toFixed(2)}</div>
 						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
 							After all bills paid
 						</div>
 					</div>
 					<div class="summary-card" style="background: #FF7043; color: white;">
-						<div class="label" style="color: white;">Total Debt</div>
-						<div class="value" style="color: white;">${totalDebt.toLocaleString("en-US", {
+						<div class="label" style="color: white; font-weight: 600;">💳 Total Debt</div>
+						<div class="value" style="color: white;">$${totalDebt.toLocaleString("en-US", {
 							minimumFractionDigits: 2,
 						})}</div>
 					</div>
 					<div class="summary-card" style="background: #FDD835; color: white;">
 						<div class="label" style="color: white; font-weight: 600;">💰 Monthly Misc Spending</div>
-						<div class="value" style="color: white; font-weight: 700;">${totalMiscSpending.toFixed(
+						<div class="value" style="color: white; font-weight: 700;">$${totalMiscSpending.toFixed(
 							2
 						)}</div>
 						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
@@ -2121,7 +2123,7 @@
 					</div>
 					<div class="summary-card" style="background: #26A69A; color: white;">
 						<div class="label" style="color: white; font-weight: 600;">💵 Monthly Other Deposits</div>
-						<div class="value" style="color: white; font-weight: 700;">${totalMonthlyDeposits.toFixed(
+						<div class="value" style="color: white; font-weight: 700;">$${totalMonthlyDeposits.toFixed(
 							2
 						)}</div>
 						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
@@ -2132,13 +2134,13 @@
 						</div>
 					</div>
 					<div class="summary-card" style="background: #9C27B0; color: white;">
-						<div class="label" style="color: white;">Surplus Savings Balance</div>
-						<div class="value" style="color: white;">${accumulatedSavings.toLocaleString(
+						<div class="label" style="color: white; font-weight: 600;">💎 Surplus Savings Balance</div>
+						<div class="value" style="color: white;">$${accumulatedSavings.toLocaleString(
 							"en-US",
 							{ minimumFractionDigits: 2 }
 						)}</div>
 						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							This month: ${monthlySurplus.toFixed(2)}
+							This month: $${monthlySurplus.toFixed(2)}
 						</div>
 					</div>
 				</div>
