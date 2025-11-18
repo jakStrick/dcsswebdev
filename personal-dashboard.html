@@ -709,9 +709,11 @@
 					}
 
 					const data = await response.json();
+					// Handle nested user object from verify endpoint
+					const userData = data.user || data;
 					document.getElementById("userName").textContent =
-						data.name || data.email;
-					return data;
+						userData.name || userData.email;
+					return userData;
 				} catch (error) {
 					console.error("Auth verification failed:", error);
 					localStorage.removeItem("authToken");
