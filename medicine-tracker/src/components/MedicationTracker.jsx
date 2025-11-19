@@ -12,9 +12,9 @@ import {
 const MedicationTracker = () => {
 	const [view, setView] = useState("today");
 	const [medications, setMedications] = useState({
-		morning1: "Morning Med 1",
-		morning2: "Morning Med 2",
-		night1: "Night Med 1",
+		morning1: "Morning Med Lorsartan",
+		morning2: "Morning Med Amlodipine",
+		night1: "Night Med Metoprolol",
 	});
 	const [todayStatus, setTodayStatus] = useState({
 		morning1: { taken: false, timestamp: null },
