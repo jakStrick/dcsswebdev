@@ -1,384 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Diamond Starry Night with White Horse</title>
-		<link rel="icon" type="image/x-icon" href="favicon.ico" />
-		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diamond Starry Night with White Horse</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/nav-styles.css" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/font-color-styles.css" />
-		<style>
-			* {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-			}
+    <link rel="stylesheet" type="text/css" href="./assets/css/nav-styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/font-color-styles.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-			body,
-			html {
-				height: 100%;
-				overflow: hidden;
-				font-family: Arial, sans-serif;
-			}
+      body,
+      html {
+        height: 100%;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
 
-			.night-sky {
-				background: linear-gradient(135deg, #0f001a, #1a0f44, #000008);
-				width: 100vw;
-				height: 100vh;
-				position: relative;
-			}
+      .night-sky {
+        background: linear-gradient(135deg, #0f001a, #1a0f44, #000008);
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+      }
 
-			.star {
-				position: absolute;
-				width: 10px;
-				height: 10px;
-				background: #ff6b9d;
-				transform: rotate(45deg);
-				filter: drop-shadow(0 0 6px #ff6b9d);
-				animation: twinkle 2s ease-in-out infinite alternate;
-				box-shadow: 0 0 8px rgba(255, 255, 255, 0.3),
-					0 0 15px rgba(255, 255, 255, 0.15);
-			}
+      .star {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #ff6b9d;
+        transform: rotate(45deg);
+        filter: drop-shadow(0 0 6px #ff6b9d);
+        animation: twinkle 2s ease-in-out infinite alternate;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.3),
+          0 0 15px rgba(255, 255, 255, 0.15);
+      }
 
-			.star.rotating {
-				animation: twinkle 2s ease-in-out infinite alternate,
-					starRotate 500ms linear;
-			}
+      .star.rotating {
+        animation: twinkle 2s ease-in-out infinite alternate,
+          starRotate 500ms linear;
+      }
 
-			@keyframes starRotate {
-				0% {
-					transform: rotate(45deg) scale(var(--star-scale, 1));
-				}
-				100% {
-					transform: rotate(405deg) scale(var(--star-scale, 1));
-				}
-			}
+      @keyframes starRotate {
+        0% {
+          transform: rotate(45deg) scale(var(--star-scale, 1));
+        }
+        100% {
+          transform: rotate(405deg) scale(var(--star-scale, 1));
+        }
+      }
 
-			@keyframes twinkle {
-				0% {
-					opacity: 0.3;
-					transform: rotate(45deg) scale(0.8);
-					filter: drop-shadow(0 0 6px #ff6b9d) hue-rotate(0deg);
-					box-shadow: 0 0 6px rgba(255, 255, 255, 0.2),
-						0 0 12px rgba(255, 255, 255, 0.1);
-				}
-				100% {
-					opacity: 1;
-					transform: rotate(45deg) scale(1.2);
-					filter: drop-shadow(0 0 12px #ff1744) hue-rotate(30deg);
-					box-shadow: 0 0 12px rgba(255, 255, 255, 0.4),
-						0 0 20px rgba(255, 255, 255, 0.2);
-				}
-			}
+      @keyframes twinkle {
+        0% {
+          opacity: 0.3;
+          transform: rotate(45deg) scale(0.8);
+          filter: drop-shadow(0 0 6px #ff6b9d) hue-rotate(0deg);
+          box-shadow: 0 0 6px rgba(255, 255, 255, 0.2),
+            0 0 12px rgba(255, 255, 255, 0.1);
+        }
+        100% {
+          opacity: 1;
+          transform: rotate(45deg) scale(1.2);
+          filter: drop-shadow(0 0 12px #ff1744) hue-rotate(30deg);
+          box-shadow: 0 0 12px rgba(255, 255, 255, 0.4),
+            0 0 20px rgba(255, 255, 255, 0.2);
+        }
+      }
 
-			.shooting-star {
-				position: absolute;
-				width: 3px;
-				height: 3px;
-				background: #fff;
-				border-radius: 50%;
-				animation: shoot 3s linear infinite;
-				opacity: 0;
-			}
+      .shooting-star {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        background: #fff;
+        border-radius: 50%;
+        animation: shoot 3s linear infinite;
+        opacity: 0;
+      }
 
-			@keyframes shoot {
-				0% {
-					opacity: 0;
-					transform: translateX(0px) translateY(0px);
-				}
-				10% {
-					opacity: 1;
-					box-shadow: 0 0 10px #fff, -20px 0 20px rgba(255, 107, 157, 0.5);
-				}
-				90% {
-					opacity: 1;
-					box-shadow: 0 0 10px #fff, -100px 0 50px rgba(255, 107, 157, 0.3);
-				}
-				100% {
-					opacity: 0;
-					transform: translateX(-300px) translateY(200px);
-					box-shadow: 0 0 0 transparent;
-				}
-			}
+      @keyframes shoot {
+        0% {
+          opacity: 0;
+          transform: translateX(0px) translateY(0px);
+        }
+        10% {
+          opacity: 1;
+          box-shadow: 0 0 10px #fff, -20px 0 20px rgba(255, 107, 157, 0.5);
+        }
+        90% {
+          opacity: 1;
+          box-shadow: 0 0 10px #fff, -100px 0 50px rgba(255, 107, 157, 0.3);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-300px) translateY(200px);
+          box-shadow: 0 0 0 transparent;
+        }
+      }
 
-			.moon {
-				position: absolute;
-				top: 10%;
-				right: 15%;
-				width: 80px;
-				height: 80px;
-				background: linear-gradient(135deg, #c0c0c0, #808080);
-				border-radius: 50%;
-				box-shadow: 0 0 30px rgba(192, 192, 192, 0.3);
-				animation: moonGlow 4s ease-in-out infinite alternate;
-				z-index: 1;
-			}
+      .moon {
+        position: absolute;
+        top: 10%;
+        right: 15%;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #c0c0c0, #808080);
+        border-radius: 50%;
+        box-shadow: 0 0 30px rgba(192, 192, 192, 0.3);
+        animation: moonGlow 4s ease-in-out infinite alternate;
+        z-index: 1;
+      }
 
-			@keyframes moonGlow {
-				0% {
-					box-shadow: 0 0 30px rgba(192, 192, 192, 0.3);
-				}
-				100% {
-					box-shadow: 0 0 50px rgba(192, 192, 192, 0.6);
-				}
-			}
+      @keyframes moonGlow {
+        0% {
+          box-shadow: 0 0 30px rgba(192, 192, 192, 0.3);
+        }
+        100% {
+          box-shadow: 0 0 50px rgba(192, 192, 192, 0.6);
+        }
+      }
 
-			.cloud {
-				position: absolute;
-				background: linear-gradient(
-					135deg,
-					rgba(40, 40, 40, 0.8),
-					rgba(20, 20, 20, 0.9)
-				);
-				border-radius: 50px;
-				opacity: 0.7;
-				animation: cloudDrift 20s ease-in-out infinite;
-			}
+      .cloud {
+        position: absolute;
+        background: linear-gradient(
+          135deg,
+          rgba(40, 40, 40, 0.8),
+          rgba(20, 20, 20, 0.9)
+        );
+        border-radius: 50px;
+        opacity: 0.7;
+        animation: cloudDrift 20s ease-in-out infinite;
+      }
 
-			.cloud:before {
-				content: "";
-				position: absolute;
-				background: linear-gradient(
-					135deg,
-					rgba(30, 30, 30, 0.8),
-					rgba(10, 10, 10, 0.9)
-				);
-				border-radius: 50px;
-			}
+      .cloud:before {
+        content: "";
+        position: absolute;
+        background: linear-gradient(
+          135deg,
+          rgba(30, 30, 30, 0.8),
+          rgba(10, 10, 10, 0.9)
+        );
+        border-radius: 50px;
+      }
 
-			.cloud:after {
-				content: "";
-				position: absolute;
-				background: linear-gradient(
-					135deg,
-					rgba(35, 35, 35, 0.8),
-					rgba(15, 15, 15, 0.9)
-				);
-				border-radius: 50px;
-			}
+      .cloud:after {
+        content: "";
+        position: absolute;
+        background: linear-gradient(
+          135deg,
+          rgba(35, 35, 35, 0.8),
+          rgba(15, 15, 15, 0.9)
+        );
+        border-radius: 50px;
+      }
 
-			.cloud1 {
-				top: 8%;
-				right: 10%;
-				width: 60px;
-				height: 30px;
-				z-index: 2;
-				animation-duration: 25s;
-				animation-delay: -5s;
-			}
+      .cloud1 {
+        top: 8%;
+        right: 10%;
+        width: 60px;
+        height: 30px;
+        z-index: 2;
+        animation-duration: 25s;
+        animation-delay: -5s;
+      }
 
-			.cloud1:before {
-				top: -15px;
-				left: 10px;
-				width: 40px;
-				height: 40px;
-			}
+      .cloud1:before {
+        top: -15px;
+        left: 10px;
+        width: 40px;
+        height: 40px;
+      }
 
-			.cloud1:after {
-				top: -8px;
-				right: 15px;
-				width: 25px;
-				height: 25px;
-			}
+      .cloud1:after {
+        top: -8px;
+        right: 15px;
+        width: 25px;
+        height: 25px;
+      }
 
-			.cloud2 {
-				top: 12%;
-				right: 25%;
-				width: 80px;
-				height: 35px;
-				z-index: 0;
-				animation-duration: 30s;
-				animation-delay: -10s;
-			}
+      .cloud2 {
+        top: 12%;
+        right: 25%;
+        width: 80px;
+        height: 35px;
+        z-index: 0;
+        animation-duration: 30s;
+        animation-delay: -10s;
+      }
 
-			.cloud2:before {
-				top: -18px;
-				left: 20px;
-				width: 50px;
-				height: 50px;
-			}
+      .cloud2:before {
+        top: -18px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+      }
 
-			.cloud2:after {
-				top: -10px;
-				right: 10px;
-				width: 35px;
-				height: 35px;
-			}
+      .cloud2:after {
+        top: -10px;
+        right: 10px;
+        width: 35px;
+        height: 35px;
+      }
 
-			.cloud3 {
-				top: 15%;
-				right: 5%;
-				width: 45px;
-				height: 25px;
-				z-index: 2;
-				animation-duration: 22s;
-				animation-delay: -15s;
-			}
+      .cloud3 {
+        top: 15%;
+        right: 5%;
+        width: 45px;
+        height: 25px;
+        z-index: 2;
+        animation-duration: 22s;
+        animation-delay: -15s;
+      }
 
-			.cloud3:before {
-				top: -12px;
-				left: 8px;
-				width: 30px;
-				height: 30px;
-			}
+      .cloud3:before {
+        top: -12px;
+        left: 8px;
+        width: 30px;
+        height: 30px;
+      }
 
-			.cloud3:after {
-				top: -6px;
-				right: 12px;
-				width: 20px;
-				height: 20px;
-			}
+      .cloud3:after {
+        top: -6px;
+        right: 12px;
+        width: 20px;
+        height: 20px;
+      }
 
-			@keyframes cloudDrift {
-				0% {
-					transform: translateX(0px) translateY(0px);
-					opacity: 0.7;
-				}
-				25% {
-					transform: translateX(-10px) translateY(-5px);
-					opacity: 0.5;
-				}
-				50% {
-					transform: translateX(-5px) translateY(5px);
-					opacity: 0.8;
-				}
-				75% {
-					transform: translateX(8px) translateY(-3px);
-					opacity: 0.6;
-				}
-				100% {
-					transform: translateX(0px) translateY(0px);
-					opacity: 0.7;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<div id="navbar-placeholder"></div>
-		<div class="night-sky" id="nightSky">
-			<div class="moon"></div>
-			<div class="cloud cloud1"></div>
-			<div class="cloud cloud2"></div>
-			<div class="cloud cloud3"></div>
-		</div>
+      @keyframes cloudDrift {
+        0% {
+          transform: translateX(0px) translateY(0px);
+          opacity: 0.7;
+        }
+        25% {
+          transform: translateX(-10px) translateY(-5px);
+          opacity: 0.5;
+        }
+        50% {
+          transform: translateX(-5px) translateY(5px);
+          opacity: 0.8;
+        }
+        75% {
+          transform: translateX(8px) translateY(-3px);
+          opacity: 0.6;
+        }
+        100% {
+          transform: translateX(0px) translateY(0px);
+          opacity: 0.7;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
+    <div class="night-sky" id="nightSky">
+      <div class="moon"></div>
+      <div class="cloud cloud1"></div>
+      <div class="cloud cloud2"></div>
+      <div class="cloud cloud3"></div>
+    </div>
 
-		<script>
-			// Create diamond stars
-			function createStar() {
-				const star = document.createElement("div");
-				star.className = "star";
+    <script>
+      // Create diamond stars
+      function createStar() {
+        const star = document.createElement("div");
+        star.className = "star";
 
-				// Random position
-				star.style.left = Math.random() * 100 + "vw";
-				star.style.top = Math.random() * 100 + "vh";
+        // Random position
+        star.style.left = Math.random() * 100 + "vw";
+        star.style.top = Math.random() * 100 + "vh";
 
-				// Random size
-				const size = Math.random() * 0.5 + 0.5; // 0.5 to 1
-				star.style.transform = `rotate(45deg) scale(${size})`;
+        // Random size
+        const size = Math.random() * 0.5 + 0.5; // 0.5 to 1
+        star.style.transform = `rotate(45deg) scale(${size})`;
 
-				// Random animation duration and delay
-				star.style.animationDuration = Math.random() * 3 + 1 + "s";
-				star.style.animationDelay = Math.random() * 2 + "s";
+        // Random animation duration and delay
+        star.style.animationDuration = Math.random() * 3 + 1 + "s";
+        star.style.animationDelay = Math.random() * 2 + "s";
 
-				// Slight color variation
-				const hue = Math.random() * 60 - 30; // -30 to 30 degrees from base pink
-				star.style.filter = `drop-shadow(0 0 6px #ff6b9d) hue-rotate(${hue}deg)`;
+        // Slight color variation
+        const hue = Math.random() * 60 - 30; // -30 to 30 degrees from base pink
+        star.style.filter = `drop-shadow(0 0 6px #ff6b9d) hue-rotate(${hue}deg)`;
 
-				document.getElementById("nightSky").appendChild(star);
-			}
+        document.getElementById("nightSky").appendChild(star);
+      }
 
-			// Create shooting stars
-			function createShootingStar() {
-				const shootingStar = document.createElement("div");
-				shootingStar.className = "shooting-star";
+      // Create shooting stars
+      function createShootingStar() {
+        const shootingStar = document.createElement("div");
+        shootingStar.className = "shooting-star";
 
-				// Start from random position at top
-				shootingStar.style.left = Math.random() * 100 + "vw";
-				shootingStar.style.top = Math.random() * 20 + "vh";
+        // Start from random position at top
+        shootingStar.style.left = Math.random() * 100 + "vw";
+        shootingStar.style.top = Math.random() * 20 + "vh";
 
-				// Random animation duration
-				shootingStar.style.animationDuration = Math.random() * 2 + 2 + "s";
+        // Random animation duration
+        shootingStar.style.animationDuration = Math.random() * 2 + 2 + "s";
 
-				document.getElementById("nightSky").appendChild(shootingStar);
+        document.getElementById("nightSky").appendChild(shootingStar);
 
-				// Remove after animation
-				setTimeout(() => {
-					shootingStar.remove();
-				}, 5000);
-			}
+        // Remove after animation
+        setTimeout(() => {
+          shootingStar.remove();
+        }, 5000);
+      }
 
-			// Initialize stars
-			for (let i = 0; i < 150; i++) {
-				createStar();
-			}
+      // Initialize stars
+      for (let i = 0; i < 150; i++) {
+        createStar();
+      }
 
-			// Create shooting stars periodically
-			setInterval(createShootingStar, 3000);
+      // Create shooting stars periodically
+      setInterval(createShootingStar, 3000);
 
-			// Add more stars dynamically for extra sparkle
-			setInterval(() => {
-				if (document.querySelectorAll(".star").length < 200) {
-					createStar();
-				}
-			}, 5000);
+      // Add more stars dynamically for extra sparkle
+      setInterval(() => {
+        if (document.querySelectorAll(".star").length < 200) {
+          createStar();
+        }
+      }, 5000);
 
-			// Random star rotation effect
-			function rotateRandomStar() {
-				const stars = document.querySelectorAll(".star");
-				if (stars.length === 0) return;
+      // Random star rotation effect
+      function rotateRandomStar() {
+        const stars = document.querySelectorAll(".star");
+        if (stars.length === 0) return;
 
-				// Remove rotation class from all stars
-				stars.forEach((star) => star.classList.remove("rotating"));
+        // Remove rotation class from all stars
+        stars.forEach((star) => star.classList.remove("rotating"));
 
-				// Choose a random star
-				const randomStar = stars[Math.floor(Math.random() * stars.length)];
+        // Choose a random star
+        const randomStar = stars[Math.floor(Math.random() * stars.length)];
 
-				// Get the current scale from the star's transform
-				const computedStyle = window.getComputedStyle(randomStar);
-				const transform = computedStyle.transform;
-				let scale = 1;
+        // Get the current scale from the star's transform
+        const computedStyle = window.getComputedStyle(randomStar);
+        const transform = computedStyle.transform;
+        let scale = 1;
 
-				if (transform && transform !== "none") {
-					const matrix = new DOMMatrix(transform);
-					scale = Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b);
-				}
+        if (transform && transform !== "none") {
+          const matrix = new DOMMatrix(transform);
+          scale = Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b);
+        }
 
-				// Set the scale as a CSS custom property
-				randomStar.style.setProperty("--star-scale", scale);
+        // Set the scale as a CSS custom property
+        randomStar.style.setProperty("--star-scale", scale);
 
-				// Add rotation class
-				randomStar.classList.add("rotating");
+        // Add rotation class
+        randomStar.classList.add("rotating");
 
-				// Schedule next rotation
-				setTimeout(rotateRandomStar, 1000); // Wait 1 second (500ms animation + 500ms pause)
-			}
+        // Schedule next rotation
+        setTimeout(rotateRandomStar, 1000); // Wait 1 second (500ms animation + 500ms pause)
+      }
 
-			// Start the rotation effect after initial stars are created
-			setTimeout(rotateRandomStar, 2000);
-			document.addEventListener("click", (e) => {
-				const star = document.createElement("div");
-				star.className = "star";
-				star.style.left = e.clientX + "px";
-				star.style.top = e.clientY + "px";
-				star.style.animationDuration = "0.5s";
-				star.style.transform = "rotate(45deg) scale(1.5)";
+      // Start the rotation effect after initial stars are created
+      setTimeout(rotateRandomStar, 2000);
+      document.addEventListener("click", (e) => {
+        const star = document.createElement("div");
+        star.className = "star";
+        star.style.left = e.clientX + "px";
+        star.style.top = e.clientY + "px";
+        star.style.animationDuration = "0.5s";
+        star.style.transform = "rotate(45deg) scale(1.5)";
 
-				document.getElementById("nightSky").appendChild(star);
+        document.getElementById("nightSky").appendChild(star);
 
-				// Remove after a short time
-				setTimeout(() => {
-					star.remove();
-				}, 2000);
-			});
-		</script>
-		<script src="./assets/js/script.js"></script>
-	</body>
+        // Remove after a short time
+        setTimeout(() => {
+          star.remove();
+        }, 2000);
+      });
+    </script>
+    <script src="./assets/js/script.js"></script>
+  </body>
 </html>

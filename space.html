@@ -1,454 +1,442 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/x-icon" href="favicon.ico" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/nav-styles.css" />
-		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/nav-styles.css" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/font-color-styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/font-color-styles.css"
+    />
 
-		<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-		<title>Planet on Spacetime Fabric</title>
-		<style>
-			body {
-				margin: 0;
-				overflow: hidden;
-				background: radial-gradient(
-					circle at center,
-					#0a0a1a 0%,
-					#000000 100%
-				);
-			}
-			canvas {
-				display: block;
-			}
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+    <title>Planet on Spacetime Fabric</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: radial-gradient(circle at center, #0a0a1a 0%, #000000 100%);
+      }
+      canvas {
+        display: block;
+      }
 
-			.hero-title {
-				position: absolute;
-				top: 12%;
-				left: 50%;
-				transform: translateX(-50%);
-				font-family: "Arial Black", sans-serif;
-				font-size: 8rem;
-				font-weight: 900;
-				letter-spacing: 0.15em;
-				text-align: center;
-				margin: 0;
-				background: linear-gradient(
-					135deg,
-					#667eea 0%,
-					#764ba2 50%,
-					#f093fb 100%
-				);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
-				text-shadow: 0 0 80px rgba(102, 126, 234, 0.5);
-				animation: glow 3s ease-in-out infinite alternate;
-			}
+      .hero-title {
+        position: absolute;
+        top: 12%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: "Arial Black", sans-serif;
+        font-size: 8rem;
+        font-weight: 900;
+        letter-spacing: 0.15em;
+        text-align: center;
+        margin: 0;
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #f093fb 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 80px rgba(102, 126, 234, 0.5);
+        animation: glow 3s ease-in-out infinite alternate;
+      }
 
-			@keyframes glow {
-				from {
-					filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.6));
-				}
-				to {
-					filter: drop-shadow(0 0 40px rgba(118, 75, 162, 0.8));
-				}
-			}
+      @keyframes glow {
+        from {
+          filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.6));
+        }
+        to {
+          filter: drop-shadow(0 0 40px rgba(118, 75, 162, 0.8));
+        }
+      }
 
-			/* Fine-tune for specific breakpoints */
-			@media (max-width: 1200px) {
-				.hero-title {
-					font-size: clamp(5rem, 12vw, 10rem);
-				}
-			}
+      /* Fine-tune for specific breakpoints */
+      @media (max-width: 1200px) {
+        .hero-title {
+          font-size: clamp(5rem, 12vw, 10rem);
+        }
+      }
 
-			@media (max-width: 768px) {
-				.hero-title {
-					font-size: clamp(2rem, 10vw, 6rem);
-					letter-spacing: 0.1em;
-					top: 12%;
-				}
-			}
+      @media (max-width: 768px) {
+        .hero-title {
+          font-size: clamp(2rem, 10vw, 6rem);
+          letter-spacing: 0.1em;
+          top: 12%;
+        }
+      }
 
-			@media (max-width: 480px) {
-				.hero-title {
-					font-size: clamp(5rem, 8vw, 2.5rem);
-					letter-spacing: 0.08em;
-					top: 10%;
-				}
-			}
-		</style>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-	</head>
-	<body>
-		<div id="navbar-placeholder"></div>
-		<div class="hero-banner"><h1 class="hero-title">SPACE</h1></div>
-		<script>
-			const scene = new THREE.Scene();
-			const camera = new THREE.PerspectiveCamera(
-				60,
-				window.innerWidth / window.innerHeight,
-				0.1,
-				2000
-			);
-			camera.position.set(0, 500, 600);
-			camera.lookAt(0, 0, 0);
+      @media (max-width: 480px) {
+        .hero-title {
+          font-size: clamp(5rem, 8vw, 2.5rem);
+          letter-spacing: 0.08em;
+          top: 10%;
+        }
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
+    <div class="hero-banner"><h1 class="hero-title">SPACE</h1></div>
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        2000
+      );
+      camera.position.set(0, 500, 600);
+      camera.lookAt(0, 0, 0);
 
-			const renderer = new THREE.WebGLRenderer({ antialias: true });
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			document.body.appendChild(renderer.domElement);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
-			const mmToPx = 96 / 25.4;
-			const colSpacing = 5 * mmToPx;
-			const rowSpacing = 5 * mmToPx;
-			const width = 900;
-			const height = 900;
-			const cols = Math.floor(width / colSpacing);
-			const rows = Math.floor(height / rowSpacing);
+      const mmToPx = 96 / 25.4;
+      const colSpacing = 5 * mmToPx;
+      const rowSpacing = 5 * mmToPx;
+      const width = 900;
+      const height = 900;
+      const cols = Math.floor(width / colSpacing);
+      const rows = Math.floor(height / rowSpacing);
 
-			const dots = [];
-			const geometry = new THREE.SphereGeometry(2, 8, 8);
+      const dots = [];
+      const geometry = new THREE.SphereGeometry(2, 8, 8);
 
-			for (let col = 0; col < cols; col++) {
-				for (let row = 0; row < rows; row++) {
-					const x = col * colSpacing - width / 2 + colSpacing / 2;
-					const z = row * rowSpacing - height / 2 + rowSpacing / 2;
-					const progress = Math.sqrt(
-						Math.pow((col - cols / 2) / cols, 2) +
-							Math.pow((row - rows / 2) / rows, 2)
-					);
+      for (let col = 0; col < cols; col++) {
+        for (let row = 0; row < rows; row++) {
+          const x = col * colSpacing - width / 2 + colSpacing / 2;
+          const z = row * rowSpacing - height / 2 + rowSpacing / 2;
+          const progress = Math.sqrt(
+            Math.pow((col - cols / 2) / cols, 2) +
+              Math.pow((row - rows / 2) / rows, 2)
+          );
 
-					const r = Math.floor(100 + progress * 100);
-					const g = Math.floor(150 - progress * 50);
-					const b = Math.floor(255 - progress * 100);
+          const r = Math.floor(100 + progress * 100);
+          const g = Math.floor(150 - progress * 50);
+          const b = Math.floor(255 - progress * 100);
 
-					const color = new THREE.Color(`rgb(${r}, ${g}, ${b})`);
-					const material = new THREE.MeshBasicMaterial({ color });
-					const dot = new THREE.Mesh(geometry, material);
-					dot.position.set(x, 0, z);
-					scene.add(dot);
-					dots.push({ mesh: dot, col, row, baseX: x, baseZ: z });
-				}
-			}
+          const color = new THREE.Color(`rgb(${r}, ${g}, ${b})`);
+          const material = new THREE.MeshBasicMaterial({ color });
+          const dot = new THREE.Mesh(geometry, material);
+          dot.position.set(x, 0, z);
+          scene.add(dot);
+          dots.push({ mesh: dot, col, row, baseX: x, baseZ: z });
+        }
+      }
 
-			// Create sun core with gradient effect
-			const sunGeometry = new THREE.SphereGeometry(60, 64, 64);
-			const sunMaterial = new THREE.MeshBasicMaterial({
-				color: 0xfff4e6,
-			});
-			const sun = new THREE.Mesh(sunGeometry, sunMaterial);
-			sun.position.set(0, 60, 0);
-			scene.add(sun);
+      // Create sun core with gradient effect
+      const sunGeometry = new THREE.SphereGeometry(60, 64, 64);
+      const sunMaterial = new THREE.MeshBasicMaterial({
+        color: 0xfff4e6,
+      });
+      const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+      sun.position.set(0, 60, 0);
+      scene.add(sun);
 
-			// Inner photosphere layer
-			const photosphereGeometry = new THREE.SphereGeometry(62, 64, 64);
-			const photosphereMaterial = new THREE.MeshBasicMaterial({
-				color: 0xffcc33,
-				transparent: true,
-				opacity: 0.7,
-			});
-			const photosphere = new THREE.Mesh(
-				photosphereGeometry,
-				photosphereMaterial
-			);
-			photosphere.position.set(0, 60, 0);
-			scene.add(photosphere);
+      // Inner photosphere layer
+      const photosphereGeometry = new THREE.SphereGeometry(62, 64, 64);
+      const photosphereMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffcc33,
+        transparent: true,
+        opacity: 0.7,
+      });
+      const photosphere = new THREE.Mesh(
+        photosphereGeometry,
+        photosphereMaterial
+      );
+      photosphere.position.set(0, 60, 0);
+      scene.add(photosphere);
 
-			// Chromosphere layer
-			const chromosphereGeometry = new THREE.SphereGeometry(68, 64, 64);
-			const chromosphereMaterial = new THREE.MeshBasicMaterial({
-				color: 0xff8800,
-				transparent: true,
-				opacity: 0.4,
-			});
-			const chromosphere = new THREE.Mesh(
-				chromosphereGeometry,
-				chromosphereMaterial
-			);
-			chromosphere.position.set(0, 60, 0);
-			scene.add(chromosphere);
+      // Chromosphere layer
+      const chromosphereGeometry = new THREE.SphereGeometry(68, 64, 64);
+      const chromosphereMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff8800,
+        transparent: true,
+        opacity: 0.4,
+      });
+      const chromosphere = new THREE.Mesh(
+        chromosphereGeometry,
+        chromosphereMaterial
+      );
+      chromosphere.position.set(0, 60, 0);
+      scene.add(chromosphere);
 
-			// Inner corona
-			const coronaGeometry = new THREE.SphereGeometry(76, 64, 64);
-			const coronaMaterial = new THREE.MeshBasicMaterial({
-				color: 0xff6600,
-				transparent: true,
-				opacity: 0.25,
-			});
-			const corona = new THREE.Mesh(coronaGeometry, coronaMaterial);
-			corona.position.set(0, 60, 0);
-			scene.add(corona);
+      // Inner corona
+      const coronaGeometry = new THREE.SphereGeometry(76, 64, 64);
+      const coronaMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff6600,
+        transparent: true,
+        opacity: 0.25,
+      });
+      const corona = new THREE.Mesh(coronaGeometry, coronaMaterial);
+      corona.position.set(0, 60, 0);
+      scene.add(corona);
 
-			// Outer corona glow
-			const glowGeometry = new THREE.SphereGeometry(86, 64, 64);
-			const glowMaterial = new THREE.MeshBasicMaterial({
-				color: 0xff4400,
-				transparent: true,
-				opacity: 0.15,
-			});
-			const sunGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-			sunGlow.position.set(0, 60, 0);
-			scene.add(sunGlow);
+      // Outer corona glow
+      const glowGeometry = new THREE.SphereGeometry(86, 64, 64);
+      const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff4400,
+        transparent: true,
+        opacity: 0.15,
+      });
+      const sunGlow = new THREE.Mesh(glowGeometry, glowMaterial);
+      sunGlow.position.set(0, 60, 0);
+      scene.add(sunGlow);
 
-			// CME (Coronal Mass Ejection) particles
-			const cmeParticles = [];
-			const cmeActive = { value: false, startTime: 0, angle: 0 };
+      // CME (Coronal Mass Ejection) particles
+      const cmeParticles = [];
+      const cmeActive = { value: false, startTime: 0, angle: 0 };
 
-			function createLightningBolt(
-				startPos,
-				direction,
-				spreadAngle,
-				spreadHeight
-			) {
-				const points = [];
-				const numSegments = 8 + Math.floor(Math.random() * 6);
-				let currentPos = startPos.clone();
+      function createLightningBolt(
+        startPos,
+        direction,
+        spreadAngle,
+        spreadHeight
+      ) {
+        const points = [];
+        const numSegments = 8 + Math.floor(Math.random() * 6);
+        let currentPos = startPos.clone();
 
-				points.push(currentPos.clone());
+        points.push(currentPos.clone());
 
-				const baseAngle = direction + spreadAngle;
-				const segmentLength = 15 + Math.random() * 10;
+        const baseAngle = direction + spreadAngle;
+        const segmentLength = 15 + Math.random() * 10;
 
-				for (let i = 0; i < numSegments; i++) {
-					const jitter = (Math.random() - 0.5) * 0.6;
-					const jitterHeight = (Math.random() - 0.5) * 0.4;
+        for (let i = 0; i < numSegments; i++) {
+          const jitter = (Math.random() - 0.5) * 0.6;
+          const jitterHeight = (Math.random() - 0.5) * 0.4;
 
-					const moveX = Math.cos(baseAngle + jitter) * segmentLength;
-					const moveZ = Math.sin(baseAngle + jitter) * segmentLength;
-					const moveY =
-						(spreadHeight + jitterHeight) * segmentLength * 0.5;
+          const moveX = Math.cos(baseAngle + jitter) * segmentLength;
+          const moveZ = Math.sin(baseAngle + jitter) * segmentLength;
+          const moveY = (spreadHeight + jitterHeight) * segmentLength * 0.5;
 
-					currentPos = new THREE.Vector3(
-						currentPos.x + moveX,
-						currentPos.y + moveY,
-						currentPos.z + moveZ
-					);
+          currentPos = new THREE.Vector3(
+            currentPos.x + moveX,
+            currentPos.y + moveY,
+            currentPos.z + moveZ
+          );
 
-					points.push(currentPos.clone());
-				}
+          points.push(currentPos.clone());
+        }
 
-				return points;
-			}
+        return points;
+      }
 
-			function createCME() {
-				const numBolts = 18;
-				const cmeAngle = Math.random() * Math.PI * 2;
-				cmeActive.angle = cmeAngle;
+      function createCME() {
+        const numBolts = 18;
+        const cmeAngle = Math.random() * Math.PI * 2;
+        cmeActive.angle = cmeAngle;
 
-				for (let i = 0; i < numBolts; i++) {
-					const spreadAngle = (Math.random() - 0.5) * 0.25;
-					const spreadHeight = (Math.random() - 0.5) * 0.2;
+        for (let i = 0; i < numBolts; i++) {
+          const spreadAngle = (Math.random() - 0.5) * 0.25;
+          const spreadHeight = (Math.random() - 0.5) * 0.2;
 
-					const points = createLightningBolt(
-						sun.position,
-						cmeAngle,
-						spreadAngle,
-						spreadHeight
-					);
+          const points = createLightningBolt(
+            sun.position,
+            cmeAngle,
+            spreadAngle,
+            spreadHeight
+          );
 
-					const geometry = new THREE.BufferGeometry().setFromPoints(
-						points
-					);
-					const material = new THREE.LineBasicMaterial({
-						color: new THREE.Color().setHSL(
-							0.08 + Math.random() * 0.05,
-							1,
-							0.6 + Math.random() * 0.3
-						),
-						transparent: true,
-						opacity: 0.9,
-						linewidth: 2,
-					});
+          const geometry = new THREE.BufferGeometry().setFromPoints(points);
+          const material = new THREE.LineBasicMaterial({
+            color: new THREE.Color().setHSL(
+              0.08 + Math.random() * 0.05,
+              1,
+              0.6 + Math.random() * 0.3
+            ),
+            transparent: true,
+            opacity: 0.9,
+            linewidth: 2,
+          });
 
-					const lightning = new THREE.Line(geometry, material);
+          const lightning = new THREE.Line(geometry, material);
 
-					lightning.userData = {
-						speed: 2 + Math.random() * 2,
-						angle: cmeAngle + spreadAngle,
-						heightAngle: spreadHeight,
-						life: 0,
-						points: points,
-					};
+          lightning.userData = {
+            speed: 2 + Math.random() * 2,
+            angle: cmeAngle + spreadAngle,
+            heightAngle: spreadHeight,
+            life: 0,
+            points: points,
+          };
 
-					scene.add(lightning);
-					cmeParticles.push(lightning);
-				}
+          scene.add(lightning);
+          cmeParticles.push(lightning);
+        }
 
-				cmeActive.value = true;
-				cmeActive.startTime = time;
-			}
+        cmeActive.value = true;
+        cmeActive.startTime = time;
+      }
 
-			// Create planet (light blue)
-			const planetGeometry = new THREE.SphereGeometry(25, 32, 32);
-			const planetMaterial = new THREE.MeshBasicMaterial({
-				color: 0x4db8ff,
-				wireframe: false,
-			});
-			const planet = new THREE.Mesh(planetGeometry, planetMaterial);
-			scene.add(planet);
+      // Create planet (light blue)
+      const planetGeometry = new THREE.SphereGeometry(25, 32, 32);
+      const planetMaterial = new THREE.MeshBasicMaterial({
+        color: 0x4db8ff,
+        wireframe: false,
+      });
+      const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+      scene.add(planet);
 
-			// Create moon
-			const moonGeometry = new THREE.SphereGeometry(8, 16, 16);
-			const moonMaterial = new THREE.MeshBasicMaterial({
-				color: 0xcccccc,
-			});
-			const moon = new THREE.Mesh(moonGeometry, moonMaterial);
-			scene.add(moon);
+      // Create moon
+      const moonGeometry = new THREE.SphereGeometry(8, 16, 16);
+      const moonMaterial = new THREE.MeshBasicMaterial({
+        color: 0xcccccc,
+      });
+      const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+      scene.add(moon);
 
-			// Add subtle grid lines for spacetime effect
-			const gridHelper = new THREE.GridHelper(width, 40, 0x2244ff, 0x112244);
-			gridHelper.position.y = -5;
-			scene.add(gridHelper);
+      // Add subtle grid lines for spacetime effect
+      const gridHelper = new THREE.GridHelper(width, 40, 0x2244ff, 0x112244);
+      gridHelper.position.y = -5;
+      scene.add(gridHelper);
 
-			let time = 0;
+      let time = 0;
 
-			function animate() {
-				time += 0.01;
+      function animate() {
+        time += 0.01;
 
-				// Trigger CME periodically (every 8 seconds)
-				if (time % (Math.random() * 20) < 0.02 && !cmeActive.value) {
-					createCME();
-				}
+        // Trigger CME periodically (every 8 seconds)
+        if (time % (Math.random() * 20) < 0.02 && !cmeActive.value) {
+          createCME();
+        }
 
-				// Animate CME particles
-				for (let i = cmeParticles.length - 1; i >= 0; i--) {
-					const lightning = cmeParticles[i];
-					lightning.userData.life += 0.01;
+        // Animate CME particles
+        for (let i = cmeParticles.length - 1; i >= 0; i--) {
+          const lightning = cmeParticles[i];
+          lightning.userData.life += 0.01;
 
-					const lifeProgress = lightning.userData.life;
+          const lifeProgress = lightning.userData.life;
 
-					// Expand lightning bolt outward
-					const expandFactor = 1 + lifeProgress * 3;
-					const newPoints = lightning.userData.points.map((point) => {
-						const direction = new THREE.Vector3(
-							point.x - sun.position.x,
-							point.y - sun.position.y,
-							point.z - sun.position.z
-						);
-						return new THREE.Vector3(
-							sun.position.x + direction.x * expandFactor,
-							sun.position.y + direction.y * expandFactor,
-							sun.position.z + direction.z * expandFactor
-						);
-					});
+          // Expand lightning bolt outward
+          const expandFactor = 1 + lifeProgress * 3;
+          const newPoints = lightning.userData.points.map((point) => {
+            const direction = new THREE.Vector3(
+              point.x - sun.position.x,
+              point.y - sun.position.y,
+              point.z - sun.position.z
+            );
+            return new THREE.Vector3(
+              sun.position.x + direction.x * expandFactor,
+              sun.position.y + direction.y * expandFactor,
+              sun.position.z + direction.z * expandFactor
+            );
+          });
 
-					lightning.geometry.setFromPoints(newPoints);
+          lightning.geometry.setFromPoints(newPoints);
 
-					// Fade out
-					lightning.material.opacity = Math.max(
-						0,
-						0.9 - lifeProgress * 0.7
-					);
+          // Fade out
+          lightning.material.opacity = Math.max(0, 0.9 - lifeProgress * 0.7);
 
-					// Remove old lightning
-					if (lifeProgress > 1.3) {
-						scene.remove(lightning);
-						lightning.geometry.dispose();
-						lightning.material.dispose();
-						cmeParticles.splice(i, 1);
-					}
-				}
+          // Remove old lightning
+          if (lifeProgress > 1.3) {
+            scene.remove(lightning);
+            lightning.geometry.dispose();
+            lightning.material.dispose();
+            cmeParticles.splice(i, 1);
+          }
+        }
 
-				// Reset CME active state when all particles are gone
-				if (cmeActive.value && cmeParticles.length === 0) {
-					cmeActive.value = false;
-				}
+        // Reset CME active state when all particles are gone
+        if (cmeActive.value && cmeParticles.length === 0) {
+          cmeActive.value = false;
+        }
 
-				// Rotate sun layers at different speeds for dynamic effect
-				sun.rotation.y += 0.004;
-				photosphere.rotation.y += 0.006;
-				photosphere.rotation.x += 0.002;
-				chromosphere.rotation.y -= 0.005;
-				chromosphere.rotation.z += 0.003;
-				corona.rotation.y += 0.008;
-				corona.rotation.x -= 0.002;
-				sunGlow.rotation.y -= 0.004;
-				sunGlow.rotation.z += 0.001;
+        // Rotate sun layers at different speeds for dynamic effect
+        sun.rotation.y += 0.004;
+        photosphere.rotation.y += 0.006;
+        photosphere.rotation.x += 0.002;
+        chromosphere.rotation.y -= 0.005;
+        chromosphere.rotation.z += 0.003;
+        corona.rotation.y += 0.008;
+        corona.rotation.x -= 0.002;
+        sunGlow.rotation.y -= 0.004;
+        sunGlow.rotation.z += 0.001;
 
-				// Move planet in orbital path around sun
-				const orbitRadius = 280;
-				const planetX = Math.cos(time * 0.4) * orbitRadius;
-				const planetZ = Math.sin(time * 0.4) * orbitRadius;
-				const planetY = 45;
-				planet.position.set(planetX, planetY, planetZ);
+        // Move planet in orbital path around sun
+        const orbitRadius = 280;
+        const planetX = Math.cos(time * 0.4) * orbitRadius;
+        const planetZ = Math.sin(time * 0.4) * orbitRadius;
+        const planetY = 45;
+        planet.position.set(planetX, planetY, planetZ);
 
-				// Rotate planet to simulate rolling
-				planet.rotation.x += 0.02;
-				planet.rotation.y += 0.015;
+        // Rotate planet to simulate rolling
+        planet.rotation.x += 0.02;
+        planet.rotation.y += 0.015;
 
-				// Moon orbits around planet
-				const moonOrbitRadius = 50;
-				const moonOrbitSpeed = 2.5;
-				const moonX =
-					planetX + Math.cos(time * moonOrbitSpeed) * moonOrbitRadius;
-				const moonZ =
-					planetZ + Math.sin(time * moonOrbitSpeed) * moonOrbitRadius;
-				const moonY = planetY + Math.sin(time * moonOrbitSpeed) * 15;
-				moon.position.set(moonX, moonY, moonZ);
+        // Moon orbits around planet
+        const moonOrbitRadius = 50;
+        const moonOrbitSpeed = 2.5;
+        const moonX =
+          planetX + Math.cos(time * moonOrbitSpeed) * moonOrbitRadius;
+        const moonZ =
+          planetZ + Math.sin(time * moonOrbitSpeed) * moonOrbitRadius;
+        const moonY = planetY + Math.sin(time * moonOrbitSpeed) * 15;
+        moon.position.set(moonX, moonY, moonZ);
 
-				dots.forEach((dot) => {
-					// Sun's gravity well (main effect)
-					const dxSun = dot.baseX - 0;
-					const dzSun = dot.baseZ - 0;
-					const distanceToSun = Math.sqrt(dxSun * dxSun + dzSun * dzSun);
+        dots.forEach((dot) => {
+          // Sun's gravity well (main effect)
+          const dxSun = dot.baseX - 0;
+          const dzSun = dot.baseZ - 0;
+          const distanceToSun = Math.sqrt(dxSun * dxSun + dzSun * dzSun);
 
-					const sunGravityDepth = 180;
-					const sunGravityRadius = 400;
+          const sunGravityDepth = 180;
+          const sunGravityRadius = 400;
 
-					let yOffset = 0;
-					if (distanceToSun < sunGravityRadius) {
-						const normalizedDist = distanceToSun / sunGravityRadius;
-						yOffset =
-							-sunGravityDepth *
-							Math.exp(-normalizedDist * 2.5) *
-							(1 - normalizedDist);
-					}
+          let yOffset = 0;
+          if (distanceToSun < sunGravityRadius) {
+            const normalizedDist = distanceToSun / sunGravityRadius;
+            yOffset =
+              -sunGravityDepth *
+              Math.exp(-normalizedDist * 2.5) *
+              (1 - normalizedDist);
+          }
 
-					// Planet's smaller gravity well
-					const dxPlanet = dot.baseX - planetX;
-					const dzPlanet = dot.baseZ - planetZ;
-					const distanceToPlanet = Math.sqrt(
-						dxPlanet * dxPlanet + dzPlanet * dzPlanet
-					);
+          // Planet's smaller gravity well
+          const dxPlanet = dot.baseX - planetX;
+          const dzPlanet = dot.baseZ - planetZ;
+          const distanceToPlanet = Math.sqrt(
+            dxPlanet * dxPlanet + dzPlanet * dzPlanet
+          );
 
-					const planetGravityDepth = 40;
-					const planetGravityRadius = 120;
+          const planetGravityDepth = 40;
+          const planetGravityRadius = 120;
 
-					if (distanceToPlanet < planetGravityRadius) {
-						const normalizedDist = distanceToPlanet / planetGravityRadius;
-						yOffset +=
-							-planetGravityDepth *
-							Math.exp(-normalizedDist * 4) *
-							(1 - normalizedDist);
-					}
+          if (distanceToPlanet < planetGravityRadius) {
+            const normalizedDist = distanceToPlanet / planetGravityRadius;
+            yOffset +=
+              -planetGravityDepth *
+              Math.exp(-normalizedDist * 4) *
+              (1 - normalizedDist);
+          }
 
-					// Add subtle wave motion
-					const wave = Math.sin(distanceToSun * 0.02 - time * 2) * 4;
+          // Add subtle wave motion
+          const wave = Math.sin(distanceToSun * 0.02 - time * 2) * 4;
 
-					dot.mesh.position.y = yOffset + wave;
-				});
+          dot.mesh.position.y = yOffset + wave;
+        });
 
-				renderer.render(scene, camera);
-				requestAnimationFrame(animate);
-			}
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
 
-			animate();
+      animate();
 
-			window.addEventListener("resize", () => {
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize(window.innerWidth, window.innerHeight);
-			});
-		</script>
-		<script src="./assets/js/script.js"></script>
-	</body>
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+    <script src="./assets/js/script.js"></script>
+  </body>
 </html>

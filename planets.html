@@ -1,386 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/x-icon" href="favicon.ico" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/nav-styles.css" />
-		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/nav-styles.css" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/font-color-styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/font-color-styles.css"
+    />
 
-		<script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
 
-		<title>Solar System Motion</title>
-		<style>
-			body {
-				margin: 0;
-				overflow: hidden;
-				background: #000;
-				font-family: Arial, sans-serif;
-			}
-			canvas {
-				display: block;
-			}
-			.controls {
-				position: absolute;
-				top: 20px;
-				left: 20px;
-				color: #fff;
-				background: rgba(0, 0, 0, 0.7);
-				padding: 15px;
-				border-radius: 8px;
-				font-size: 14px;
-			}
-			.controls label {
-				display: block;
-				margin: 10px 0 5px 0;
-			}
-			.controls input[type="range"] {
-				width: 200px;
-			}
-			.info {
-				position: absolute;
-				bottom: 20px;
-				left: 20px;
-				color: #fff;
-				background: rgba(0, 0, 0, 0.7);
-				padding: 15px;
-				border-radius: 8px;
-				font-size: 12px;
-				max-width: 300px;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="navbar-placeholder"></div>
-		<canvas id="canvas"></canvas>
+    <title>Solar System Motion</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+        font-family: Arial, sans-serif;
+      }
+      canvas {
+        display: block;
+      }
+      .controls {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .controls label {
+        display: block;
+        margin: 10px 0 5px 0;
+      }
+      .controls input[type="range"] {
+        width: 200px;
+      }
+      .info {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 12px;
+        max-width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
+    <canvas id="canvas"></canvas>
 
-		<div class="controls">
-			<h3 style="margin-top: 0">Controls</h3>
-			<label>
-				Speed: <span id="speedValue">1.0</span>x
-				<input
-					type="range"
-					id="speed"
-					min="0.1"
-					max="3"
-					step="0.1"
-					value="1" />
-			</label>
-			<label>
-				<input type="checkbox" id="showTrails" checked /> Show Trails
-			</label>
-			<label>
-				<input type="checkbox" id="showOrbits" /> Show Orbital Planes
-			</label>
-		</div>
+    <div class="controls">
+      <h3 style="margin-top: 0">Controls</h3>
+      <label>
+        Speed: <span id="speedValue">1.0</span>x
+        <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1" />
+      </label>
+      <label>
+        <input type="checkbox" id="showTrails" checked /> Show Trails
+      </label>
+      <label>
+        <input type="checkbox" id="showOrbits" /> Show Orbital Planes
+      </label>
+    </div>
 
-		<div class="info">
-			<strong>Solar System Through the Galaxy</strong><br />
-			The Sun spirals through space at ~220 km/s, carrying the planets with
-			it. The planets orbit the Sun while the entire system travels in a
-			spiral pattern through the galaxy.
-		</div>
+    <div class="info">
+      <strong>Solar System Through the Galaxy</strong><br />
+      The Sun spirals through space at ~220 km/s, carrying the planets with it.
+      The planets orbit the Sun while the entire system travels in a spiral
+      pattern through the galaxy.
+    </div>
 
-		<script>
-			const canvas = document.getElementById("canvas");
-			const ctx = canvas.getContext("2d");
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
 
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-			window.addEventListener("resize", () => {
-				canvas.width = window.innerWidth;
-				canvas.height = window.innerHeight;
-			});
+      window.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
 
-			// Controls
-			const speedSlider = document.getElementById("speed");
-			const speedValue = document.getElementById("speedValue");
-			const showTrailsCheckbox = document.getElementById("showTrails");
-			const showOrbitsCheckbox = document.getElementById("showOrbits");
+      // Controls
+      const speedSlider = document.getElementById("speed");
+      const speedValue = document.getElementById("speedValue");
+      const showTrailsCheckbox = document.getElementById("showTrails");
+      const showOrbitsCheckbox = document.getElementById("showOrbits");
 
-			speedSlider.addEventListener("input", (e) => {
-				speedValue.textContent = parseFloat(e.target.value).toFixed(1);
-			});
+      speedSlider.addEventListener("input", (e) => {
+        speedValue.textContent = parseFloat(e.target.value).toFixed(1);
+      });
 
-			// Camera and world settings
-			const forwardSpeed = 2;
-			const sunZ = 425;
-			const spiralRadius = 56.1;
-			const spiralSpeed = 0.015;
+      // Camera and world settings
+      const forwardSpeed = 2;
+      const sunZ = 425;
+      const spiralRadius = 56.1;
+      const spiralSpeed = 0.015;
 
-			// Stars for background
-			const stars = [];
-			for (let i = 0; i < 300; i++) {
-				stars.push({
-					x: Math.random() * 2000 - 1000,
-					y: Math.random() * 2000 - 1000,
-					z: Math.random() * 3000,
-					size: Math.random() * 2.2,
-				});
-			}
+      // Stars for background
+      const stars = [];
+      for (let i = 0; i < 300; i++) {
+        stars.push({
+          x: Math.random() * 2000 - 1000,
+          y: Math.random() * 2000 - 1000,
+          z: Math.random() * 3000,
+          size: Math.random() * 2.2,
+        });
+      }
 
-			// Planets data
-			const planets = [
-				{
-					name: "Mercury",
-					distance: 37.4,
-					speed: 0.04,
-					size: 4.56,
-					color: "#8c7853",
-					angle: 0,
-				},
-				{
-					name: "Venus",
-					distance: 56.1,
-					speed: 0.03,
-					size: 7.56,
-					color: "#ffc649",
-					angle: Math.PI / 3,
-				},
-				{
-					name: "Earth",
-					distance: 74.8,
-					speed: 0.025,
-					size: 7.56,
-					color: "#4a90e2",
-					angle: Math.PI,
-				},
-				{
-					name: "Mars",
-					distance: 93.5,
-					speed: 0.02,
-					size: 6.12,
-					color: "#e27b58",
-					angle: Math.PI * 1.5,
-				},
-				{
-					name: "Jupiter",
-					distance: 140.25,
-					speed: 0.01,
-					size: 18.24,
-					color: "#c88b3a",
-					angle: Math.PI / 4,
-				},
-				{
-					name: "Saturn",
-					distance: 177.65,
-					speed: 0.008,
-					size: 15.24,
-					color: "#fad5a5",
-					angle: Math.PI * 0.7,
-				},
-				{
-					name: "Uranus",
-					distance: 215.05,
-					speed: 0.006,
-					size: 10.68,
-					color: "#4fd0e7",
-					angle: Math.PI * 1.2,
-				},
-				{
-					name: "Neptune",
-					distance: 243.1,
-					speed: 0.005,
-					size: 10.68,
-					color: "#4166f5",
-					angle: Math.PI * 1.8,
-				},
-			];
+      // Planets data
+      const planets = [
+        {
+          name: "Mercury",
+          distance: 37.4,
+          speed: 0.04,
+          size: 4.56,
+          color: "#8c7853",
+          angle: 0,
+        },
+        {
+          name: "Venus",
+          distance: 56.1,
+          speed: 0.03,
+          size: 7.56,
+          color: "#ffc649",
+          angle: Math.PI / 3,
+        },
+        {
+          name: "Earth",
+          distance: 74.8,
+          speed: 0.025,
+          size: 7.56,
+          color: "#4a90e2",
+          angle: Math.PI,
+        },
+        {
+          name: "Mars",
+          distance: 93.5,
+          speed: 0.02,
+          size: 6.12,
+          color: "#e27b58",
+          angle: Math.PI * 1.5,
+        },
+        {
+          name: "Jupiter",
+          distance: 140.25,
+          speed: 0.01,
+          size: 18.24,
+          color: "#c88b3a",
+          angle: Math.PI / 4,
+        },
+        {
+          name: "Saturn",
+          distance: 177.65,
+          speed: 0.008,
+          size: 15.24,
+          color: "#fad5a5",
+          angle: Math.PI * 0.7,
+        },
+        {
+          name: "Uranus",
+          distance: 215.05,
+          speed: 0.006,
+          size: 10.68,
+          color: "#4fd0e7",
+          angle: Math.PI * 1.2,
+        },
+        {
+          name: "Neptune",
+          distance: 243.1,
+          speed: 0.005,
+          size: 10.68,
+          color: "#4166f5",
+          angle: Math.PI * 1.8,
+        },
+      ];
 
-			const trails = planets.map(() => []);
-			const maxTrailLength = 100;
+      const trails = planets.map(() => []);
+      const maxTrailLength = 100;
 
-			function project3D(x, y, z) {
-				const distance = z + 300;
-				if (distance <= 0) {
-					return { x: 0, y: 0, scale: 0 };
-				}
-				const scale = 300 / distance;
-				return {
-					x: canvas.width / 2 + x * scale,
-					y: canvas.height / 2 + y * scale,
-					scale: scale,
-				};
-			}
+      function project3D(x, y, z) {
+        const distance = z + 300;
+        if (distance <= 0) {
+          return { x: 0, y: 0, scale: 0 };
+        }
+        const scale = 300 / distance;
+        return {
+          x: canvas.width / 2 + x * scale,
+          y: canvas.height / 2 + y * scale,
+          scale: scale,
+        };
+      }
 
-			function drawStars(speed) {
-				stars.forEach((star) => {
-					star.z -= forwardSpeed * speed;
+      function drawStars(speed) {
+        stars.forEach((star) => {
+          star.z -= forwardSpeed * speed;
 
-					if (star.z < -100) {
-						star.z += 3000;
-						star.x = Math.random() * 2000 - 1000;
-						star.y = Math.random() * 2000 - 1000;
-						star.size = Math.random() * 2.2;
-					}
+          if (star.z < -100) {
+            star.z += 3000;
+            star.x = Math.random() * 2000 - 1000;
+            star.y = Math.random() * 2000 - 1000;
+            star.size = Math.random() * 2.2;
+          }
 
-					const pos = project3D(star.x, star.y, star.z);
+          const pos = project3D(star.x, star.y, star.z);
 
-					if (pos.scale > 0) {
-						ctx.fillStyle = `rgba(255, 255, 255, ${pos.scale * 0.8})`;
-						ctx.beginPath();
-						ctx.arc(pos.x, pos.y, star.size * pos.scale, 0, Math.PI * 2);
-						ctx.fill();
-					}
-				});
-			}
+          if (pos.scale > 0) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${pos.scale * 0.8})`;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, star.size * pos.scale, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      }
 
-			function drawSun(sunX, sunY, sunZ) {
-				const pos = project3D(sunX, sunY, sunZ);
+      function drawSun(sunX, sunY, sunZ) {
+        const pos = project3D(sunX, sunY, sunZ);
 
-				if (pos.scale > 0) {
-					const gradient = ctx.createRadialGradient(
-						pos.x,
-						pos.y,
-						0,
-						pos.x,
-						pos.y,
-						45.6 * pos.scale
-					);
-					gradient.addColorStop(0, "rgba(255, 220, 100, 0.8)");
-					gradient.addColorStop(0.5, "rgba(255, 180, 50, 0.3)");
-					gradient.addColorStop(1, "rgba(255, 150, 0, 0)");
+        if (pos.scale > 0) {
+          const gradient = ctx.createRadialGradient(
+            pos.x,
+            pos.y,
+            0,
+            pos.x,
+            pos.y,
+            45.6 * pos.scale
+          );
+          gradient.addColorStop(0, "rgba(255, 220, 100, 0.8)");
+          gradient.addColorStop(0.5, "rgba(255, 180, 50, 0.3)");
+          gradient.addColorStop(1, "rgba(255, 150, 0, 0)");
 
-					ctx.fillStyle = gradient;
-					ctx.beginPath();
-					ctx.arc(pos.x, pos.y, 45.6 * pos.scale, 0, Math.PI * 2);
-					ctx.fill();
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 45.6 * pos.scale, 0, Math.PI * 2);
+          ctx.fill();
 
-					ctx.fillStyle = "#ffeb3b";
-					ctx.beginPath();
-					ctx.arc(pos.x, pos.y, 22.8 * pos.scale, 0, Math.PI * 2);
-					ctx.fill();
-				}
-			}
+          ctx.fillStyle = "#ffeb3b";
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 22.8 * pos.scale, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
 
-			function drawPlanet(planet, index, sunX, sunY, sunZ) {
-				const x = Math.cos(planet.angle) * planet.distance + sunX;
-				const y = Math.sin(planet.angle) * planet.distance + sunY;
+      function drawPlanet(planet, index, sunX, sunY, sunZ) {
+        const x = Math.cos(planet.angle) * planet.distance + sunX;
+        const y = Math.sin(planet.angle) * planet.distance + sunY;
 
-				const pos = project3D(x, y, sunZ);
-				const sunPos = project3D(sunX, sunY, sunZ);
+        const pos = project3D(x, y, sunZ);
+        const sunPos = project3D(sunX, sunY, sunZ);
 
-				const depthFactor = Math.max(0.3, Math.min(1, pos.scale * 3));
+        const depthFactor = Math.max(0.3, Math.min(1, pos.scale * 3));
 
-				if (pos.scale > 0 && sunPos.scale > 0) {
-					ctx.strokeStyle = `rgba(100, 100, 150, ${0.2 * depthFactor})`;
-					ctx.lineWidth = 0.5;
-					ctx.beginPath();
-					ctx.moveTo(sunPos.x, sunPos.y);
-					ctx.lineTo(pos.x, pos.y);
-					ctx.stroke();
-				}
+        if (pos.scale > 0 && sunPos.scale > 0) {
+          ctx.strokeStyle = `rgba(100, 100, 150, ${0.2 * depthFactor})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(sunPos.x, sunPos.y);
+          ctx.lineTo(pos.x, pos.y);
+          ctx.stroke();
+        }
 
-				if (pos.scale > 0 && showTrailsCheckbox.checked) {
-					trails[index].push({ x: pos.x, y: pos.y });
+        if (pos.scale > 0 && showTrailsCheckbox.checked) {
+          trails[index].push({ x: pos.x, y: pos.y });
 
-					if (trails[index].length > maxTrailLength) {
-						trails[index].shift();
-					}
+          if (trails[index].length > maxTrailLength) {
+            trails[index].shift();
+          }
 
-					if (trails[index].length > 1) {
-						ctx.strokeStyle = planet.color;
-						ctx.lineWidth = 1;
-						ctx.globalAlpha = 0.3 * depthFactor;
-						ctx.beginPath();
+          if (trails[index].length > 1) {
+            ctx.strokeStyle = planet.color;
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.3 * depthFactor;
+            ctx.beginPath();
 
-						for (let i = 0; i < trails[index].length; i++) {
-							const trailPos = trails[index][i];
-							if (i === 0) {
-								ctx.moveTo(trailPos.x, trailPos.y);
-							} else {
-								ctx.lineTo(trailPos.x, trailPos.y);
-							}
-						}
+            for (let i = 0; i < trails[index].length; i++) {
+              const trailPos = trails[index][i];
+              if (i === 0) {
+                ctx.moveTo(trailPos.x, trailPos.y);
+              } else {
+                ctx.lineTo(trailPos.x, trailPos.y);
+              }
+            }
 
-						ctx.stroke();
-						ctx.globalAlpha = 1;
-					}
-				}
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
+        }
 
-				if (pos.scale > 0) {
-					ctx.globalAlpha = depthFactor;
-					ctx.fillStyle = planet.color;
-					ctx.beginPath();
-					ctx.arc(pos.x, pos.y, planet.size * pos.scale, 0, Math.PI * 2);
-					ctx.fill();
+        if (pos.scale > 0) {
+          ctx.globalAlpha = depthFactor;
+          ctx.fillStyle = planet.color;
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, planet.size * pos.scale, 0, Math.PI * 2);
+          ctx.fill();
 
-					ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-					ctx.beginPath();
-					ctx.arc(
-						pos.x - planet.size * pos.scale * 0.3,
-						pos.y - planet.size * pos.scale * 0.3,
-						planet.size * pos.scale * 0.3,
-						0,
-						Math.PI * 2
-					);
-					ctx.fill();
-					ctx.globalAlpha = 1;
-				}
-			}
+          ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+          ctx.beginPath();
+          ctx.arc(
+            pos.x - planet.size * pos.scale * 0.3,
+            pos.y - planet.size * pos.scale * 0.3,
+            planet.size * pos.scale * 0.3,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      }
 
-			function drawOrbitalPlane(sunX, sunY, sunZ) {
-				if (!showOrbitsCheckbox.checked) return;
+      function drawOrbitalPlane(sunX, sunY, sunZ) {
+        if (!showOrbitsCheckbox.checked) return;
 
-				ctx.strokeStyle = "rgba(100, 100, 150, 0.3)";
-				ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgba(100, 100, 150, 0.3)";
+        ctx.lineWidth = 1;
 
-				planets.forEach((planet) => {
-					ctx.beginPath();
-					const segments = 64;
+        planets.forEach((planet) => {
+          ctx.beginPath();
+          const segments = 64;
 
-					for (let i = 0; i <= segments; i++) {
-						const angle = (i / segments) * Math.PI * 2;
-						const x = Math.cos(angle) * planet.distance + sunX;
-						const y = Math.sin(angle) * planet.distance + sunY;
-						const pos = project3D(x, y, sunZ);
+          for (let i = 0; i <= segments; i++) {
+            const angle = (i / segments) * Math.PI * 2;
+            const x = Math.cos(angle) * planet.distance + sunX;
+            const y = Math.sin(angle) * planet.distance + sunY;
+            const pos = project3D(x, y, sunZ);
 
-						if (i === 0) {
-							ctx.moveTo(pos.x, pos.y);
-						} else {
-							ctx.lineTo(pos.x, pos.y);
-						}
-					}
+            if (i === 0) {
+              ctx.moveTo(pos.x, pos.y);
+            } else {
+              ctx.lineTo(pos.x, pos.y);
+            }
+          }
 
-					ctx.stroke();
-				});
-			}
+          ctx.stroke();
+        });
+      }
 
-			let spiralAngle = 0;
+      let spiralAngle = 0;
 
-			function animate() {
-				const speed = parseFloat(speedSlider.value);
+      function animate() {
+        const speed = parseFloat(speedSlider.value);
 
-				spiralAngle += spiralSpeed * speed;
-				const sunX = Math.cos(spiralAngle) * spiralRadius;
-				const sunY = Math.sin(spiralAngle) * spiralRadius;
+        spiralAngle += spiralSpeed * speed;
+        const sunX = Math.cos(spiralAngle) * spiralRadius;
+        const sunY = Math.sin(spiralAngle) * spiralRadius;
 
-				ctx.fillStyle = "#000";
-				ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-				drawStars(speed);
-				drawOrbitalPlane(sunX, sunY, sunZ);
-				drawSun(sunX, sunY, sunZ);
+        drawStars(speed);
+        drawOrbitalPlane(sunX, sunY, sunZ);
+        drawSun(sunX, sunY, sunZ);
 
-				planets.forEach((planet, index) => {
-					planet.angle += planet.speed * speed;
-					drawPlanet(planet, index, sunX, sunY, sunZ);
-				});
+        planets.forEach((planet, index) => {
+          planet.angle += planet.speed * speed;
+          drawPlanet(planet, index, sunX, sunY, sunZ);
+        });
 
-				requestAnimationFrame(animate);
-			}
+        requestAnimationFrame(animate);
+      }
 
-			animate();
-		</script>
-		<script src="./assets/js/script.js"></script>
-	</body>
+      animate();
+    </script>
+    <script src="./assets/js/script.js"></script>
+  </body>
 </html>

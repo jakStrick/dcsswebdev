@@ -1,553 +1,538 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/x-icon" href="favicon.ico" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/nav-styles.css" />
-		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/nav-styles.css" />
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
 
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/font-color-styles.css" />
-		<title>Claude Code | Terminal-Native AI Coding</title>
-		<style>
-			* {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-			}
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/font-color-styles.css"
+    />
+    <title>Claude Code | Terminal-Native AI Coding</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-			body {
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-					sans-serif;
-				background: #0a0a0a;
-				color: #e0e0e0;
-				overflow-x: hidden;
-			}
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0a0a0a;
+        color: #e0e0e0;
+        overflow-x: hidden;
+      }
 
-			.hero {
-				min-height: 50vh;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				text-align: center;
-				padding: 2rem;
-				top: 8rem;
-				background: radial-gradient(
-					ellipse at top,
-					#1a1a2e 0%,
-					#0a0a0a 50%
-				);
-				position: relative;
-			}
+      .hero {
+        min-height: 50vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 2rem;
+        top: 8rem;
+        background: radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0a 50%);
+        position: relative;
+      }
 
-			.hero::before {
-				content: "";
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				background: linear-gradient(
-						90deg,
-						transparent 0%,
-						rgba(204, 138, 73, 0.1) 50%,
-						transparent 100%
-					),
-					linear-gradient(
-						0deg,
-						transparent 0%,
-						rgba(204, 138, 73, 0.05) 50%,
-						transparent 100%
-					);
-				animation: gridMove 20s linear infinite;
-				opacity: 0.3;
-			}
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(204, 138, 73, 0.1) 50%,
+            transparent 100%
+          ),
+          linear-gradient(
+            0deg,
+            transparent 0%,
+            rgba(204, 138, 73, 0.05) 50%,
+            transparent 100%
+          );
+        animation: gridMove 20s linear infinite;
+        opacity: 0.3;
+      }
 
-			@keyframes gridMove {
-				0% {
-					transform: translate(0, 0);
-				}
-				100% {
-					transform: translate(50px, 50px);
-				}
-			}
+      @keyframes gridMove {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(50px, 50px);
+        }
+      }
 
-			.badge {
-				display: inline-block;
-				padding: 0.5rem 1rem;
-				background: rgba(204, 138, 73, 0.1);
-				border: 1px solid rgba(204, 138, 73, 0.3);
-				border-radius: 20px;
-				color: #cc8a49;
-				font-size: 0.9rem;
-				margin-bottom: 2rem;
-				z-index: 1;
-			}
+      .badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: rgba(204, 138, 73, 0.1);
+        border: 1px solid rgba(204, 138, 73, 0.3);
+        border-radius: 20px;
+        color: #cc8a49;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+        z-index: 1;
+      }
 
-			h1 {
-				font-size: 4rem;
-				font-weight: 700;
-				line-height: 1.2;
-				margin-bottom: 1.5rem;
-				background: linear-gradient(135deg, #ffffff 0%, #cc8a49 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
-				z-index: 1;
-			}
+      h1 {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #ffffff 0%, #cc8a49 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        z-index: 1;
+      }
 
-			.subtitle {
-				font-size: 1.5rem;
-				color: #999;
-				max-width: 700px;
-				margin: 0 auto 3rem;
-				z-index: 1;
-			}
+      .subtitle {
+        font-size: 1.5rem;
+        color: #999;
+        max-width: 700px;
+        margin: 0 auto 3rem;
+        z-index: 1;
+      }
 
-			.cta-button {
-				display: inline-block;
-				padding: 1rem 2.5rem;
-				background: linear-gradient(135deg, #cc8a49 0%, #b87742 100%);
-				color: white;
-				text-decoration: none;
-				border-radius: 8px;
-				font-weight: 600;
-				font-size: 1.1rem;
-				transition: all 0.3s ease;
-				box-shadow: 0 10px 30px rgba(204, 138, 73, 0.3);
-				z-index: 1;
-			}
+      .cta-button {
+        display: inline-block;
+        padding: 1rem 2.5rem;
+        background: linear-gradient(135deg, #cc8a49 0%, #b87742 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(204, 138, 73, 0.3);
+        z-index: 1;
+      }
 
-			.cta-button:hover {
-				transform: translateY(-2px);
-				box-shadow: 0 15px 40px rgba(204, 138, 73, 0.4);
-			}
+      .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(204, 138, 73, 0.4);
+      }
 
-			.terminal-demo {
-				max-width: 900px;
-				margin: 4rem auto;
-				background: #1a1a1a;
-				border-radius: 12px;
-				overflow: hidden;
-				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-				z-index: 1;
-			}
+      .terminal-demo {
+        max-width: 900px;
+        margin: 4rem auto;
+        background: #1a1a1a;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        z-index: 1;
+      }
 
-			.terminal-header {
-				background: #2a2a2a;
-				padding: 0.8rem 1rem;
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-			}
+      .terminal-header {
+        background: #2a2a2a;
+        padding: 0.8rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
 
-			.terminal-dot {
-				width: 12px;
-				height: 12px;
-				border-radius: 50%;
-				background: #ff5f56;
-			}
+      .terminal-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #ff5f56;
+      }
 
-			.terminal-dot:nth-child(2) {
-				background: #ffbd2e;
-			}
-			.terminal-dot:nth-child(3) {
-				background: #27c93f;
-			}
+      .terminal-dot:nth-child(2) {
+        background: #ffbd2e;
+      }
+      .terminal-dot:nth-child(3) {
+        background: #27c93f;
+      }
 
-			.terminal-body {
-				padding: 0rem;
-				font-family: "Monaco", "Courier New", monospace;
-				font-size: 0.9rem;
-				line-height: 1.6;
-			}
+      .terminal-body {
+        padding: 0rem;
+        font-family: "Monaco", "Courier New", monospace;
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
 
-			.terminal-line {
-				opacity: 0;
-				animation: fadeIn 0.5s ease forwards;
-			}
+      .terminal-line {
+        opacity: 0;
+        animation: fadeIn 0.5s ease forwards;
+      }
 
-			.terminal-line:nth-child(1) {
-				animation-delay: 0.5s;
-			}
-			.terminal-line:nth-child(2) {
-				animation-delay: 1s;
-			}
-			.terminal-line:nth-child(3) {
-				animation-delay: 1.5s;
-			}
-			.terminal-line:nth-child(4) {
-				animation-delay: 2s;
-			}
-			.terminal-line:nth-child(5) {
-				animation-delay: 2.5s;
-			}
+      .terminal-line:nth-child(1) {
+        animation-delay: 0.5s;
+      }
+      .terminal-line:nth-child(2) {
+        animation-delay: 1s;
+      }
+      .terminal-line:nth-child(3) {
+        animation-delay: 1.5s;
+      }
+      .terminal-line:nth-child(4) {
+        animation-delay: 2s;
+      }
+      .terminal-line:nth-child(5) {
+        animation-delay: 2.5s;
+      }
 
-			@keyframes fadeIn {
-				to {
-					opacity: 1;
-				}
-			}
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
 
-			.prompt {
-				color: #cc8a49;
-			}
-			.command {
-				color: #4ec9b0;
-			}
-			.output {
-				color: #9cdcfe;
-			}
-			.comment {
-				color: #6a9955;
-			}
+      .prompt {
+        color: #cc8a49;
+      }
+      .command {
+        color: #4ec9b0;
+      }
+      .output {
+        color: #9cdcfe;
+      }
+      .comment {
+        color: #6a9955;
+      }
 
-			.features {
-				padding: 1rem 1rem;
-				max-width: 1200px;
-				margin: 0 auto;
-			}
+      .features {
+        padding: 1rem 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
 
-			.features-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-				gap: 3rem;
-				margin-top: 1rem;
-				padding-bottom: 10rem;
-			}
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 3rem;
+        margin-top: 1rem;
+        padding-bottom: 10rem;
+      }
 
-			.feature-card {
-				background: linear-gradient(
-					135deg,
-					rgba(26, 26, 46, 0.5) 0%,
-					rgba(10, 10, 10, 0.5) 100%
-				);
-				padding: 2.5rem;
-				border-radius: 16px;
-				border: 1px solid rgba(204, 138, 73, 0.1);
-				transition: all 0.3s ease;
-			}
+      .feature-card {
+        background: linear-gradient(
+          135deg,
+          rgba(26, 26, 46, 0.5) 0%,
+          rgba(10, 10, 10, 0.5) 100%
+        );
+        padding: 2.5rem;
+        border-radius: 16px;
+        border: 1px solid rgba(204, 138, 73, 0.1);
+        transition: all 0.3s ease;
+      }
 
-			.feature-card:hover {
-				transform: translateY(-5px);
-				border-color: rgba(204, 138, 73, 0.3);
-				box-shadow: 0 20px 40px rgba(204, 138, 73, 0.1);
-			}
+      .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(204, 138, 73, 0.3);
+        box-shadow: 0 20px 40px rgba(204, 138, 73, 0.1);
+      }
 
-			.feature-icon {
-				width: 60px;
-				height: 60px;
-				background: rgba(204, 138, 73, 0.1);
-				border-radius: 12px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				margin-bottom: 1.5rem;
-				font-size: 2rem;
-			}
+      .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(204, 138, 73, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+      }
 
-			.feature-card h3 {
-				font-size: 1.5rem;
-				margin-bottom: 1rem;
-				color: #fff;
-			}
+      .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: #fff;
+      }
 
-			.feature-card p {
-				color: #999;
-				line-height: 1.6;
-			}
+      .feature-card p {
+        color: #999;
+        line-height: 1.6;
+      }
 
-			.section-title {
-				font-size: 3rem;
-				text-align: center;
-				margin-bottom: 1rem;
-				background: linear-gradient(135deg, #ffffff 0%, #cc8a49 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
-				margin-bottom: 2rem;
-			}
+      .section-title {
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #ffffff 0%, #cc8a49 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 2rem;
+      }
 
-			.section-subtitle {
-				text-align: center;
-				color: #999;
-				font-size: 1.2rem;
-				max-width: 600px;
-				margin: 0 auto;
-			}
+      .section-subtitle {
+        text-align: center;
+        color: #999;
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto;
+      }
 
-			.testimonial-card {
-				max-width: 900px;
-				margin: 4rem auto 6rem;
-				background: linear-gradient(
-					135deg,
-					rgba(26, 26, 46, 0.6) 0%,
-					rgba(10, 10, 10, 0.6) 100%
-				);
-				padding: 3rem;
-				border-radius: 20px;
-				border: 1px solid rgba(204, 138, 73, 0.2);
-				position: relative;
-				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-			}
+      .testimonial-card {
+        max-width: 900px;
+        margin: 4rem auto 6rem;
+        background: linear-gradient(
+          135deg,
+          rgba(26, 26, 46, 0.6) 0%,
+          rgba(10, 10, 10, 0.6) 100%
+        );
+        padding: 3rem;
+        border-radius: 20px;
+        border: 1px solid rgba(204, 138, 73, 0.2);
+        position: relative;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
 
-			.testimonial-card::before {
-				content: "";
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				background: linear-gradient(
-					135deg,
-					rgba(204, 138, 73, 0.05) 0%,
-					transparent 50%
-				);
-				border-radius: 20px;
-				pointer-events: none;
-			}
+      .testimonial-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(204, 138, 73, 0.05) 0%,
+          transparent 50%
+        );
+        border-radius: 20px;
+        pointer-events: none;
+      }
 
-			.testimonial-content {
-				position: relative;
-				z-index: 1;
-			}
+      .testimonial-content {
+        position: relative;
+        z-index: 1;
+      }
 
-			.quote-icon {
-				font-size: 4rem;
-				color: rgba(204, 138, 73, 0.3);
-				line-height: 0.5;
-				margin-bottom: 1rem;
-			}
+      .quote-icon {
+        font-size: 4rem;
+        color: rgba(204, 138, 73, 0.3);
+        line-height: 0.5;
+        margin-bottom: 1rem;
+      }
 
-			.testimonial-text {
-				font-size: 1.15rem;
-				line-height: 1.8;
-				color: #d0d0d0;
-				margin-bottom: 2rem;
-			}
+      .testimonial-text {
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: #d0d0d0;
+        margin-bottom: 2rem;
+      }
 
-			.testimonial-text a {
-				color: #cc8a49;
-				text-decoration: none;
-				border-bottom: 1px solid rgba(204, 138, 73, 0.3);
-				transition: all 0.3s ease;
-			}
+      .testimonial-text a {
+        color: #cc8a49;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(204, 138, 73, 0.3);
+        transition: all 0.3s ease;
+      }
 
-			.testimonial-text a:hover {
-				color: #e09d5f;
-				border-bottom-color: #cc8a49;
-			}
+      .testimonial-text a:hover {
+        color: #e09d5f;
+        border-bottom-color: #cc8a49;
+      }
 
-			.testimonial-author {
-				display: flex;
-				align-items: center;
-				gap: 1rem;
-				padding-top: 2rem;
-				border-top: 1px solid rgba(204, 138, 73, 0.1);
-			}
+      .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(204, 138, 73, 0.1);
+      }
 
-			.author-info {
-				flex: 1;
-			}
+      .author-info {
+        flex: 1;
+      }
 
-			.author-name {
-				font-weight: 600;
-				color: #fff;
-				font-size: 1.1rem;
-				margin-bottom: 0.3rem;
-			}
+      .author-name {
+        font-weight: 600;
+        color: #fff;
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
+      }
 
-			.author-title {
-				color: #999;
-				font-size: 0.95rem;
-			}
+      .author-title {
+        color: #999;
+        font-size: 0.95rem;
+      }
 
-			@media (max-width: 768px) {
-				h1 {
-					font-size: 2.5rem;
-				}
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2.5rem;
+        }
 
-				.subtitle {
-					font-size: 1.2rem;
-				}
+        .subtitle {
+          font-size: 1.2rem;
+        }
 
-				.terminal-demo {
-					margin: 2rem 1rem;
-				}
+        .terminal-demo {
+          margin: 2rem 1rem;
+        }
 
-				.testimonial-card {
-					margin: 2rem 1rem 3rem;
-					padding: 2rem 1.5rem;
-				}
+        .testimonial-card {
+          margin: 2rem 1rem 3rem;
+          padding: 2rem 1.5rem;
+        }
 
-				.testimonial-text {
-					font-size: 1rem;
-				}
+        .testimonial-text {
+          font-size: 1rem;
+        }
 
-				.features {
-					padding: 4rem 1rem;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<div id="navbar-placeholder"></div>
-		<section class="hero">
-			<div class="badge">Built for developers</div>
-			<h1>Deep coding at<br />terminal velocity</h1>
-			<p class="subtitle">
-				Unleash Claude's raw power directly in your terminal. Turn
-				hours-long workflows into a single command.
-			</p>
-			<a href="#" class="cta-button">Get Started</a>
+        .features {
+          padding: 4rem 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
+    <section class="hero">
+      <div class="badge">Built for developers</div>
+      <h1>Deep coding at<br />terminal velocity</h1>
+      <p class="subtitle">
+        Unleash Claude's raw power directly in your terminal. Turn hours-long
+        workflows into a single command.
+      </p>
+      <a href="#" class="cta-button">Get Started</a>
 
-			<div class="terminal-demo">
-				<div class="terminal-header">
-					<div class="terminal-dot"></div>
-					<div class="terminal-dot"></div>
-					<div class="terminal-dot"></div>
-				</div>
-				<div class="terminal-body">
-					<div class="terminal-line">
-						<span class="prompt">$</span>
-						<span class="command">claude</span>
-						<span class="output"
-							>"Refactor the auth module to use OAuth2"</span
-						>
-					</div>
-					<div class="terminal-line">
-						<span class="comment">// Analyzing codebase...</span>
-					</div>
-					<div class="terminal-line">
-						<span class="output">✓ Found 12 files in auth module</span>
-					</div>
-					<div class="terminal-line">
-						<span class="output">✓ Creating OAuth2 implementation</span>
-					</div>
-					<div class="terminal-line">
-						<span class="output">✓ Tests passing • Ready to commit</span>
-					</div>
-				</div>
-			</div>
-		</section>
+      <div class="terminal-demo">
+        <div class="terminal-header">
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line">
+            <span class="prompt">$</span>
+            <span class="command">claude</span>
+            <span class="output">"Refactor the auth module to use OAuth2"</span>
+          </div>
+          <div class="terminal-line">
+            <span class="comment">// Analyzing codebase...</span>
+          </div>
+          <div class="terminal-line">
+            <span class="output">✓ Found 12 files in auth module</span>
+          </div>
+          <div class="terminal-line">
+            <span class="output">✓ Creating OAuth2 implementation</span>
+          </div>
+          <div class="terminal-line">
+            <span class="output">✓ Tests passing • Ready to commit</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-		<section class="features">
-			<h2 class="section-title">Real-world impact</h2>
-			<p class="section-subtitle">
-				Developers are transforming their workflows with Claude AI
-			</p>
+    <section class="features">
+      <h2 class="section-title">Real-world impact</h2>
+      <p class="section-subtitle">
+        Developers are transforming their workflows with Claude AI
+      </p>
 
-			<div class="testimonial-card">
-				<div class="testimonial-content">
-					<div class="quote-icon">"</div>
-					<p class="testimonial-text">
-						Integrating Claude AI into my development strategy has
-						fundamentally changed how I build. What used to take weeks now
-						takes days. I've cut development costs dramatically while
-						maintaining—and often exceeding—quality standards.
-						<br /><br />
-						My website,
-						<a
-							href="https://dcsswebdev.com"
-							target="_blank"
-							rel="noopener"
-							>dcsswebdev.com</a
-						>, is a testament to this approach. The games and interactive
-						artifacts showcased there were developed by Claude AI, with my
-						guidance and modifications when necessary. This partnership
-						between human creativity and AI capability has allowed me to
-						deliver sophisticated solutions faster than I ever could
-						alone. <br /><br />
-						Claude doesn't just write code—it becomes a thought partner
-						that understands context, suggests optimizations, and helps me
-						iterate rapidly. It's become an indispensable part of my
-						development toolkit.
-					</p>
-					<div class="testimonial-author">
-						<div class="author-info">
-							<div class="author-name">DCSS Web Developer</div>
-							<div class="author-title">
-								Full-Stack Developer • dcsswebdev.com
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
+      <div class="testimonial-card">
+        <div class="testimonial-content">
+          <div class="quote-icon">"</div>
+          <p class="testimonial-text">
+            Integrating Claude AI into my development strategy has fundamentally
+            changed how I build. What used to take weeks now takes days. I've
+            cut development costs dramatically while maintaining—and often
+            exceeding—quality standards.
+            <br /><br />
+            My website,
+            <a href="https://dcsswebdev.com" target="_blank" rel="noopener"
+              >dcsswebdev.com</a
+            >, is a testament to this approach. The games and interactive
+            artifacts showcased there were developed by Claude AI, with my
+            guidance and modifications when necessary. This partnership between
+            human creativity and AI capability has allowed me to deliver
+            sophisticated solutions faster than I ever could alone. <br /><br />
+            Claude doesn't just write code—it becomes a thought partner that
+            understands context, suggests optimizations, and helps me iterate
+            rapidly. It's become an indispensable part of my development
+            toolkit.
+          </p>
+          <div class="testimonial-author">
+            <div class="author-info">
+              <div class="author-name">DCSS Web Developer</div>
+              <div class="author-title">
+                Full-Stack Developer • dcsswebdev.com
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-		<section class="features">
-			<h2 class="section-title">Powerful intelligence</h2>
-			<p class="section-subtitle">
-				Claude Code brings Sonnet 4.5 right to your terminal with agentic
-				capabilities
-			</p>
+    <section class="features">
+      <h2 class="section-title">Powerful intelligence</h2>
+      <p class="section-subtitle">
+        Claude Code brings Sonnet 4.5 right to your terminal with agentic
+        capabilities
+      </p>
 
-			<div class="features-grid">
-				<div class="feature-card">
-					<div class="feature-icon">🧠</div>
-					<h3>Understands entire codebases</h3>
-					<p>
-						Uses agentic search to understand your entire codebase without
-						manual context selection. Makes coordinated changes across
-						multiple files.
-					</p>
-				</div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3>Understands entire codebases</h3>
+          <p>
+            Uses agentic search to understand your entire codebase without
+            manual context selection. Makes coordinated changes across multiple
+            files.
+          </p>
+        </div>
 
-				<div class="feature-card">
-					<div class="feature-icon">⚡</div>
-					<h3>Works where you work</h3>
-					<p>
-						Lives right inside your terminal—no context switching.
-						Integrates with VS Code, JetBrains IDEs, and your existing
-						build systems.
-					</p>
-				</div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Works where you work</h3>
+          <p>
+            Lives right inside your terminal—no context switching. Integrates
+            with VS Code, JetBrains IDEs, and your existing build systems.
+          </p>
+        </div>
 
-				<div class="feature-card">
-					<div class="feature-icon">🛡️</div>
-					<h3>You're in control</h3>
-					<p>
-						Never modifies your files without explicit approval. Adapts to
-						your coding standards and patterns. Fully configurable to your
-						workflow.
-					</p>
-				</div>
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>You're in control</h3>
+          <p>
+            Never modifies your files without explicit approval. Adapts to your
+            coding standards and patterns. Fully configurable to your workflow.
+          </p>
+        </div>
 
-				<div class="feature-card">
-					<div class="feature-icon">🔧</div>
-					<h3>Code onboarding</h3>
-					<p>
-						Maps and explains entire codebases in seconds. Understands
-						project structure and dependencies automatically.
-					</p>
-				</div>
+        <div class="feature-card">
+          <div class="feature-icon">🔧</div>
+          <h3>Code onboarding</h3>
+          <p>
+            Maps and explains entire codebases in seconds. Understands project
+            structure and dependencies automatically.
+          </p>
+        </div>
 
-				<div class="feature-card">
-					<div class="feature-icon">🚀</div>
-					<h3>Turn issues into PRs</h3>
-					<p>
-						Integrates with GitHub, GitLab, and your command line tools to
-						handle the entire workflow—from issues to tested PRs.
-					</p>
-				</div>
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3>Turn issues into PRs</h3>
+          <p>
+            Integrates with GitHub, GitLab, and your command line tools to
+            handle the entire workflow—from issues to tested PRs.
+          </p>
+        </div>
 
-				<div class="feature-card">
-					<div class="feature-icon">✨</div>
-					<h3>Make powerful edits</h3>
-					<p>
-						Deep understanding of your codebase enables powerful,
-						multi-file edits that actually work the first time.
-					</p>
-				</div>
-			</div>
-		</section>
-		<script src="./assets/js/script.js"></script>
-	</body>
+        <div class="feature-card">
+          <div class="feature-icon">✨</div>
+          <h3>Make powerful edits</h3>
+          <p>
+            Deep understanding of your codebase enables powerful, multi-file
+            edits that actually work the first time.
+          </p>
+        </div>
+      </div>
+    </section>
+    <script src="./assets/js/script.js"></script>
+  </body>
 </html>

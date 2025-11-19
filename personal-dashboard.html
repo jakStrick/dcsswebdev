@@ -1,787 +1,790 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/x-icon" href="favicon.ico?v=1" />
-
-		<!-- Authentication Check - Must run BEFORE page renders -->
-		<script>
-			(function () {
-				const authToken = localStorage.getItem("authToken");
-				if (!authToken) {
-					// No token at all - redirect immediately
-					window.location.replace("personal.html");
-					return;
-				}
-				// Token exists - will be verified after page loads
-			})();
-		</script>
-
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/glassmorphism-styles.css" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/nav-styles.css" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/font-color-styles.css" />
-		<link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="./assets/css/dashboard-styles.css" />
-		<title>Personal Dashboard - DCSS Web Dev</title>
-		<style>
-			/* Sidebar Widget Styles */
-			.sidebar-widget {
-				width: 280px;
-				background: rgba(255, 255, 255, 0.95);
-				backdrop-filter: blur(10px);
-				border-radius: 1rem;
-				padding: 1.5rem;
-				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-				border: 1px solid rgba(255, 255, 255, 0.3);
-				height: fit-content;
-				position: sticky;
-				top: 20px;
-			}
-
-			.widget-header {
-				margin-bottom: 1rem;
-				padding-bottom: 0.75rem;
-				border-bottom: 2px solid #667eea;
-			}
-
-			.widget-header h3 {
-				margin: 0;
-				font-size: 1.25rem;
-				color: #2d3748;
-			}
-
-			.widget-content {
-				position: relative;
-			}
-
-			.pages-dropdown {
-				position: relative;
-			}
-
-			.dropdown-toggle {
-				width: 100%;
-				padding: 0.875rem 1rem;
-				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-				color: white;
-				border: none;
-				border-radius: 0.5rem;
-				font-size: 1rem;
-				font-weight: 600;
-				cursor: pointer;
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				transition: all 0.3s ease;
-			}
-
-			.dropdown-toggle:hover {
-				transform: translateY(-2px);
-				box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-			}
-
-			.dropdown-arrow {
-				transition: transform 0.3s ease;
-				font-size: 0.75rem;
-			}
-
-			.dropdown-toggle.active .dropdown-arrow {
-				transform: rotate(180deg);
-			}
-
-			.dropdown-menu {
-				position: absolute;
-				top: calc(100% + 0.5rem);
-				left: 0;
-				right: 0;
-				background: white;
-				border-radius: 0.5rem;
-				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-				overflow: hidden;
-				max-height: 0;
-				opacity: 0;
-				visibility: hidden;
-				transition: all 0.3s ease;
-				z-index: 1000;
-			}
-
-			.dropdown-menu.show {
-				max-height: 400px;
-				opacity: 1;
-				visibility: visible;
-			}
-
-			.dropdown-item {
-				display: flex;
-				align-items: center;
-				gap: 0.75rem;
-				padding: 0.875rem 1rem;
-				color: #2d3748;
-				text-decoration: none;
-				transition: all 0.2s ease;
-				border-bottom: 1px solid #e2e8f0;
-			}
-
-			.dropdown-item:last-child {
-				border-bottom: none;
-			}
-
-			.dropdown-item:hover {
-				background: linear-gradient(
-					135deg,
-					rgba(102, 126, 234, 0.1) 0%,
-					rgba(118, 75, 162, 0.1) 100%
-				);
-				padding-left: 1.25rem;
-			}
-
-			.item-icon {
-				font-size: 1.25rem;
-			}
-
-			/* Responsive Media Queries */
-			@media (max-width: 1024px) {
-				.dashboard-container {
-					padding: 1rem;
-				}
-
-				.sidebar-widget {
-					width: 250px;
-				}
-			}
-
-			@media (max-width: 900px) {
-				.dashboard-container {
-					padding: 0.5rem;
-				}
-
-				.dashboard-header {
-					flex-direction: column;
-					gap: 1rem;
-					align-items: flex-start;
-				}
-
-				.dashboard-header .header-actions {
-					margin-top: 1rem;
-					width: 100%;
-					display: flex;
-					gap: 1rem;
-					justify-content: flex-start;
-				}
-
-				.dashboard-header .welcome-section {
-					width: 100%;
-				}
-
-				.dashboard-container > div[style*="display: flex"] {
-					flex-direction: column !important;
-					gap: 1rem !important;
-				}
-
-				.sidebar-widget {
-					width: 100%;
-					position: static;
-					margin-top: 1.5rem;
-					top: unset;
-				}
-
-				.dashboard-grid {
-					grid-template-columns: repeat(
-						auto-fit,
-						minmax(200px, 1fr)
-					) !important;
-				}
-			}
-
-			@media (max-width: 768px) {
-				.dashboard-header h1 {
-					font-size: 1.5rem;
-				}
-
-				.stat-card {
-					padding: 1rem;
-				}
-
-				.stat-value {
-					font-size: 2rem;
-				}
-
-				.modal-content {
-					width: 95%;
-					max-width: 95%;
-					margin: 1rem;
-					padding: 1rem;
-				}
-
-				.modal-header h2 {
-					font-size: 1.25rem;
-				}
-
-				.progress-container {
-					width: 90%;
-					padding: 1.5rem;
-				}
-			}
-
-			@media (max-width: 600px) {
-				.dashboard-header h1 {
-					font-size: 1.25rem;
-				}
-
-				.dashboard-header p,
-				.dashboard-header .header-actions button {
-					font-size: 0.9rem;
-				}
-
-				.dashboard-header .header-actions {
-					flex-direction: column;
-					gap: 0.5rem;
-				}
-
-				.dashboard-header .header-actions button {
-					width: 100%;
-				}
-
-				.dashboard-grid {
-					grid-template-columns: 1fr !important;
-					gap: 1rem !important;
-				}
-
-				.stat-card {
-					min-width: 0;
-					width: 100%;
-				}
-
-				.stat-value {
-					font-size: 1.75rem;
-				}
-
-				.data-section h2 {
-					font-size: 1.25rem;
-				}
-
-				.drop-zone {
-					width: 100%;
-					min-width: 0;
-					box-sizing: border-box;
-					padding: 1.5rem 1rem;
-				}
-
-				.drop-zone-icon {
-					font-size: 2rem;
-				}
-
-				.drop-zone-text {
-					font-size: 1rem;
-				}
-
-				.drop-zone-hint {
-					font-size: 0.85rem;
-				}
-
-				.add-item-form {
-					width: 100%;
-					min-width: 0;
-					box-sizing: border-box;
-					padding: 1rem;
-				}
-
-				.add-item-form h3 {
-					font-size: 1.1rem;
-				}
-
-				.form-row {
-					flex-direction: column;
-				}
-
-				.form-field {
-					width: 100%;
-				}
-
-				.form-actions {
-					flex-direction: column;
-					gap: 0.5rem;
-				}
-
-				.form-actions button {
-					width: 100%;
-				}
-
-				.data-table {
-					font-size: 0.85rem;
-				}
-
-				.data-table,
-				.data-table thead,
-				.data-table tbody,
-				.data-table th,
-				.data-table td {
-					display: block;
-					width: 100%;
-					box-sizing: border-box;
-				}
-
-				.data-table thead {
-					display: none;
-				}
-
-				.data-table tr {
-					margin-bottom: 1rem;
-					border: 1px solid #e2e8f0;
-					border-radius: 0.5rem;
-					padding: 0.75rem;
-					background: white;
-				}
-
-				.data-table td {
-					padding: 0.5rem 0;
-					border-bottom: none;
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-				}
-
-				.data-table td:before {
-					content: attr(data-label);
-					font-weight: 600;
-					color: #4a5568;
-					margin-right: 1rem;
-				}
-
-				.data-table td:last-child {
-					justify-content: flex-end;
-					gap: 0.5rem;
-				}
-
-				.action-btn {
-					padding: 0.4rem 0.6rem;
-					font-size: 1rem;
-				}
-
-				.modal-content {
-					width: 95%;
-					max-width: 95%;
-					margin: 0.5rem;
-					padding: 0.75rem;
-					max-height: 90vh;
-					overflow-y: auto;
-				}
-
-				.modal-header {
-					padding: 0.75rem;
-					margin: -0.75rem -0.75rem 0.75rem;
-				}
-
-				.modal-header h2 {
-					font-size: 1.1rem;
-				}
-
-				.modal-field {
-					margin-bottom: 1rem;
-				}
-
-				.modal-field label {
-					font-size: 0.9rem;
-				}
-
-				.modal-field-content {
-					font-size: 0.85rem;
-				}
-
-				.progress-container {
-					width: 90%;
-					padding: 1rem;
-				}
-
-				.progress-icon {
-					font-size: 2rem;
-				}
-
-				.progress-title {
-					font-size: 1.1rem;
-				}
-
-				.progress-filename {
-					font-size: 0.85rem;
-				}
-
-				.sidebar-widget {
-					padding: 1rem;
-				}
-
-				.widget-header h3 {
-					font-size: 1.1rem;
-				}
-
-				.dropdown-toggle {
-					padding: 0.75rem 1rem;
-					font-size: 0.9rem;
-				}
-
-				.dropdown-item {
-					padding: 0.75rem 0.875rem;
-					font-size: 0.9rem;
-				}
-
-				.item-icon {
-					font-size: 1.1rem;
-				}
-
-				.empty-state-icon {
-					font-size: 3rem;
-				}
-
-				.empty-state h3 {
-					font-size: 1.25rem;
-				}
-
-				.empty-state p {
-					font-size: 0.9rem;
-				}
-			}
-
-			@media (max-width: 400px) {
-				.dashboard-container {
-					padding: 0.25rem;
-				}
-
-				.dashboard-header h1 {
-					font-size: 1.1rem;
-				}
-
-				.stat-card {
-					padding: 0.75rem;
-				}
-
-				.stat-title {
-					font-size: 0.85rem;
-				}
-
-				.stat-value {
-					font-size: 1.5rem;
-				}
-
-				.drop-zone {
-					padding: 1rem 0.75rem;
-				}
-
-				.add-item-form {
-					padding: 0.75rem;
-				}
-
-				.modal-content {
-					width: 98%;
-					margin: 0.25rem;
-					padding: 0.5rem;
-				}
-
-				.progress-container {
-					width: 95%;
-					padding: 0.75rem;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<div id="navbar-placeholder"></div>
-
-		<!-- Progress Overlay -->
-		<div class="progress-overlay" id="progressOverlay">
-			<div class="progress-container">
-				<div class="progress-icon" id="progressIcon">📦</div>
-				<div class="progress-title" id="progressTitle">Uploading...</div>
-				<div class="progress-filename" id="progressFilename">file.zip</div>
-				<div class="progress-bar-wrapper">
-					<div class="progress-bar-fill" id="progressBarFill"></div>
-				</div>
-				<div class="progress-text" id="progressText">0%</div>
-				<div class="progress-details" id="progressDetails">
-					Preparing upload...
-				</div>
-			</div>
-		</div>
-
-		<div class="dashboard-container">
-			<div class="dashboard-header">
-				<div class="welcome-section">
-					<h1>Welcome, <span id="userName">User</span>!</h1>
-					<p>Last login: <span id="lastLogin">Loading...</span></p>
-				</div>
-				<div class="header-actions">
-					<button class="btn btn-primary" id="refreshBtn">
-						🔄 Refresh Data
-					</button>
-					<button class="btn btn-secondary" id="logoutBtn">
-						🚪 Logout
-					</button>
-				</div>
-			</div>
-
-			<!-- Main Content Wrapper with Sidebar -->
-			<div style="display: flex; gap: 1.5rem">
-				<!-- Main Content Area -->
-				<div style="flex: 1">
-					<!-- Statistics Cards -->
-					<div class="dashboard-grid">
-						<div class="stat-card">
-							<div class="stat-card-header">
-								<div class="stat-icon">📊</div>
-							</div>
-							<div class="stat-title">Total Records</div>
-							<div class="stat-value" id="totalRecords">0</div>
-						</div>
-
-						<div class="stat-card">
-							<div class="stat-card-header">
-								<div class="stat-icon">📝</div>
-							</div>
-							<div class="stat-title">Active Items</div>
-							<div class="stat-value" id="activeItems">0</div>
-						</div>
-
-						<div class="stat-card">
-							<div class="stat-card-header">
-								<div class="stat-icon">🕐</div>
-							</div>
-							<div class="stat-title">Last Updated</div>
-							<div
-								class="stat-value"
-								id="lastUpdated"
-								style="font-size: 1.5rem">
-								--
-							</div>
-						</div>
-					</div>
-
-					<!-- Data Section -->
-					<div class="data-section">
-						<h2>📋 Personal Data</h2>
-
-						<!-- Drag and Drop Zone -->
-						<div class="drop-zone" id="dropZone">
-							<div class="drop-zone-icon">📁</div>
-							<div class="drop-zone-text">
-								Drag & Drop files here or click to add data
-							</div>
-							<div class="drop-zone-hint">
-								Supports: Text files, JSON, ZIP files, images, PDFs,
-								videos, and more<br />
-								<small style="color: #999"
-									>Maximum file size: <strong>5 GB</strong> (5120
-									MB)</small
-								>
-							</div>
-						</div>
-
-						<!-- Add Item Form -->
-						<div class="add-item-form" id="addItemForm">
-							<h3 style="margin-bottom: 15px">Add New Item</h3>
-							<form id="itemForm">
-								<div class="form-row">
-									<div class="form-field">
-										<label for="itemTitle">Title *</label>
-										<input
-											type="text"
-											id="itemTitle"
-											required
-											placeholder="Enter title" />
-									</div>
-									<div class="form-field">
-										<label for="itemCategory">Category</label>
-										<select id="itemCategory">
-											<option value="">Select category</option>
-											<option value="personal">Personal</option>
-											<option value="work">Work</option>
-											<option value="project">Project</option>
-											<option value="note">Note</option>
-											<option value="other">Other</option>
-										</select>
-									</div>
-								</div>
-								<div class="form-field">
-									<label for="itemDescription">Description</label>
-									<textarea
-										id="itemDescription"
-										placeholder="Enter description"></textarea>
-								</div>
-								<div class="form-field">
-									<label for="itemContent">Content</label>
-									<textarea
-										id="itemContent"
-										placeholder="Enter content"></textarea>
-								</div>
-								<div class="form-actions">
-									<button
-										type="button"
-										class="btn btn-cancel"
-										id="cancelFormBtn">
-										Cancel
-									</button>
-									<button type="submit" class="btn btn-success">
-										Save Item
-									</button>
-								</div>
-							</form>
-						</div>
-
-						<div id="dataContent">
-							<div class="loading">
-								<div class="loading-spinner"></div>
-								<p>Loading your data...</p>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- End Main Content Area -->
-
-				<!-- Sidebar Widget -->
-				<div class="sidebar-widget">
-					<div class="widget-header">
-						<h3>🔗 My Pages</h3>
-					</div>
-					<div class="widget-content">
-						<div class="pages-dropdown">
-							<button class="dropdown-toggle" id="pagesDropdownBtn">
-								<span>Personal Web Pages</span>
-								<span class="dropdown-arrow">▼</span>
-							</button>
-							<div class="dropdown-menu" id="pagesDropdownMenu">
-								<a
-									href="7k9mPxQ2vL8nRwT4jHcY6bFzN3sAd5.html"
-									class="dropdown-item"
-									target="_blank">
-									<span class="item-icon">💰</span>
-									<span>Monthly Budget</span>
-								</a>
-
-								<a
-									href="https://dcsswebdev.com/medicine-tracker"
-									class="dropdown-item"
-									target="_blank">
-									<span class="item-icon">💊</span>
-									<span>Medication Tracker</span>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- End Main Content Wrapper -->
-		</div>
-
-		<!-- View Item Modal -->
-		<div id="viewModal" class="modal">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h2>📄 View Item</h2>
-					<button class="close-modal" onclick="closeViewModal()">×</button>
-				</div>
-				<div class="modal-body" id="modalBody">
-					<!-- Content will be inserted here -->
-				</div>
-			</div>
-		</div>
-
-		<script src="./assets/js/script.js"></script>
-		<script>
-			// Check authentication
-			const authToken = localStorage.getItem("authToken");
-			if (!authToken) {
-				window.location.href = "personal.html";
-			}
-
-			// Verify token and load user data
-			async function verifyAuth() {
-				try {
-					const response = await fetch("/api/auth/verify", {
-						headers: {
-							Authorization: `Bearer ${authToken}`,
-						},
-					});
-
-					if (!response.ok) {
-						throw new Error("Invalid session");
-					}
-
-					const data = await response.json();
-					// Handle nested user object from verify endpoint
-					const userData = data.user || data;
-					document.getElementById("userName").textContent =
-						userData.name || userData.email;
-					return userData;
-				} catch (error) {
-					console.error("Auth verification failed:", error);
-					localStorage.removeItem("authToken");
-					window.location.href = "personal.html";
-				}
-			}
-
-			// Format description for table display
-			function formatDescriptionForTable(description) {
-				if (!description) return "--";
-
-				// Try to parse as JSON (file metadata)
-				try {
-					const metadata = JSON.parse(description);
-					if (metadata.fileName) {
-						// It's file metadata - show file icon and name
-						return `📄 ${metadata.fileName}`;
-					}
-				} catch (e) {
-					// Not JSON, check if it's too long
-					if (description.length > 50) {
-						return description.substring(0, 47) + "...";
-					}
-				}
-
-				return description;
-			}
-
-			// Load dashboard data from D1
-			async function loadDashboardData() {
-				const dataContent = document.getElementById("dataContent");
-
-				try {
-					const response = await fetch("/api/data/personal", {
-						headers: {
-							Authorization: `Bearer ${authToken}`,
-						},
-					});
-
-					if (!response.ok) {
-						throw new Error("Failed to load data");
-					}
-
-					const data = await response.json();
-
-					// Update statistics
-					document.getElementById("totalRecords").textContent =
-						data.totalRecords || 0;
-					document.getElementById("activeItems").textContent =
-						data.activeItems || 0;
-					document.getElementById("lastUpdated").textContent =
-						data.lastUpdated
-							? new Date(data.lastUpdated).toLocaleTimeString()
-							: "--";
-					document.getElementById("lastLogin").textContent = new Date(
-						data.lastLogin
-					).toLocaleString();
-
-					// Display data table
-					if (data.records && data.records.length > 0) {
-						let tableHTML = `
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico?v=1" />
+
+    <!-- Authentication Check - Must run BEFORE page renders -->
+    <script>
+      (function () {
+        const authToken = localStorage.getItem("authToken");
+        if (!authToken) {
+          // No token at all - redirect immediately
+          window.location.replace("personal.html");
+          return;
+        }
+        // Token exists - will be verified after page loads
+      })();
+    </script>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/glassmorphism-styles.css"
+    />
+    <link rel="stylesheet" type="text/css" href="./assets/css/nav-styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/font-color-styles.css"
+    />
+    <link rel="stylesheet" type="text/css" href="./assets/css/styles.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/dashboard-styles.css"
+    />
+    <title>Personal Dashboard - DCSS Web Dev</title>
+    <style>
+      /* Sidebar Widget Styles */
+      .sidebar-widget {
+        width: 280px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+      }
+
+      .widget-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #667eea;
+      }
+
+      .widget-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #2d3748;
+      }
+
+      .widget-content {
+        position: relative;
+      }
+
+      .pages-dropdown {
+        position: relative;
+      }
+
+      .dropdown-toggle {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+      }
+
+      .dropdown-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .dropdown-arrow {
+        transition: transform 0.3s ease;
+        font-size: 0.75rem;
+      }
+
+      .dropdown-toggle.active .dropdown-arrow {
+        transform: rotate(180deg);
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+      }
+
+      .dropdown-menu.show {
+        max-height: 400px;
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        color: #2d3748;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .dropdown-item:last-child {
+        border-bottom: none;
+      }
+
+      .dropdown-item:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(102, 126, 234, 0.1) 0%,
+          rgba(118, 75, 162, 0.1) 100%
+        );
+        padding-left: 1.25rem;
+      }
+
+      .item-icon {
+        font-size: 1.25rem;
+      }
+
+      /* Responsive Media Queries */
+      @media (max-width: 1024px) {
+        .dashboard-container {
+          padding: 1rem;
+        }
+
+        .sidebar-widget {
+          width: 250px;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .dashboard-container {
+          padding: 0.5rem;
+        }
+
+        .dashboard-header {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: flex-start;
+        }
+
+        .dashboard-header .header-actions {
+          margin-top: 1rem;
+          width: 100%;
+          display: flex;
+          gap: 1rem;
+          justify-content: flex-start;
+        }
+
+        .dashboard-header .welcome-section {
+          width: 100%;
+        }
+
+        .dashboard-container > div[style*="display: flex"] {
+          flex-direction: column !important;
+          gap: 1rem !important;
+        }
+
+        .sidebar-widget {
+          width: 100%;
+          position: static;
+          margin-top: 1.5rem;
+          top: unset;
+        }
+
+        .dashboard-grid {
+          grid-template-columns: repeat(
+            auto-fit,
+            minmax(200px, 1fr)
+          ) !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .dashboard-header h1 {
+          font-size: 1.5rem;
+        }
+
+        .stat-card {
+          padding: 1rem;
+        }
+
+        .stat-value {
+          font-size: 2rem;
+        }
+
+        .modal-content {
+          width: 95%;
+          max-width: 95%;
+          margin: 1rem;
+          padding: 1rem;
+        }
+
+        .modal-header h2 {
+          font-size: 1.25rem;
+        }
+
+        .progress-container {
+          width: 90%;
+          padding: 1.5rem;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .dashboard-header h1 {
+          font-size: 1.25rem;
+        }
+
+        .dashboard-header p,
+        .dashboard-header .header-actions button {
+          font-size: 0.9rem;
+        }
+
+        .dashboard-header .header-actions {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .dashboard-header .header-actions button {
+          width: 100%;
+        }
+
+        .dashboard-grid {
+          grid-template-columns: 1fr !important;
+          gap: 1rem !important;
+        }
+
+        .stat-card {
+          min-width: 0;
+          width: 100%;
+        }
+
+        .stat-value {
+          font-size: 1.75rem;
+        }
+
+        .data-section h2 {
+          font-size: 1.25rem;
+        }
+
+        .drop-zone {
+          width: 100%;
+          min-width: 0;
+          box-sizing: border-box;
+          padding: 1.5rem 1rem;
+        }
+
+        .drop-zone-icon {
+          font-size: 2rem;
+        }
+
+        .drop-zone-text {
+          font-size: 1rem;
+        }
+
+        .drop-zone-hint {
+          font-size: 0.85rem;
+        }
+
+        .add-item-form {
+          width: 100%;
+          min-width: 0;
+          box-sizing: border-box;
+          padding: 1rem;
+        }
+
+        .add-item-form h3 {
+          font-size: 1.1rem;
+        }
+
+        .form-row {
+          flex-direction: column;
+        }
+
+        .form-field {
+          width: 100%;
+        }
+
+        .form-actions {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .form-actions button {
+          width: 100%;
+        }
+
+        .data-table {
+          font-size: 0.85rem;
+        }
+
+        .data-table,
+        .data-table thead,
+        .data-table tbody,
+        .data-table th,
+        .data-table td {
+          display: block;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .data-table thead {
+          display: none;
+        }
+
+        .data-table tr {
+          margin-bottom: 1rem;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.5rem;
+          padding: 0.75rem;
+          background: white;
+        }
+
+        .data-table td {
+          padding: 0.5rem 0;
+          border-bottom: none;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .data-table td:before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: #4a5568;
+          margin-right: 1rem;
+        }
+
+        .data-table td:last-child {
+          justify-content: flex-end;
+          gap: 0.5rem;
+        }
+
+        .action-btn {
+          padding: 0.4rem 0.6rem;
+          font-size: 1rem;
+        }
+
+        .modal-content {
+          width: 95%;
+          max-width: 95%;
+          margin: 0.5rem;
+          padding: 0.75rem;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+
+        .modal-header {
+          padding: 0.75rem;
+          margin: -0.75rem -0.75rem 0.75rem;
+        }
+
+        .modal-header h2 {
+          font-size: 1.1rem;
+        }
+
+        .modal-field {
+          margin-bottom: 1rem;
+        }
+
+        .modal-field label {
+          font-size: 0.9rem;
+        }
+
+        .modal-field-content {
+          font-size: 0.85rem;
+        }
+
+        .progress-container {
+          width: 90%;
+          padding: 1rem;
+        }
+
+        .progress-icon {
+          font-size: 2rem;
+        }
+
+        .progress-title {
+          font-size: 1.1rem;
+        }
+
+        .progress-filename {
+          font-size: 0.85rem;
+        }
+
+        .sidebar-widget {
+          padding: 1rem;
+        }
+
+        .widget-header h3 {
+          font-size: 1.1rem;
+        }
+
+        .dropdown-toggle {
+          padding: 0.75rem 1rem;
+          font-size: 0.9rem;
+        }
+
+        .dropdown-item {
+          padding: 0.75rem 0.875rem;
+          font-size: 0.9rem;
+        }
+
+        .item-icon {
+          font-size: 1.1rem;
+        }
+
+        .empty-state-icon {
+          font-size: 3rem;
+        }
+
+        .empty-state h3 {
+          font-size: 1.25rem;
+        }
+
+        .empty-state p {
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 400px) {
+        .dashboard-container {
+          padding: 0.25rem;
+        }
+
+        .dashboard-header h1 {
+          font-size: 1.1rem;
+        }
+
+        .stat-card {
+          padding: 0.75rem;
+        }
+
+        .stat-title {
+          font-size: 0.85rem;
+        }
+
+        .stat-value {
+          font-size: 1.5rem;
+        }
+
+        .drop-zone {
+          padding: 1rem 0.75rem;
+        }
+
+        .add-item-form {
+          padding: 0.75rem;
+        }
+
+        .modal-content {
+          width: 98%;
+          margin: 0.25rem;
+          padding: 0.5rem;
+        }
+
+        .progress-container {
+          width: 95%;
+          padding: 0.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
+
+    <!-- Progress Overlay -->
+    <div class="progress-overlay" id="progressOverlay">
+      <div class="progress-container">
+        <div class="progress-icon" id="progressIcon">📦</div>
+        <div class="progress-title" id="progressTitle">Uploading...</div>
+        <div class="progress-filename" id="progressFilename">file.zip</div>
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+        <div class="progress-details" id="progressDetails">
+          Preparing upload...
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <div class="welcome-section">
+          <h1>Welcome, <span id="userName">User</span>!</h1>
+          <p>Last login: <span id="lastLogin">Loading...</span></p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="refreshBtn">
+            🔄 Refresh Data
+          </button>
+          <button class="btn btn-secondary" id="logoutBtn">🚪 Logout</button>
+        </div>
+      </div>
+
+      <!-- Main Content Wrapper with Sidebar -->
+      <div style="display: flex; gap: 1.5rem">
+        <!-- Main Content Area -->
+        <div style="flex: 1">
+          <!-- Statistics Cards -->
+          <div class="dashboard-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-icon">📊</div>
+              </div>
+              <div class="stat-title">Total Records</div>
+              <div class="stat-value" id="totalRecords">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-icon">📝</div>
+              </div>
+              <div class="stat-title">Active Items</div>
+              <div class="stat-value" id="activeItems">0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-icon">🕐</div>
+              </div>
+              <div class="stat-title">Last Updated</div>
+              <div
+                class="stat-value"
+                id="lastUpdated"
+                style="font-size: 1.5rem"
+              >
+                --
+              </div>
+            </div>
+          </div>
+
+          <!-- Data Section -->
+          <div class="data-section">
+            <h2>📋 Personal Data</h2>
+
+            <!-- Drag and Drop Zone -->
+            <div class="drop-zone" id="dropZone">
+              <div class="drop-zone-icon">📁</div>
+              <div class="drop-zone-text">
+                Drag & Drop files here or click to add data
+              </div>
+              <div class="drop-zone-hint">
+                Supports: Text files, JSON, ZIP files, images, PDFs, videos, and
+                more<br />
+                <small style="color: #999"
+                  >Maximum file size: <strong>5 GB</strong> (5120 MB)</small
+                >
+              </div>
+            </div>
+
+            <!-- Add Item Form -->
+            <div class="add-item-form" id="addItemForm">
+              <h3 style="margin-bottom: 15px">Add New Item</h3>
+              <form id="itemForm">
+                <div class="form-row">
+                  <div class="form-field">
+                    <label for="itemTitle">Title *</label>
+                    <input
+                      type="text"
+                      id="itemTitle"
+                      required
+                      placeholder="Enter title"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="itemCategory">Category</label>
+                    <select id="itemCategory">
+                      <option value="">Select category</option>
+                      <option value="personal">Personal</option>
+                      <option value="work">Work</option>
+                      <option value="project">Project</option>
+                      <option value="note">Note</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label for="itemDescription">Description</label>
+                  <textarea
+                    id="itemDescription"
+                    placeholder="Enter description"
+                  ></textarea>
+                </div>
+                <div class="form-field">
+                  <label for="itemContent">Content</label>
+                  <textarea
+                    id="itemContent"
+                    placeholder="Enter content"
+                  ></textarea>
+                </div>
+                <div class="form-actions">
+                  <button
+                    type="button"
+                    class="btn btn-cancel"
+                    id="cancelFormBtn"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" class="btn btn-success">
+                    Save Item
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div id="dataContent">
+              <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading your data...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Main Content Area -->
+
+        <!-- Sidebar Widget -->
+        <div class="sidebar-widget">
+          <div class="widget-header">
+            <h3>🔗 My Pages</h3>
+          </div>
+          <div class="widget-content">
+            <div class="pages-dropdown">
+              <button class="dropdown-toggle" id="pagesDropdownBtn">
+                <span>Personal Web Pages</span>
+                <span class="dropdown-arrow">▼</span>
+              </button>
+              <div class="dropdown-menu" id="pagesDropdownMenu">
+                <a
+                  href="7k9mPxQ2vL8nRwT4jHcY6bFzN3sAd5.html"
+                  class="dropdown-item"
+                  target="_blank"
+                >
+                  <span class="item-icon">💰</span>
+                  <span>Monthly Budget</span>
+                </a>
+
+                <a
+                  href="https://dcsswebdev.com/medicine-tracker"
+                  class="dropdown-item"
+                  target="_blank"
+                >
+                  <span class="item-icon">💊</span>
+                  <span>Medication Tracker</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Main Content Wrapper -->
+    </div>
+
+    <!-- View Item Modal -->
+    <div id="viewModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>📄 View Item</h2>
+          <button class="close-modal" onclick="closeViewModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Content will be inserted here -->
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/js/script.js"></script>
+    <script>
+      // Check authentication
+      const authToken = localStorage.getItem("authToken");
+      if (!authToken) {
+        window.location.href = "personal.html";
+      }
+
+      // Verify token and load user data
+      async function verifyAuth() {
+        try {
+          const response = await fetch("/api/auth/verify", {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Invalid session");
+          }
+
+          const data = await response.json();
+          // Handle nested user object from verify endpoint
+          const userData = data.user || data;
+          document.getElementById("userName").textContent =
+            userData.name || userData.email;
+          return userData;
+        } catch (error) {
+          console.error("Auth verification failed:", error);
+          localStorage.removeItem("authToken");
+          window.location.href = "personal.html";
+        }
+      }
+
+      // Format description for table display
+      function formatDescriptionForTable(description) {
+        if (!description) return "--";
+
+        // Try to parse as JSON (file metadata)
+        try {
+          const metadata = JSON.parse(description);
+          if (metadata.fileName) {
+            // It's file metadata - show file icon and name
+            return `📄 ${metadata.fileName}`;
+          }
+        } catch (e) {
+          // Not JSON, check if it's too long
+          if (description.length > 50) {
+            return description.substring(0, 47) + "...";
+          }
+        }
+
+        return description;
+      }
+
+      // Load dashboard data from D1
+      async function loadDashboardData() {
+        const dataContent = document.getElementById("dataContent");
+
+        try {
+          const response = await fetch("/api/data/personal", {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to load data");
+          }
+
+          const data = await response.json();
+
+          // Update statistics
+          document.getElementById("totalRecords").textContent =
+            data.totalRecords || 0;
+          document.getElementById("activeItems").textContent =
+            data.activeItems || 0;
+          document.getElementById("lastUpdated").textContent = data.lastUpdated
+            ? new Date(data.lastUpdated).toLocaleTimeString()
+            : "--";
+          document.getElementById("lastLogin").textContent = new Date(
+            data.lastLogin
+          ).toLocaleString();
+
+          // Display data table
+          if (data.records && data.records.length > 0) {
+            let tableHTML = `
 			            <table class="data-table">
 			              <thead>
 			                <tr>
@@ -797,586 +800,557 @@
 			              <tbody>
 			          `;
 
-						data.records.forEach((record) => {
-							tableHTML += `
+            data.records.forEach((record) => {
+              tableHTML += `
 			              <tr>
 			                <td data-label="ID">${record.id}</td>
 			                <td data-label="Title">${record.title || "--"}</td>
 			                <td data-label="Description">${formatDescriptionForTable(
-										record.description
-									)}</td>
+                        record.description
+                      )}</td>
 			                <td data-label="Category">${record.category || "--"}</td>
 			                <td data-label="Created">${new Date(
-										record.created_at
-									).toLocaleDateString()}</td>
+                        record.created_at
+                      ).toLocaleDateString()}</td>
 			                <td data-label="Status">${record.status || "Active"}</td>
 			                <td data-label="Actions">
 			                  <button class="action-btn view-btn" onclick="viewItem(${
-										record.id
-									})" title="View">👁️</button>
+                          record.id
+                        })" title="View">👁️</button>
 			                  <button class="action-btn download-btn" onclick="downloadItem(${
-										record.id
-									}, '${record.title}')" title="Download">💾</button>
+                          record.id
+                        }, '${record.title}')" title="Download">💾</button>
 			                  <button class="action-btn delete-btn" onclick="deleteItem(${
-										record.id
-									})" title="Delete">🗑️</button>
+                          record.id
+                        })" title="Delete">🗑️</button>
 			                </td>
 			              </tr>
 			            `;
-						});
+            });
 
-						tableHTML += `
+            tableHTML += `
 			              </tbody>
 			            </table>
 			          `;
 
-						dataContent.innerHTML = tableHTML;
+            dataContent.innerHTML = tableHTML;
 
-						// Store records globally for access by action buttons
-						window.personalDataRecords = data.records;
-					} else {
-						dataContent.innerHTML = `
+            // Store records globally for access by action buttons
+            window.personalDataRecords = data.records;
+          } else {
+            dataContent.innerHTML = `
 			            <div class="empty-state">
 			              <div class="empty-state-icon">🔭</div>
 			              <h3>No Data Yet</h3>
 			              <p>Your personal data will appear here once you start adding items.</p>
 			            </div>
 			          `;
-					}
-				} catch (error) {
-					console.error("Error loading data:", error);
-					dataContent.innerHTML = `
+          }
+        } catch (error) {
+          console.error("Error loading data:", error);
+          dataContent.innerHTML = `
 			          <div class="error-message">
 			            <strong>⚠️ Error Loading Data</strong><br>
 			            ${error.message}. Please try refreshing the page.
 			          </div>
 			        `;
-				}
-			}
+        }
+      }
 
-			// Logout functionality
-			document.getElementById("logoutBtn").addEventListener("click", () => {
-				if (confirm("Are you sure you want to logout?")) {
-					localStorage.removeItem("authToken");
-					localStorage.removeItem("rememberMe");
-					window.location.href = "personal.html";
-				}
-			});
+      // Logout functionality
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        if (confirm("Are you sure you want to logout?")) {
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("rememberMe");
+          window.location.href = "personal.html";
+        }
+      });
 
-			// Refresh data
-			document.getElementById("refreshBtn").addEventListener("click", () => {
-				document.getElementById("dataContent").innerHTML = `
+      // Refresh data
+      document.getElementById("refreshBtn").addEventListener("click", () => {
+        document.getElementById("dataContent").innerHTML = `
 			        <div class="loading">
 			          <div class="loading-spinner"></div>
 			          <p>Refreshing your data...</p>
 			        </div>
 			      `;
-				loadDashboardData();
-			});
-
-			// Drag and Drop functionality
-			const dropZone = document.getElementById("dropZone");
-			const addItemForm = document.getElementById("addItemForm");
-			const itemForm = document.getElementById("itemForm");
-			const cancelFormBtn = document.getElementById("cancelFormBtn");
-
-			// Prevent default drag behaviors
-			["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-				dropZone.addEventListener(eventName, preventDefaults, false);
-				document.body.addEventListener(eventName, preventDefaults, false);
-			});
-
-			function preventDefaults(e) {
-				e.preventDefault();
-				e.stopPropagation();
-			}
-
-			// Highlight drop zone when dragging over it
-			["dragenter", "dragover"].forEach((eventName) => {
-				dropZone.addEventListener(
-					eventName,
-					() => {
-						dropZone.classList.add("drag-over");
-					},
-					false
-				);
-			});
-
-			["dragleave", "drop"].forEach((eventName) => {
-				dropZone.addEventListener(
-					eventName,
-					() => {
-						dropZone.classList.remove("drag-over");
-					},
-					false
-				);
-			});
-
-			// Handle dropped files
-			dropZone.addEventListener("drop", handleDrop, false);
-
-			function handleDrop(e) {
-				const dt = e.dataTransfer;
-				const files = dt.files;
-
-				if (files.length > 0) {
-					handleFiles(files);
-				}
-			}
-
-			// Upload large file to R2 using chunked upload (avoids 100MB POST limit)
-			async function uploadLargeFile(file) {
-				const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
-
-				if (
-					!confirm(
-						`📦 Large File Upload\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nThis file will be uploaded to cloud storage in chunks.\n\nContinue?`
-					)
-				) {
-					return;
-				}
-
-				// Show progress overlay
-				showProgress("📤 Uploading", file.name, 0, "Preparing upload...");
-
-				try {
-					// Step 1: Get upload metadata
-					console.log("Step 1: Getting upload metadata...");
-					updateProgress(5, "Getting upload metadata...");
-
-					const presignedResponse = await fetch(
-						"/api/files/presigned-url",
-						{
-							method: "POST",
-							headers: {
-								Authorization: `Bearer ${authToken}`,
-								"Content-Type": "application/json",
-							},
-							body: JSON.stringify({
-								fileName: file.name,
-								fileType: file.type || "application/octet-stream",
-								fileSize: file.size,
-							}),
-						}
-					);
-
-					// Check if response is JSON
-					const contentType1 =
-						presignedResponse.headers.get("content-type");
-					if (
-						!contentType1 ||
-						!contentType1.includes("application/json")
-					) {
-						const text = await presignedResponse.text();
-						console.error("Non-JSON response from presigned-url:", text);
-						throw new Error(
-							`Server error: ${presignedResponse.status} - ${
-								text || "No response body"
-							}`
-						);
-					}
-
-					const presignedData = await presignedResponse.json();
-
-					if (!presignedResponse.ok) {
-						throw new Error(
-							presignedData.error ||
-								presignedData.details ||
-								"Failed to prepare upload"
-						);
-					}
-
-					const { r2Key, recordId } = presignedData;
-					console.log("Upload metadata received:", { r2Key, recordId });
-
-					// Step 2: Upload file in chunks to avoid 100MB limit
-					const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
-					const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
-					console.log(
-						`Step 2: Uploading ${totalChunks} chunk(s) to R2...`
-					);
-
-					for (
-						let chunkIndex = 0;
-						chunkIndex < totalChunks;
-						chunkIndex++
-					) {
-						const start = chunkIndex * CHUNK_SIZE;
-						const end = Math.min(start + CHUNK_SIZE, file.size);
-						const chunk = file.slice(start, end);
-
-						// Calculate progress (5% for metadata, 90% for upload, 5% for finalize)
-						const uploadProgress = 5 + (chunkIndex / totalChunks) * 90;
-						const chunkSizeMB = ((end - start) / 1024 / 1024).toFixed(2);
-
-						updateProgress(
-							uploadProgress,
-							`Uploading chunk ${
-								chunkIndex + 1
-							} of ${totalChunks} (${chunkSizeMB} MB)`
-						);
-
-						console.log(
-							`Uploading chunk ${
-								chunkIndex + 1
-							}/${totalChunks} (${chunkSizeMB} MB)...`
-						);
-
-						const uploadResponse = await fetch(
-							"/api/files/stream-upload",
-							{
-								method: "POST",
-								headers: {
-									Authorization: `Bearer ${authToken}`,
-									"Content-Type":
-										file.type || "application/octet-stream",
-									"X-R2-Key": r2Key,
-									"X-Record-Id": recordId,
-									"X-Chunk-Index": chunkIndex.toString(),
-									"X-Total-Chunks": totalChunks.toString(),
-								},
-								body: chunk,
-							}
-						);
-
-						// Check if response is JSON
-						const contentType2 =
-							uploadResponse.headers.get("content-type");
-						if (
-							!contentType2 ||
-							!contentType2.includes("application/json")
-						) {
-							const text = await uploadResponse.text();
-							console.error(
-								"Non-JSON response from stream-upload:",
-								text
-							);
-							throw new Error(
-								`Server error: ${uploadResponse.status} - ${
-									text || "No response body"
-								}`
-							);
-						}
-
-						const result = await uploadResponse.json();
-
-						if (!uploadResponse.ok) {
-							throw new Error(
-								result.error || result.details || "Upload failed"
-							);
-						}
-
-						console.log(
-							`Chunk ${chunkIndex + 1}/${totalChunks} uploaded`
-						);
-					}
-
-					updateProgress(100, "Upload complete!");
-					console.log("All chunks uploaded successfully");
-
-					// Hide progress after a brief delay
-					setTimeout(() => {
-						hideProgress();
-						alert(
-							`✅ File uploaded successfully!\n\n${file.name}\nSize: ${fileSizeMB} MB`
-						);
-						// Reload dashboard
-						loadDashboardData();
-					}, 1000);
-				} catch (error) {
-					console.error("Upload error:", error);
-					hideProgress();
-
-					// More detailed error message
-					let errorMsg = error.message;
-					if (
-						errorMsg.includes("R2 bucket binding") ||
-						errorMsg.includes("Storage not configured")
-					) {
-						errorMsg +=
-							"\n\n⚠️ R2 Storage Configuration Required:\n\n1. Go to Cloudflare Dashboard\n2. Navigate to Workers & Pages → dcsswebdev\n3. Settings → Functions\n4. Add R2 bucket binding:\n   - Variable: FILES\n   - Bucket: dcsswebdev-files\n5. Redeploy the site";
-					}
-
-					alert(`❌ Upload failed:\n\n${errorMsg}`);
-				}
-			}
-
-			// Progress bar helper functions
-			function showProgress(title, filename, percentage, details) {
-				const overlay = document.getElementById("progressOverlay");
-				const icon = document.getElementById("progressIcon");
-				const titleEl = document.getElementById("progressTitle");
-				const filenameEl = document.getElementById("progressFilename");
-				const fillEl = document.getElementById("progressBarFill");
-				const textEl = document.getElementById("progressText");
-				const detailsEl = document.getElementById("progressDetails");
-
-				icon.textContent = title.includes("Download") ? "📥" : "📤";
-				titleEl.textContent = title;
-				filenameEl.textContent = filename;
-				fillEl.style.width = percentage + "%";
-				textEl.textContent = Math.round(percentage) + "%";
-				detailsEl.textContent = details;
-
-				overlay.classList.add("show");
-			}
-
-			function updateProgress(percentage, details) {
-				const fillEl = document.getElementById("progressBarFill");
-				const textEl = document.getElementById("progressText");
-				const detailsEl = document.getElementById("progressDetails");
-
-				fillEl.style.width = percentage + "%";
-				textEl.textContent = Math.round(percentage) + "%";
-				if (details) {
-					detailsEl.textContent = details;
-				}
-			}
-
-			function hideProgress() {
-				const overlay = document.getElementById("progressOverlay");
-				overlay.classList.remove("show");
-			}
-
-			// Handle file reading
-			async function handleFiles(files) {
-				for (let file of files) {
-					// File size limits
-					const SMALL_FILE_LIMIT = 1 * 1024 * 1024; // 1MB - stored in D1
-					const LARGE_FILE_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB - stored in R2
-					const fileSizeMB = (file.size / 1024 / 1024).toFixed(2); // Check maximum file size
-					if (file.size > LARGE_FILE_LIMIT) {
-						alert(
-							`❌ File too large!\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nMaximum allowed: 5 GB (5120 MB)\n\nPlease choose a smaller file.`
-						);
-						continue;
-					}
-
-					// Determine if file should use R2 (large files) or D1 (small files)
-					const useR2 = file.size > SMALL_FILE_LIMIT;
-
-					if (useR2) {
-						// Upload large file directly to R2
-						await uploadLargeFile(file);
-						continue;
-					}
-
-					const reader = new FileReader();
-					const isZipFile =
-						file.name.toLowerCase().endsWith(".zip") ||
-						file.type === "application/zip" ||
-						file.type === "application/x-zip-compressed";
-					const isBinaryFile =
-						isZipFile ||
-						file.type.includes("image/") ||
-						file.type.includes("video/") ||
-						file.type.includes("audio/") ||
-						file.type === "application/pdf";
-
-					reader.onload = async (e) => {
-						let content = e.target.result;
-						let contentType = "text";
-
-						if (isBinaryFile) {
-							// For binary files, convert to base64
-							const base64 = btoa(
-								new Uint8Array(content).reduce(
-									(data, byte) => data + String.fromCharCode(byte),
-									""
-								)
-							);
-							content = base64;
-							contentType = "binary";
-
-							// Double-check encoded size (base64 is ~33% larger)
-							if (content.length > MAX_FILE_SIZE * 1.5) {
-								alert(
-									`❌ File too large after encoding!\n\nThe file becomes too large when prepared for storage.\nPlease choose a smaller file.`
-								);
-								return;
-							}
-						}
-
-						// Pre-fill the form with file data
-						document.getElementById("itemTitle").value = file.name;
-						document.getElementById("itemContent").value = content;
-
-						// Store metadata in description
-						const metadata = JSON.stringify({
-							fileName: file.name,
-							fileType: file.type || "unknown",
-							fileSize: file.size,
-							contentType: contentType,
-							uploadDate: new Date().toISOString(),
-						});
-
-						document.getElementById("itemDescription").value = metadata;
-
-						// Set category based on file type
-						const categorySelect =
-							document.getElementById("itemCategory");
-						if (isZipFile) {
-							categorySelect.value = "other";
-						}
-
-						// Show the form with file size warning if large
-						const sizeKB = file.size / 1024;
-						if (sizeKB > 500) {
-							alert(
-								`⚠️ Large file detected: ${sizeKB.toFixed(
-									0
-								)} KB\n\nThis file is close to the size limit. If saving fails, try a smaller file.`
-							);
-						}
-
-						addItemForm.classList.add("show");
-						dropZone.style.display = "none";
-					};
-
-					reader.onerror = function () {
-						alert(
-							`❌ Error reading file: ${file.name}\n\nPlease try again or choose a different file.`
-						);
-					};
-
-					// Read as binary for zip and other binary files, text otherwise
-					if (isBinaryFile) {
-						reader.readAsArrayBuffer(file);
-					} else {
-						reader.readAsText(file);
-					}
-				}
-			}
-
-			// Click to show form
-			dropZone.addEventListener("click", () => {
-				addItemForm.classList.add("show");
-				dropZone.style.display = "none";
-			});
-
-			// Cancel form
-			cancelFormBtn.addEventListener("click", () => {
-				addItemForm.classList.remove("show");
-				dropZone.style.display = "block";
-				itemForm.reset();
-			});
-
-			// Submit form to save data
-			itemForm.addEventListener("submit", async (e) => {
-				e.preventDefault();
-
-				const itemData = {
-					title: document.getElementById("itemTitle").value,
-					description: document.getElementById("itemDescription").value,
-					category: document.getElementById("itemCategory").value,
-					content: document.getElementById("itemContent").value,
-					status: "active",
-				};
-
-				// Check data size before sending
-				const dataSize = JSON.stringify(itemData).length;
-				const dataSizeMB = (dataSize / 1024 / 1024).toFixed(2);
-
-				if (dataSize > 1024 * 1024) {
-					// 1MB limit
-					alert(
-						`❌ Data too large to save!\n\nSize: ${dataSizeMB} MB\nLimit: 1 MB\n\nPlease use a smaller file.`
-					);
-					return;
-				}
-
-				try {
-					const response = await fetch("/api/data/personal", {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${authToken}`,
-						},
-						body: JSON.stringify(itemData),
-					});
-
-					const result = await response.json();
-
-					if (!response.ok) {
-						throw new Error(
-							result.error || result.details || "Failed to save data"
-						);
-					}
-
-					// Success - reset form and reload data
-					itemForm.reset();
-					addItemForm.classList.remove("show");
-					dropZone.style.display = "block";
-
-					// Show success message
-					alert("✅ Item saved successfully!");
-
-					// Reload dashboard data
-					loadDashboardData();
-				} catch (error) {
-					console.error("Error saving data:", error);
-					alert(
-						"❌ Error saving data:\n\n" +
-							error.message +
-							"\n\nTry using a smaller file (< 1MB)."
-					);
-				}
-			});
-
-			// View item in modal
-			window.viewItem = function (itemId) {
-				const item = window.personalDataRecords.find(
-					(r) => r.id === itemId
-				);
-				if (!item) return;
-
-				// Try to parse metadata
-				let metadata = null;
-				let isBinaryFile = false;
-				try {
-					metadata = JSON.parse(item.description);
-					isBinaryFile = metadata.contentType === "binary";
-				} catch (e) {
-					// Not metadata JSON
-				}
-
-				// Format content display based on type
-				let contentDisplay = item.content || "No content";
-				if (isBinaryFile) {
-					const sizeKB = metadata.fileSize
-						? (metadata.fileSize / 1024).toFixed(2)
-						: "Unknown";
-					contentDisplay = `<strong>📦 Binary File</strong><br>
+        loadDashboardData();
+      });
+
+      // Drag and Drop functionality
+      const dropZone = document.getElementById("dropZone");
+      const addItemForm = document.getElementById("addItemForm");
+      const itemForm = document.getElementById("itemForm");
+      const cancelFormBtn = document.getElementById("cancelFormBtn");
+
+      // Prevent default drag behaviors
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      // Highlight drop zone when dragging over it
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(
+          eventName,
+          () => {
+            dropZone.classList.add("drag-over");
+          },
+          false
+        );
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(
+          eventName,
+          () => {
+            dropZone.classList.remove("drag-over");
+          },
+          false
+        );
+      });
+
+      // Handle dropped files
+      dropZone.addEventListener("drop", handleDrop, false);
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0) {
+          handleFiles(files);
+        }
+      }
+
+      // Upload large file to R2 using chunked upload (avoids 100MB POST limit)
+      async function uploadLargeFile(file) {
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+
+        if (
+          !confirm(
+            `📦 Large File Upload\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nThis file will be uploaded to cloud storage in chunks.\n\nContinue?`
+          )
+        ) {
+          return;
+        }
+
+        // Show progress overlay
+        showProgress("📤 Uploading", file.name, 0, "Preparing upload...");
+
+        try {
+          // Step 1: Get upload metadata
+          console.log("Step 1: Getting upload metadata...");
+          updateProgress(5, "Getting upload metadata...");
+
+          const presignedResponse = await fetch("/api/files/presigned-url", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              fileName: file.name,
+              fileType: file.type || "application/octet-stream",
+              fileSize: file.size,
+            }),
+          });
+
+          // Check if response is JSON
+          const contentType1 = presignedResponse.headers.get("content-type");
+          if (!contentType1 || !contentType1.includes("application/json")) {
+            const text = await presignedResponse.text();
+            console.error("Non-JSON response from presigned-url:", text);
+            throw new Error(
+              `Server error: ${presignedResponse.status} - ${
+                text || "No response body"
+              }`
+            );
+          }
+
+          const presignedData = await presignedResponse.json();
+
+          if (!presignedResponse.ok) {
+            throw new Error(
+              presignedData.error ||
+                presignedData.details ||
+                "Failed to prepare upload"
+            );
+          }
+
+          const { r2Key, recordId } = presignedData;
+          console.log("Upload metadata received:", { r2Key, recordId });
+
+          // Step 2: Upload file in chunks to avoid 100MB limit
+          const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
+          const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+          console.log(`Step 2: Uploading ${totalChunks} chunk(s) to R2...`);
+
+          for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, file.size);
+            const chunk = file.slice(start, end);
+
+            // Calculate progress (5% for metadata, 90% for upload, 5% for finalize)
+            const uploadProgress = 5 + (chunkIndex / totalChunks) * 90;
+            const chunkSizeMB = ((end - start) / 1024 / 1024).toFixed(2);
+
+            updateProgress(
+              uploadProgress,
+              `Uploading chunk ${
+                chunkIndex + 1
+              } of ${totalChunks} (${chunkSizeMB} MB)`
+            );
+
+            console.log(
+              `Uploading chunk ${
+                chunkIndex + 1
+              }/${totalChunks} (${chunkSizeMB} MB)...`
+            );
+
+            const uploadResponse = await fetch("/api/files/stream-upload", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+                "Content-Type": file.type || "application/octet-stream",
+                "X-R2-Key": r2Key,
+                "X-Record-Id": recordId,
+                "X-Chunk-Index": chunkIndex.toString(),
+                "X-Total-Chunks": totalChunks.toString(),
+              },
+              body: chunk,
+            });
+
+            // Check if response is JSON
+            const contentType2 = uploadResponse.headers.get("content-type");
+            if (!contentType2 || !contentType2.includes("application/json")) {
+              const text = await uploadResponse.text();
+              console.error("Non-JSON response from stream-upload:", text);
+              throw new Error(
+                `Server error: ${uploadResponse.status} - ${
+                  text || "No response body"
+                }`
+              );
+            }
+
+            const result = await uploadResponse.json();
+
+            if (!uploadResponse.ok) {
+              throw new Error(
+                result.error || result.details || "Upload failed"
+              );
+            }
+
+            console.log(`Chunk ${chunkIndex + 1}/${totalChunks} uploaded`);
+          }
+
+          updateProgress(100, "Upload complete!");
+          console.log("All chunks uploaded successfully");
+
+          // Hide progress after a brief delay
+          setTimeout(() => {
+            hideProgress();
+            alert(
+              `✅ File uploaded successfully!\n\n${file.name}\nSize: ${fileSizeMB} MB`
+            );
+            // Reload dashboard
+            loadDashboardData();
+          }, 1000);
+        } catch (error) {
+          console.error("Upload error:", error);
+          hideProgress();
+
+          // More detailed error message
+          let errorMsg = error.message;
+          if (
+            errorMsg.includes("R2 bucket binding") ||
+            errorMsg.includes("Storage not configured")
+          ) {
+            errorMsg +=
+              "\n\n⚠️ R2 Storage Configuration Required:\n\n1. Go to Cloudflare Dashboard\n2. Navigate to Workers & Pages → dcsswebdev\n3. Settings → Functions\n4. Add R2 bucket binding:\n   - Variable: FILES\n   - Bucket: dcsswebdev-files\n5. Redeploy the site";
+          }
+
+          alert(`❌ Upload failed:\n\n${errorMsg}`);
+        }
+      }
+
+      // Progress bar helper functions
+      function showProgress(title, filename, percentage, details) {
+        const overlay = document.getElementById("progressOverlay");
+        const icon = document.getElementById("progressIcon");
+        const titleEl = document.getElementById("progressTitle");
+        const filenameEl = document.getElementById("progressFilename");
+        const fillEl = document.getElementById("progressBarFill");
+        const textEl = document.getElementById("progressText");
+        const detailsEl = document.getElementById("progressDetails");
+
+        icon.textContent = title.includes("Download") ? "📥" : "📤";
+        titleEl.textContent = title;
+        filenameEl.textContent = filename;
+        fillEl.style.width = percentage + "%";
+        textEl.textContent = Math.round(percentage) + "%";
+        detailsEl.textContent = details;
+
+        overlay.classList.add("show");
+      }
+
+      function updateProgress(percentage, details) {
+        const fillEl = document.getElementById("progressBarFill");
+        const textEl = document.getElementById("progressText");
+        const detailsEl = document.getElementById("progressDetails");
+
+        fillEl.style.width = percentage + "%";
+        textEl.textContent = Math.round(percentage) + "%";
+        if (details) {
+          detailsEl.textContent = details;
+        }
+      }
+
+      function hideProgress() {
+        const overlay = document.getElementById("progressOverlay");
+        overlay.classList.remove("show");
+      }
+
+      // Handle file reading
+      async function handleFiles(files) {
+        for (let file of files) {
+          // File size limits
+          const SMALL_FILE_LIMIT = 1 * 1024 * 1024; // 1MB - stored in D1
+          const LARGE_FILE_LIMIT = 5 * 1024 * 1024 * 1024; // 5GB - stored in R2
+          const fileSizeMB = (file.size / 1024 / 1024).toFixed(2); // Check maximum file size
+          if (file.size > LARGE_FILE_LIMIT) {
+            alert(
+              `❌ File too large!\n\nFile: ${file.name}\nSize: ${fileSizeMB} MB\n\nMaximum allowed: 5 GB (5120 MB)\n\nPlease choose a smaller file.`
+            );
+            continue;
+          }
+
+          // Determine if file should use R2 (large files) or D1 (small files)
+          const useR2 = file.size > SMALL_FILE_LIMIT;
+
+          if (useR2) {
+            // Upload large file directly to R2
+            await uploadLargeFile(file);
+            continue;
+          }
+
+          const reader = new FileReader();
+          const isZipFile =
+            file.name.toLowerCase().endsWith(".zip") ||
+            file.type === "application/zip" ||
+            file.type === "application/x-zip-compressed";
+          const isBinaryFile =
+            isZipFile ||
+            file.type.includes("image/") ||
+            file.type.includes("video/") ||
+            file.type.includes("audio/") ||
+            file.type === "application/pdf";
+
+          reader.onload = async (e) => {
+            let content = e.target.result;
+            let contentType = "text";
+
+            if (isBinaryFile) {
+              // For binary files, convert to base64
+              const base64 = btoa(
+                new Uint8Array(content).reduce(
+                  (data, byte) => data + String.fromCharCode(byte),
+                  ""
+                )
+              );
+              content = base64;
+              contentType = "binary";
+
+              // Double-check encoded size (base64 is ~33% larger)
+              if (content.length > MAX_FILE_SIZE * 1.5) {
+                alert(
+                  `❌ File too large after encoding!\n\nThe file becomes too large when prepared for storage.\nPlease choose a smaller file.`
+                );
+                return;
+              }
+            }
+
+            // Pre-fill the form with file data
+            document.getElementById("itemTitle").value = file.name;
+            document.getElementById("itemContent").value = content;
+
+            // Store metadata in description
+            const metadata = JSON.stringify({
+              fileName: file.name,
+              fileType: file.type || "unknown",
+              fileSize: file.size,
+              contentType: contentType,
+              uploadDate: new Date().toISOString(),
+            });
+
+            document.getElementById("itemDescription").value = metadata;
+
+            // Set category based on file type
+            const categorySelect = document.getElementById("itemCategory");
+            if (isZipFile) {
+              categorySelect.value = "other";
+            }
+
+            // Show the form with file size warning if large
+            const sizeKB = file.size / 1024;
+            if (sizeKB > 500) {
+              alert(
+                `⚠️ Large file detected: ${sizeKB.toFixed(
+                  0
+                )} KB\n\nThis file is close to the size limit. If saving fails, try a smaller file.`
+              );
+            }
+
+            addItemForm.classList.add("show");
+            dropZone.style.display = "none";
+          };
+
+          reader.onerror = function () {
+            alert(
+              `❌ Error reading file: ${file.name}\n\nPlease try again or choose a different file.`
+            );
+          };
+
+          // Read as binary for zip and other binary files, text otherwise
+          if (isBinaryFile) {
+            reader.readAsArrayBuffer(file);
+          } else {
+            reader.readAsText(file);
+          }
+        }
+      }
+
+      // Click to show form
+      dropZone.addEventListener("click", () => {
+        addItemForm.classList.add("show");
+        dropZone.style.display = "none";
+      });
+
+      // Cancel form
+      cancelFormBtn.addEventListener("click", () => {
+        addItemForm.classList.remove("show");
+        dropZone.style.display = "block";
+        itemForm.reset();
+      });
+
+      // Submit form to save data
+      itemForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const itemData = {
+          title: document.getElementById("itemTitle").value,
+          description: document.getElementById("itemDescription").value,
+          category: document.getElementById("itemCategory").value,
+          content: document.getElementById("itemContent").value,
+          status: "active",
+        };
+
+        // Check data size before sending
+        const dataSize = JSON.stringify(itemData).length;
+        const dataSizeMB = (dataSize / 1024 / 1024).toFixed(2);
+
+        if (dataSize > 1024 * 1024) {
+          // 1MB limit
+          alert(
+            `❌ Data too large to save!\n\nSize: ${dataSizeMB} MB\nLimit: 1 MB\n\nPlease use a smaller file.`
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/data/personal", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify(itemData),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              result.error || result.details || "Failed to save data"
+            );
+          }
+
+          // Success - reset form and reload data
+          itemForm.reset();
+          addItemForm.classList.remove("show");
+          dropZone.style.display = "block";
+
+          // Show success message
+          alert("✅ Item saved successfully!");
+
+          // Reload dashboard data
+          loadDashboardData();
+        } catch (error) {
+          console.error("Error saving data:", error);
+          alert(
+            "❌ Error saving data:\n\n" +
+              error.message +
+              "\n\nTry using a smaller file (< 1MB)."
+          );
+        }
+      });
+
+      // View item in modal
+      window.viewItem = function (itemId) {
+        const item = window.personalDataRecords.find((r) => r.id === itemId);
+        if (!item) return;
+
+        // Try to parse metadata
+        let metadata = null;
+        let isBinaryFile = false;
+        try {
+          metadata = JSON.parse(item.description);
+          isBinaryFile = metadata.contentType === "binary";
+        } catch (e) {
+          // Not metadata JSON
+        }
+
+        // Format content display based on type
+        let contentDisplay = item.content || "No content";
+        if (isBinaryFile) {
+          const sizeKB = metadata.fileSize
+            ? (metadata.fileSize / 1024).toFixed(2)
+            : "Unknown";
+          contentDisplay = `<strong>📦 Binary File</strong><br>
 							Type: ${metadata.fileType || "Unknown"}<br>
 							Size: ${sizeKB} KB<br>
 							<em>This is a binary file (zip, image, etc.). Click the download button to retrieve the original file.</em>`;
-				} else if (contentDisplay.length > 500) {
-					contentDisplay =
-						contentDisplay.substring(0, 500) +
-						"...<br><em>(Content truncated. Download to see full content.)</em>";
-				}
+        } else if (contentDisplay.length > 500) {
+          contentDisplay =
+            contentDisplay.substring(0, 500) +
+            "...<br><em>(Content truncated. Download to see full content.)</em>";
+        }
 
-				// Format description
-				let descriptionDisplay = item.description || "--";
-				if (metadata) {
-					descriptionDisplay = `<strong>File Info:</strong><br>
+        // Format description
+        let descriptionDisplay = item.description || "--";
+        if (metadata) {
+          descriptionDisplay = `<strong>File Info:</strong><br>
 							Name: ${metadata.fileName || "Unknown"}<br>
 							Type: ${metadata.fileType || "Unknown"}<br>
 							Size: ${
-								metadata.fileSize
-									? (metadata.fileSize / 1024).toFixed(2) + " KB"
-									: "Unknown"
-							}<br>
+                metadata.fileSize
+                  ? (metadata.fileSize / 1024).toFixed(2) + " KB"
+                  : "Unknown"
+              }<br>
 							Uploaded: ${
-								metadata.uploadDate
-									? new Date(metadata.uploadDate).toLocaleString()
-									: "Unknown"
-							}`;
-				}
+                metadata.uploadDate
+                  ? new Date(metadata.uploadDate).toLocaleString()
+                  : "Unknown"
+              }`;
+        }
 
-				const modalBody = document.getElementById("modalBody");
-				modalBody.innerHTML = `
+        const modalBody = document.getElementById("modalBody");
+        modalBody.innerHTML = `
 						<div class="modal-field">
 							<label>Title:</label>
 							<div class="modal-field-content">${item.title || "--"}</div>
@@ -1396,200 +1370,190 @@
 						<div class="modal-field">
 							<label>Created:</label>
 							<div class="modal-field-content">${new Date(
-								item.created_at
-							).toLocaleString()}</div>
+                item.created_at
+              ).toLocaleString()}</div>
 						</div>
 						<div class="modal-field">
 							<label>Updated:</label>
 							<div class="modal-field-content">${new Date(
-								item.updated_at
-							).toLocaleString()}</div>
+                item.updated_at
+              ).toLocaleString()}</div>
 						</div>
 					`;
 
-				document.getElementById("viewModal").classList.add("show");
-			};
+        document.getElementById("viewModal").classList.add("show");
+      };
 
-			// Close modal
-			window.closeViewModal = function () {
-				document.getElementById("viewModal").classList.remove("show");
-			};
+      // Close modal
+      window.closeViewModal = function () {
+        document.getElementById("viewModal").classList.remove("show");
+      };
 
-			// Close modal when clicking outside
-			document
-				.getElementById("viewModal")
-				.addEventListener("click", function (e) {
-					if (e.target === this) {
-						closeViewModal();
-					}
-				});
+      // Close modal when clicking outside
+      document
+        .getElementById("viewModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeViewModal();
+          }
+        });
 
-			// Download item as file
-			window.downloadItem = async function (itemId, title) {
-				const item = window.personalDataRecords.find(
-					(r) => r.id === itemId
-				);
-				if (!item) return;
+      // Download item as file
+      window.downloadItem = async function (itemId, title) {
+        const item = window.personalDataRecords.find((r) => r.id === itemId);
+        if (!item) return;
 
-				// Parse metadata from description if available
-				let metadata = null;
-				let fileName = title;
-				let fileType = "text/plain";
-				let fileExtension = ".txt";
+        // Parse metadata from description if available
+        let metadata = null;
+        let fileName = title;
+        let fileType = "text/plain";
+        let fileExtension = ".txt";
 
-				try {
-					metadata = JSON.parse(item.description);
-					if (metadata.fileName) {
-						fileName = metadata.fileName;
-						// Extract file extension
-						const lastDot = fileName.lastIndexOf(".");
-						if (lastDot > 0) {
-							fileExtension = fileName.substring(lastDot);
-						}
-					}
-					if (metadata.fileType) {
-						fileType = metadata.fileType;
-					}
-				} catch (e) {
-					// Not JSON metadata, use defaults
-				}
+        try {
+          metadata = JSON.parse(item.description);
+          if (metadata.fileName) {
+            fileName = metadata.fileName;
+            // Extract file extension
+            const lastDot = fileName.lastIndexOf(".");
+            if (lastDot > 0) {
+              fileExtension = fileName.substring(lastDot);
+            }
+          }
+          if (metadata.fileType) {
+            fileType = metadata.fileType;
+          }
+        } catch (e) {
+          // Not JSON metadata, use defaults
+        }
 
-				// Check if file is stored in R2
-				if (metadata && metadata.contentType === "r2") {
-					// Download from R2
-					try {
-						showProgress(
-							"📥 Downloading",
-							fileName,
-							0,
-							"Starting download..."
-						);
+        // Check if file is stored in R2
+        if (metadata && metadata.contentType === "r2") {
+          // Download from R2
+          try {
+            showProgress("📥 Downloading", fileName, 0, "Starting download...");
 
-						const response = await fetch(
-							`/api/files/download/${itemId}`,
-							{
-								headers: {
-									Authorization: `Bearer ${authToken}`,
-								},
-							}
-						);
+            const response = await fetch(`/api/files/download/${itemId}`, {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            });
 
-						if (!response.ok) {
-							throw new Error("Download failed");
-						}
+            if (!response.ok) {
+              throw new Error("Download failed");
+            }
 
-						updateProgress(50, "Receiving file...");
+            updateProgress(50, "Receiving file...");
 
-						const blob = await response.blob();
-						updateProgress(75, "Preparing download...");
+            const blob = await response.blob();
+            updateProgress(75, "Preparing download...");
 
-						const url = URL.createObjectURL(blob);
+            const url = URL.createObjectURL(blob);
 
-						const a = document.createElement("a");
-						a.href = url;
-						a.download = fileName;
-						document.body.appendChild(a);
-						a.click();
-						document.body.removeChild(a);
-						URL.revokeObjectURL(url);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
 
-						updateProgress(100, "Download complete!");
+            updateProgress(100, "Download complete!");
 
-						setTimeout(() => {
-							hideProgress();
-							alert("✅ File downloaded successfully!");
-						}, 1000);
-					} catch (error) {
-						console.error("Download error:", error);
-						hideProgress();
-						alert("❌ Download failed: " + error.message);
-					}
-					return;
-				} // Create file content for D1-stored files
-				const content = item.content || "";
-				let blob;
+            setTimeout(() => {
+              hideProgress();
+              alert("✅ File downloaded successfully!");
+            }, 1000);
+          } catch (error) {
+            console.error("Download error:", error);
+            hideProgress();
+            alert("❌ Download failed: " + error.message);
+          }
+          return;
+        } // Create file content for D1-stored files
+        const content = item.content || "";
+        let blob;
 
-				// Check if content is base64 encoded (binary file)
-				if (metadata && metadata.contentType === "binary") {
-					// Decode base64 to binary
-					const binaryString = atob(content);
-					const bytes = new Uint8Array(binaryString.length);
-					for (let i = 0; i < binaryString.length; i++) {
-						bytes[i] = binaryString.charCodeAt(i);
-					}
-					blob = new Blob([bytes], { type: fileType });
-				} else {
-					// Text file
-					blob = new Blob([content], { type: fileType });
-				}
+        // Check if content is base64 encoded (binary file)
+        if (metadata && metadata.contentType === "binary") {
+          // Decode base64 to binary
+          const binaryString = atob(content);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          blob = new Blob([bytes], { type: fileType });
+        } else {
+          // Text file
+          blob = new Blob([content], { type: fileType });
+        }
 
-				const url = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob);
 
-				// Create download link
-				const a = document.createElement("a");
-				a.href = url;
-				a.download = fileName;
-				document.body.appendChild(a);
-				a.click();
-				document.body.removeChild(a);
-				URL.revokeObjectURL(url);
+        // Create download link
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
 
-				alert("✅ File downloaded successfully!");
-			};
+        alert("✅ File downloaded successfully!");
+      };
 
-			// Delete item
-			window.deleteItem = async function (itemId) {
-				if (
-					!confirm(
-						"Are you sure you want to delete this item? This action cannot be undone."
-					)
-				) {
-					return;
-				}
+      // Delete item
+      window.deleteItem = async function (itemId) {
+        if (
+          !confirm(
+            "Are you sure you want to delete this item? This action cannot be undone."
+          )
+        ) {
+          return;
+        }
 
-				try {
-					const response = await fetch(`/api/data/personal/${itemId}`, {
-						method: "DELETE",
-						headers: {
-							Authorization: `Bearer ${authToken}`,
-						},
-					});
+        try {
+          const response = await fetch(`/api/data/personal/${itemId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          });
 
-					if (!response.ok) {
-						throw new Error("Failed to delete item");
-					}
+          if (!response.ok) {
+            throw new Error("Failed to delete item");
+          }
 
-					alert("✅ Item deleted successfully!");
-					loadDashboardData();
-				} catch (error) {
-					console.error("Error deleting item:", error);
-					alert("❌ Error deleting item: " + error.message);
-				}
-			};
+          alert("✅ Item deleted successfully!");
+          loadDashboardData();
+        } catch (error) {
+          console.error("Error deleting item:", error);
+          alert("❌ Error deleting item: " + error.message);
+        }
+      };
 
-			// Initialize dashboard
-			window.addEventListener("DOMContentLoaded", async () => {
-				await verifyAuth();
-				await loadDashboardData();
+      // Initialize dashboard
+      window.addEventListener("DOMContentLoaded", async () => {
+        await verifyAuth();
+        await loadDashboardData();
 
-				// Initialize dropdown toggle
-				const dropdownBtn = document.getElementById("pagesDropdownBtn");
-				const dropdownMenu = document.getElementById("pagesDropdownMenu");
+        // Initialize dropdown toggle
+        const dropdownBtn = document.getElementById("pagesDropdownBtn");
+        const dropdownMenu = document.getElementById("pagesDropdownMenu");
 
-				dropdownBtn.addEventListener("click", function (e) {
-					e.stopPropagation();
-					this.classList.toggle("active");
-					dropdownMenu.classList.toggle("show");
-				});
+        dropdownBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          this.classList.toggle("active");
+          dropdownMenu.classList.toggle("show");
+        });
 
-				// Close dropdown when clicking outside
-				document.addEventListener("click", function (e) {
-					if (!e.target.closest(".pages-dropdown")) {
-						dropdownBtn.classList.remove("active");
-						dropdownMenu.classList.remove("show");
-					}
-				});
-			});
-		</script>
-	</body>
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function (e) {
+          if (!e.target.closest(".pages-dropdown")) {
+            dropdownBtn.classList.remove("active");
+            dropdownMenu.classList.remove("show");
+          }
+        });
+      });
+    </script>
+  </body>
 </html>
