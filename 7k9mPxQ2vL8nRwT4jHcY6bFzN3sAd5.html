@@ -467,6 +467,31 @@
           display: none;
         }
       }
+      /* Responsive Misc/Unforeseen row styling */
+      @media (max-width: 900px) {
+        td.misc-unforeseen {
+          padding: 0.5rem !important;
+        }
+        td.misc-unforeseen > div {
+          flex-direction: column !important;
+          gap: 0.5rem !important;
+        }
+      }
+      @media (max-width: 600px) {
+        td.misc-unforeseen {
+          padding: 0.25rem !important;
+        }
+        td.misc-unforeseen > div {
+          flex-direction: column !important;
+          gap: 0.25rem !important;
+        }
+        td.misc-unforeseen input,
+        td.misc-unforeseen button {
+          width: 100% !important;
+          min-width: 0 !important;
+          font-size: 0.95rem !important;
+        }
+      }
       /* Responsive Design */
       @media (max-width: 1200px) {
         .container {
@@ -2474,8 +2499,8 @@
 
           html += `
                         <tr style="background: #fff9e6; border-top: 2px solid #ffc107;">
-                            <td colspan="7">
-                                <div style="padding: 0.5rem;">
+                          <td colspan="7" class="misc-unforeseen">
+                            <div style="padding: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
                                     <div class="bill-name" style="color: #856404; margin-bottom: 0.75rem;">
                                         💰 Misc/Unforeseen - Week ${index + 1}
                                         ${
