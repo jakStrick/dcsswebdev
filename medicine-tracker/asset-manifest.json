@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/medicine-tracker/static/css/main.62507a0f.css",
+    "main.css": "/medicine-tracker/static/css/main.31e81d59.css",
     "main.js": "/medicine-tracker/static/js/main.8bff2e55.js",
     "static/js/453.8dff6533.chunk.js": "/medicine-tracker/static/js/453.8dff6533.chunk.js",
     "index.html": "/medicine-tracker/index.html",
-    "main.62507a0f.css.map": "/medicine-tracker/static/css/main.62507a0f.css.map",
+    "main.31e81d59.css.map": "/medicine-tracker/static/css/main.31e81d59.css.map",
     "main.8bff2e55.js.map": "/medicine-tracker/static/js/main.8bff2e55.js.map",
     "453.8dff6533.chunk.js.map": "/medicine-tracker/static/js/453.8dff6533.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.62507a0f.css",
+    "static/css/main.31e81d59.css",
     "static/js/main.8bff2e55.js"
   ]
 }
