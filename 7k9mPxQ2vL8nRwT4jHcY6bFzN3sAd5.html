@@ -1153,6 +1153,10 @@
           const json = await res.json();
 
           const price = extractPriceFromAlphaVantage(json);
+
+          console.log("Alpha Vantage raw JSON:", json);
+          console.log("Parsed price:", price);
+
           if (price === null) {
             // Don’t clobber the UI with 0.00; just keep the previous good value.
             console.warn(
