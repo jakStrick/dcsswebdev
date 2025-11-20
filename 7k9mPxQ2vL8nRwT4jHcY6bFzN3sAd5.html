@@ -705,7 +705,7 @@
         </div>
         <div class="btn-group">
           <button class="btn btn-primary" onclick="calculateBudget()">
-            Calculate Alignment
+            🔄 UPDATE BUDGET
           </button>
 
           <button class="btn btn-success" onclick="showAddBillForm()">
@@ -715,13 +715,13 @@
             💵 Add Deposit
           </button>
           <button class="btn btn-secondary" onclick="toggleAdjustments()">
-            Adjust Bills
+            ⚙️ Adjust Bills
           </button>
           <button class="btn btn-secondary" onclick="toggleSavingsManager()">
-            Manage Savings
+            📋 Manage Savings
           </button>
           <button class="btn btn-secondary" onclick="window.print()">
-            Print Report
+            🖨️ Print Report
           </button>
         </div>
       </div>
@@ -1048,6 +1048,10 @@
             ),
             deposits: JSON.parse(localStorage.getItem("deposits") || "{}"),
             bankBalance: localStorage.getItem("bankBalance"),
+            stockData: JSON.parse(
+              localStorage.getItem("stockData") ||
+                '{"rsu":{"shares":0,"pricePerShare":0},"espp":{"shares":0,"pricePerShare":0},"k401":0}'
+            ),
           };
         }
       }
@@ -1106,6 +1110,9 @@
             case "surplusSavings":
               localStorage.setItem("surplusSavings", data.amount.toString());
               break;
+            case "stockData":
+              localStorage.setItem("stockData", JSON.stringify(data));
+              break;
           }
           return false;
         }
@@ -1120,6 +1127,98 @@
         customBills: [],
       };
 
+      // Stock data structure
+      let stockData = {
+        rsu: {
+          shares: 200,
+          pricePerShare: 0,
+        },
+        espp: { shares: 30, pricePerShare: 0 },
+        k401: 0,
+      };
+
+      const currencyFmt = new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      async function fetchQorvoPrice() {
+        const url =
+          "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=QRVO&apikey=I76RIC3ME3P5U0K0";
+
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          const json = await res.json();
+
+          const price = extractPriceFromAlphaVantage(json);
+
+          console.log("Alpha Vantage raw JSON:", json);
+          console.log("Parsed price:", price);
+
+          if (price === null) {
+            // Don’t clobber the UI with 0.00; just keep the previous good value.
+            console.warn(
+              "Price unavailable; keeping previous value:",
+              stockData.rsu.pricePerShare
+            );
+            return;
+          }
+
+          // Update model
+          stockData.rsu.pricePerShare = price;
+          stockData.espp.pricePerShare = price;
+
+          // Update UI: per‑share
+          document.getElementById("qrvo-price").textContent =
+            currencyFmt.format(price);
+          document.getElementById("qrvo-price-esp").textContent =
+            currencyFmt.format(price);
+
+          // Update totals
+          const rsuTotal = price * stockData.rsu.shares;
+          const esppTotal = price * stockData.espp.shares;
+          document.getElementById("rsu-total").textContent =
+            currencyFmt.format(rsuTotal);
+          document.getElementById("espp-total").textContent =
+            currencyFmt.format(esppTotal);
+        } catch (err) {
+          console.error("Error fetching QRVO price:", err);
+          // Leave previous value in place; optionally show a small error badge.
+        }
+      }
+
+      function extractPriceFromAlphaVantage(json) {
+        if (!json || typeof json !== "object") return null;
+
+        // If the API rate-limited you, you'll see "Note" or "Information":
+        if (json.Note || json.Information || json["Error Message"]) {
+          console.warn(
+            "Alpha Vantage message:",
+            json.Note || json.Information || json["Error Message"]
+          );
+          return null;
+        }
+
+        const quote = json["Global Quote"];
+        if (!quote || typeof quote !== "object") return null;
+
+        let raw = quote["05. price"];
+        if (typeof raw !== "string" && typeof raw !== "number") return null;
+
+        // Normalize to string, strip non-numeric except dot/minus
+        raw = String(raw)
+          .trim()
+          .replace(/[^\d.\-]/g, "");
+        const price = Number.parseFloat(raw);
+
+        // Guard against NaN or non-finite
+        if (!Number.isFinite(price)) return null;
+
+        return price;
+      }
+
       async function refreshBudgetDataCache() {
         const data = await fetchBudgetData();
         budgetDataCache = {
@@ -1128,6 +1227,11 @@
           surplusSavings: data.surplusSavings || 0,
           deposits: data.deposits || {},
           customBills: data.customBills || [],
+        };
+        stockData = data.stockData || {
+          rsu: { shares: 200, pricePerShare: 81 },
+          espp: { shares: 0, pricePerShare: 0 },
+          k401: 0,
         };
         return budgetDataCache;
       }
@@ -1494,6 +1598,46 @@
                 <div style="margin-bottom: 1.5rem;">
                   <h4 style="color: #667eea; margin-bottom: 0.75rem; font-size: 1rem; border-bottom: 2px solid #667eea; padding-bottom: 0.25rem;">${category}</h4>
                   <div class="control-group">
+                    <div style="margin-bottom: 1.5rem;">
+          <h4 style="color: #667eea; margin-bottom: 0.75rem; font-size: 1rem; border-bottom: 2px solid #667eea; padding-bottom: 0.25rem;">💼 Investments & Retirement</h4>
+          <div class="control-group">
+            <div class="control-item">
+              <label>RSU Shares</label>
+              <input type="number" id="adjust_rsu_shares" value="${(
+                stockData.rsu.shares || 0
+              ).toFixed(0)}" step="1" 
+                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
+            </div>
+            <div class="control-item">
+              <label>RSU Price per Share</label>
+              <input type="number" id="adjust_rsu_price" value="${(
+                stockData.rsu.pricePerShare || 0
+              ).toFixed(2)}" step="0.01" 
+                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
+            </div>
+            <div class="control-item">
+              <label>ESPP Shares</label>
+              <input type="number" id="adjust_espp_shares" value="${(
+                stockData.espp.shares || 0
+              ).toFixed(0)}" step="1" 
+                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
+            </div>
+            <div class="control-item">
+              <label>ESPP Price per Share</label>
+              <input type="number" id="adjust_espp_price" value="${(
+                stockData.espp.pricePerShare || 0
+              ).toFixed(2)}" step="0.01" 
+                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
+            </div>
+            <div class="control-item">
+              <label>401K Balance</label>
+              <input type="number" id="adjust_401k" value="${(
+                stockData.k401 || 0
+              ).toFixed(2)}" step="0.01" 
+                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
+      </div>
+    </div>
+  </div>
               `;
 
               categories[category].forEach((bill, index) => {
@@ -1527,6 +1671,20 @@
       }
 
       async function applyAdjustments() {
+        // Update stock data
+        stockData.rsu.shares =
+          parseFloat(document.getElementById("adjust_rsu_shares").value) || 0;
+        stockData.rsu.pricePerShare =
+          parseFloat(document.getElementById("adjust_rsu_price").value) || 0;
+        stockData.espp.shares =
+          parseFloat(document.getElementById("adjust_espp_shares").value) || 0;
+        stockData.espp.pricePerShare =
+          parseFloat(document.getElementById("adjust_espp_price").value) || 0;
+        stockData.k401 =
+          parseFloat(document.getElementById("adjust_401k").value) || 0;
+
+        // Save stock data to API
+        await saveBudgetData("stockData", stockData);
         // Update bill amounts based on input fields
         const adjustments = {};
         const inputs = document.querySelectorAll('[id^="adjust_"]');
@@ -2198,8 +2356,7 @@
 							After all bills paid
 						</div>
 					</div>
-	
-					</div>
+					
 					<div class="summary-card" style="background: #FDD835; color: white;">
 						<div class="label" style="color: white; font-weight: 600;">💰 Monthly Misc Spending</div>
 						<div class="value" style="color: white; font-weight: 700;">$${totalMiscSpending.toFixed(
@@ -2234,15 +2391,45 @@
 							This month: $${monthlySurplus.toFixed(2)}
 						</div>
 					</div>
+
+          <div class="summary-card" style="background: #3F51B5; color: white;">
+              <div class="label" style="color: white; font-weight: 600;">📈 RSU Stock Value</div>
+              <div class="value" style="color: white;">$${(
+                (stockData.rsu.shares || 0) * (stockData.rsu.pricePerShare || 0)
+              ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+              <div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+                ${stockData.rsu.shares || 0} shares @ $${(
+          stockData.rsu.pricePerShare || 0
+        ).toFixed(2)}
+          </div>
+        </div>
+        <div class="summary-card" style="background: #00897B; color: white;">
+          <div class="label" style="color: white; font-weight: 600;">📊 ESPP Stock Value</div>
+          <div class="value" style="color: white;">$${(
+            (stockData.espp.shares || 0) * (stockData.espp.pricePerShare || 0)
+          ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+          <div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+            ${stockData.espp.shares || 0} shares @ $${(
+          stockData.espp.pricePerShare || 0
+        ).toFixed(2)}
+          </div>
+        </div>
+        <div class="summary-card" style="background: #FF6F00; color: white;">
+          <div class="label" style="color: white; font-weight: 600;">🏦 401K Balance</div>
+          <div class="value" style="color: white;">$${(
+            stockData.k401 || 0
+          ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+        </div>
 				</div>
-								<div class="summary-card" style="background: #FF7043; color: white;">
+				<div class="summary-card" style="background: #FF7043; color: white;">
 						<div class="label" style="color: white; font-weight: 600;">💳 Total Debt</div>
 						<div class="value" style="color: white;">$${totalDebt.toLocaleString("en-US", {
               minimumFractionDigits: 2,
             })}</div>
+					</div>
 
+				<!-- Deposit History Section -->
 
-			<!-- Deposit History Section -->
                 ${
                   totalMonthlyDeposits > 0 &&
                   budgetDataCache.deposits[depositsKey]?.entries
@@ -3109,6 +3296,9 @@
 
       // Auto-calculate on page load
       window.addEventListener("DOMContentLoaded", async () => {
+        //get the Qrvo stock price
+        fetchQorvoPrice();
+        setInterval(fetchQorvoPrice, 3600000); // refresh every minute
         // Check if browser supports month input and show fallback if needed
         const monthInput = document.getElementById("monthYear");
         checkMonthSupport(monthInput);
