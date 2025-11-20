@@ -1137,21 +1137,83 @@
         k401: 0,
       };
 
+      const currencyFmt = new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
       async function fetchQorvoPrice() {
         const url =
           "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=QRVO&apikey=I76RIC3ME3P5U0K0";
+
         try {
-          const res = await fetch(url);
-          const data = await res.json();
-          const price = parseFloat(data["Global Quote"]["05. price"]);
+          const res = await fetch(url, { cache: "no-store" });
+          const json = await res.json();
+
+          const price = extractPriceFromAlphaVantage(json);
+          if (price === null) {
+            // Don’t clobber the UI with 0.00; just keep the previous good value.
+            console.warn(
+              "Price unavailable; keeping previous value:",
+              stockData.rsu.pricePerShare
+            );
+            return;
+          }
+
+          // Update model
           stockData.rsu.pricePerShare = price;
           stockData.espp.pricePerShare = price;
+
+          // Update UI: per‑share
+          document.getElementById("qrvo-price").textContent =
+            currencyFmt.format(price);
+          document.getElementById("qrvo-price-esp").textContent =
+            currencyFmt.format(price);
+
+          // Update totals
+          const rsuTotal = price * stockData.rsu.shares;
+          const esppTotal = price * stockData.espp.shares;
+          document.getElementById("rsu-total").textContent =
+            currencyFmt.format(rsuTotal);
+          document.getElementById("espp-total").textContent =
+            currencyFmt.format(esppTotal);
         } catch (err) {
           console.error("Error fetching QRVO price:", err);
+          // Leave previous value in place; optionally show a small error badge.
         }
       }
 
-      setInterval(fetchQorvoPrice, 60_000); // refresh every minute
+      function extractPriceFromAlphaVantage(json) {
+        if (!json || typeof json !== "object") return null;
+
+        // If the API rate-limited you, you'll see "Note" or "Information":
+        if (json.Note || json.Information || json["Error Message"]) {
+          console.warn(
+            "Alpha Vantage message:",
+            json.Note || json.Information || json["Error Message"]
+          );
+          return null;
+        }
+
+        const quote = json["Global Quote"];
+        if (!quote || typeof quote !== "object") return null;
+
+        let raw = quote["05. price"];
+        if (typeof raw !== "string" && typeof raw !== "number") return null;
+
+        // Normalize to string, strip non-numeric except dot/minus
+        raw = String(raw)
+          .trim()
+          .replace(/[^\d.\-]/g, "");
+        const price = Number.parseFloat(raw);
+
+        // Guard against NaN or non-finite
+        if (!Number.isFinite(price)) return null;
+
+        return price;
+      }
 
       async function refreshBudgetDataCache() {
         const data = await fetchBudgetData();
@@ -3232,6 +3294,7 @@
       window.addEventListener("DOMContentLoaded", async () => {
         //get the Qrvo stock price
         fetchQorvoPrice();
+        setInterval(fetchQorvoPrice, 60_000); // refresh every minute
         // Check if browser supports month input and show fallback if needed
         const monthInput = document.getElementById("monthYear");
         checkMonthSupport(monthInput);
