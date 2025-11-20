@@ -705,7 +705,7 @@
         </div>
         <div class="btn-group">
           <button class="btn btn-primary" onclick="calculateBudget()">
-            Calculate Alignment
+            🔄 UPDATE BUDGET
           </button>
 
           <button class="btn btn-success" onclick="showAddBillForm()">
@@ -715,13 +715,13 @@
             💵 Add Deposit
           </button>
           <button class="btn btn-secondary" onclick="toggleAdjustments()">
-            Adjust Bills
+            ⚙️ Adjust Bills
           </button>
           <button class="btn btn-secondary" onclick="toggleSavingsManager()">
-            Manage Savings
+            📋 Manage Savings
           </button>
           <button class="btn btn-secondary" onclick="window.print()">
-            Print Report
+            🖨️ Print Report
           </button>
         </div>
       </div>
@@ -1639,23 +1639,6 @@
     </div>
   </div>
               `;
-
-              categories[category].forEach((bill, index) => {
-                const fieldHTML = `
-                  <div class="control-item">
-                    <label>${bill.name}${
-                  bill.bimonthly ? " (Bi-monthly)" : ""
-                }</label>
-                    <input type="number" id="adjust_${
-                      bill.name
-                    }" value="${bill.amount.toFixed(2)}" step="0.01" 
-                           data-bill-name="${
-                             bill.name
-                           }" style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
-                  </div>
-                `;
-                fieldsContainer.innerHTML += fieldHTML;
-              });
 
               fieldsContainer.innerHTML += `
                   </div>
