@@ -1,135 +1,268 @@
-import React, { useEffect, useRef, useState } from 'react'; import * as THREE
-from 'three'; // Sample star catalog data (replace with your data.json content)
-const generateStarCatalog = () => { const stars = []; for (let i = 0; i < 5000;
-i++) { stars.push({ x: (Math.random() - 0.5) * 2000, y: (Math.random() - 0.5) *
-2000, z: (Math.random() - 0.5) * 2000, magnitude: Math.random() * 5 + 1,
-temperature: Math.random() * 20000 + 3000, name: `Star-${i}` }); } return stars;
-}; const CosmosVisualization = () => { const mountRef = useRef(null); const
-[loading, setLoading] = useState(true); const [starCount, setStarCount] =
-useState(0); const [hoveredStar, setHoveredStar] = useState(null); const
-[mousePos, setMousePos] = useState({ x: 0, y: 0 }); useEffect(() => { if
-(!mountRef.current) return; const scene = new THREE.Scene(); const camera = new
-THREE.PerspectiveCamera( 75, mountRef.current.clientWidth /
-mountRef.current.clientHeight, 0.1, 3000 ); const renderer = new
-THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-mountRef.current.appendChild(renderer.domElement); scene.background = new
-THREE.Color(0x000510); camera.position.set(0, 50, 200); // Create circular
-texture for stars const createCircleTexture = () => { const canvas =
-document.createElement('canvas'); canvas.width = 32; canvas.height = 32; const
-ctx = canvas.getContext('2d'); const gradient = ctx.createRadialGradient(16, 16,
-0, 16, 16, 16); gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
-gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)'); gradient.addColorStop(1,
-'rgba(255, 255, 255, 0)'); ctx.fillStyle = gradient; ctx.fillRect(0, 0, 32, 32);
-return new THREE.CanvasTexture(canvas); }; const circleTexture =
-createCircleTexture(); // Load star catalog const starCatalog =
-generateStarCatalog(); setStarCount(starCatalog.length); // Create stars const
-starGeometry = new THREE.BufferGeometry(); const positions = []; const colors =
-[]; const sizes = []; starCatalog.forEach(star => { positions.push(star.x,
-star.y, star.z); // Color based on temperature (blue = hot, red = cool) const
-temp = star.temperature; let r, g, b; if (temp < 5000) { r = 1.0; g = 0.3 +
-(temp - 3000) / 5000; b = 0.1; } else if (temp < 10000) { r = 1.0; g = 0.8 +
-(temp - 5000) / 10000; b = 0.5 + (temp - 5000) / 10000; } else { r = 0.7 + (temp
-- 10000) / 40000; g = 0.8 + (temp - 10000) / 50000; b = 1.0; } colors.push(r, g,
-b); // Size based on magnitude (brighter = bigger) const size = (7 -
-star.magnitude) * 1.5; sizes.push(size); });
-starGeometry.setAttribute('position', new
-THREE.Float32BufferAttribute(positions, 3)); starGeometry.setAttribute('color',
-new THREE.Float32BufferAttribute(colors, 3)); starGeometry.setAttribute('size',
-new THREE.Float32BufferAttribute(sizes, 1)); const starMaterial = new
-THREE.PointsMaterial({ size: 2, vertexColors: true, transparent: true, opacity:
-0.9, sizeAttenuation: true, blending: THREE.AdditiveBlending, map: circleTexture
-}); const starField = new THREE.Points(starGeometry, starMaterial);
-scene.add(starField); // Add ambient nebula effect const nebulaGeometry = new
-THREE.BufferGeometry(); const nebulaPositions = []; const nebulaColors = [];
-const nebulaSizes = []; for (let i = 0; i < 200; i++) { nebulaPositions.push(
-(Math.random() - 0.5) * 1500, (Math.random() - 0.5) * 1500, (Math.random() -
-0.5) * 1500 ); const hue = Math.random(); if (hue < 0.3) {
-nebulaColors.push(0.5, 0.1, 0.8); } else if (hue < 0.6) { nebulaColors.push(0.1,
-0.3, 0.8); } else { nebulaColors.push(0.8, 0.2, 0.3); }
-nebulaSizes.push(Math.random() * 50 + 30); }
-nebulaGeometry.setAttribute('position', new
-THREE.Float32BufferAttribute(nebulaPositions, 3));
-nebulaGeometry.setAttribute('color', new
-THREE.Float32BufferAttribute(nebulaColors, 3));
-nebulaGeometry.setAttribute('size', new
-THREE.Float32BufferAttribute(nebulaSizes, 1)); const nebulaMaterial = new
-THREE.PointsMaterial({ size: 40, vertexColors: true, transparent: true, opacity:
-0.15, sizeAttenuation: true, blending: THREE.AdditiveBlending, map:
-circleTexture }); const nebula = new THREE.Points(nebulaGeometry,
-nebulaMaterial); scene.add(nebula); // Mouse interaction let mouseX = 0; let
-mouseY = 0; let targetX = 0; let targetY = 0; let isMouseDown = false; const
-mouse = new THREE.Vector2(); const raycaster = new THREE.Raycaster();
-raycaster.params.Points.threshold = 5; const onMouseDown = (e) => { if (e.button
-=== 0) { isMouseDown = true; } }; const onMouseUp = (e) => { if (e.button === 0)
-{ isMouseDown = false; } }; const onMouseMove = (e) => { const newMouseX =
-(e.clientX / window.innerWidth) * 2 - 1; const newMouseY = -(e.clientY /
-window.innerHeight) * 2 + 1; // Only update camera target if mouse is held down
-if (isMouseDown) { mouseX = newMouseX; mouseY = newMouseY; } mouse.x =
-newMouseX; mouse.y = newMouseY; setMousePos({ x: e.clientX, y: e.clientY }); //
-Raycasting for star hover detection raycaster.setFromCamera(mouse, camera);
-const intersects = raycaster.intersectObject(starField); if (intersects.length >
-0) { const index = intersects[0].index; setHoveredStar({ name:
-starCatalog[index].name, magnitude: starCatalog[index].magnitude.toFixed(2),
-temperature: Math.round(starCatalog[index].temperature) }); } else {
-setHoveredStar(null); } }; window.addEventListener('mousemove', onMouseMove);
-window.addEventListener('mousedown', onMouseDown);
-window.addEventListener('mouseup', onMouseUp); // Mouse wheel zoom const onWheel
-= (e) => { e.preventDefault(); camera.position.z += e.deltaY * 0.1;
-camera.position.z = Math.max(50, Math.min(500, camera.position.z)); };
-mountRef.current.addEventListener('wheel', onWheel); // Animation let time = 0;
-const animate = () => { requestAnimationFrame(animate); time += 0.001; // Smooth
-camera movement based on mouse targetX = mouseX * 100; targetY = mouseY * 100;
-camera.position.x += (targetX - camera.position.x) * 0.05; camera.position.y +=
-(targetY - camera.position.y) * 0.05; camera.lookAt(scene.position); // Rotate
-star field slowly starField.rotation.y += 0.0002; starField.rotation.x =
-Math.sin(time) * 0.05; // Rotate nebula nebula.rotation.y -= 0.0001;
-nebula.rotation.x = Math.cos(time * 0.5) * 0.03; renderer.render(scene, camera);
-}; animate(); setLoading(false); // Handle resize const handleResize = () => {
-if (!mountRef.current) return; const width = mountRef.current.clientWidth; const
-height = mountRef.current.clientHeight; camera.aspect = width / height;
-camera.updateProjectionMatrix(); renderer.setSize(width, height); };
-window.addEventListener('resize', handleResize); // Cleanup return () => {
-window.removeEventListener('mousemove', onMouseMove);
-window.removeEventListener('resize', handleResize); if (mountRef.current) {
-mountRef.current.removeEventListener('wheel', onWheel);
-mountRef.current.removeChild(renderer.domElement); } renderer.dispose();
-starGeometry.dispose(); starMaterial.dispose(); nebulaGeometry.dispose();
-nebulaMaterial.dispose(); circleTexture.dispose(); }; }, []); return (
-<div className="relative w-full h-screen bg-black overflow-hidden">
-  <div ref="{mountRef}" className="w-full h-full" />
+import React, { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
 
-  <div
-    className="absolute top-4 left-4 text-white bg-black bg-opacity-50 p-4 rounded-lg backdrop-blur-sm"
-  >
-    <h1 className="text-2xl font-bold mb-2">Interactive Cosmos</h1>
-    <p className="text-sm opacity-80">Stars: {starCount.toLocaleString()}</p>
-    <p className="text-xs opacity-60 mt-2">Click and drag to explore</p>
-    <p className="text-xs opacity-60">Scroll to zoom</p>
-    <p className="text-xs opacity-60">Hover over stars for info</p>
-  </div>
+// Generate sample star catalog data
+const generateStarCatalog = () => {
+  const stars = [];
+  for (let i = 0; i < 5000; i++) {
+    stars.push({
+      x: (Math.random() - 0.5) * 2000,
+      y: (Math.random() - 0.5) * 2000,
+      z: (Math.random() - 0.5) * 2000,
+      magnitude: Math.random() * 5 + 1,
+      temperature: Math.random() * 20000 + 3000,
+      name: `Star-${i}`,
+    });
+  }
+  return stars;
+};
 
-  <div
-    className="absolute bottom-4 right-4 text-white bg-black bg-opacity-50 p-3 rounded-lg backdrop-blur-sm"
-  >
-    <p className="text-xs opacity-80">Color: Star Temperature</p>
-    <p className="text-xs opacity-80">Size: Brightness</p>
-  </div>
+const CosmosVisualization = () => {
+  const mountRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [starCount, setStarCount] = useState(0);
+  const [hoveredStar, setHoveredStar] = useState(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  {loading && (
-  <div className="absolute inset-0 flex items-center justify-center bg-black">
-    <div className="text-white text-xl">Loading cosmos...</div>
-  </div>
-  )} {hoveredStar && ( <div className="absolute bg-black bg-opacity-80
-  text-white px-3 py-2 rounded-lg text-sm pointer-events-none backdrop-blur-sm
-  border border-white border-opacity-20" style={{ left: `${mousePos.x + 15}px`,
-  top: `${mousePos.y + 15}px`, transform: 'translate(0, -50%)' }} >
-  <div className="font-bold">{hoveredStar.name}</div>
-  <div className="text-xs opacity-80">Magnitude: {hoveredStar.magnitude}</div>
-  <div className="text-xs opacity-80">
-    Temperature: {hoveredStar.temperature}K
-  </div>
-</div>
-)}; export default CosmosVisualization;
+  useEffect(() => {
+    if (!mountRef.current) return;
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      mountRef.current.clientWidth / mountRef.current.clientHeight,
+      0.1,
+      3000
+    );
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    mountRef.current.appendChild(renderer.domElement);
+
+    scene.background = new THREE.Color(0x000510);
+    camera.position.set(0, 50, 200);
+
+    // Create circular texture for stars
+    const createCircleTexture = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+      gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 32, 32);
+      return new THREE.CanvasTexture(canvas);
+    };
+
+    const circleTexture = createCircleTexture();
+
+    // Load star catalog
+    const starCatalog = generateStarCatalog();
+    setStarCount(starCatalog.length);
+
+    // Create stars
+    const starGeometry = new THREE.BufferGeometry();
+    const positions = [];
+    const colors = [];
+    const sizes = [];
+
+    starCatalog.forEach(star => {
+      positions.push(star.x, star.y, star.z);
+
+      // Color based on temperature
+      const temp = star.temperature;
+      let r, g, b;
+      if (temp < 5000) {
+        r = 1.0; g = 0.3 + (temp - 3000) / 5000; b = 0.1;
+      } else if (temp < 10000) {
+        r = 1.0; g = 0.8 + (temp - 5000) / 10000; b = 0.5 + (temp - 5000) / 10000;
+      } else {
+        r = 0.7 + (temp - 10000) / 40000; g = 0.8 + (temp - 10000) / 50000; b = 1.0;
+      }
+      colors.push(r, g, b);
+
+      // Size based on magnitude
+      const size = (7 - star.magnitude) * 1.5;
+      sizes.push(size);
+    });
+
+    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    starGeometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+
+    const starMaterial = new THREE.PointsMaterial({
+      size: 2,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.9,
+      sizeAttenuation: true,
+      blending: THREE.AdditiveBlending,
+      map: circleTexture,
+    });
+
+    const starField = new THREE.Points(starGeometry, starMaterial);
+    scene.add(starField);
+
+    [];
+    const nebulaSizes = [];
+
+    for (let i = 0; i < 200; i++) {
+      nebulaPositions.push((Math.random() - 0.5) * 1500, (Math.random() - 0.5) * 1500, (Math.random() - 0.5) * 1500);
+      const hue = Math.random();
+      if (hue < 0.3) {
+        nebulaColors.push(0.5, 0.1, 0.8);
+      } else if (hue < 0.6) {
+        nebulaColors.push(0.1, 0.3, 0.8);
+      } else {
+        nebulaColors.push(0.8, 0.2, 0.3);
+      }
+      nebulaSizes.push(Math.random() * 50 + 30);
+    }
+
+    nebulaGeometry.setAttribute('position', new THREE.Float32BufferAttribute(nebulaPositions, 3));
+    nebulaGeometry.setAttribute('color', new THREE.Float32BufferAttribute(nebulaColors, 3));
+    nebulaGeometry.setAttribute('size', new THREE.Float32BufferAttribute(nebulaSizes, 1));
+
+    const nebulaMaterial = new THREE.PointsMaterial({
+      size: 40,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.15,
+      sizeAttenuation: true,
+      blending: THREE.AdditiveBlending,
+      map: circleTexture,
+    });
+
+    const nebula = new THREE.Points(nebulaGeometry, nebulaMaterial);
+    scene.add(nebula);
+
+    // Mouse interaction
+    let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0, isMouseDown = false;
+    const mouse = new THREE.Vector2();
+    const raycaster = new THREE.Raycaster();
+    raycaster.params.Points.threshold = 5;
+
+    const onMouseDown = e => { if (e.button === 0) isMouseDown = true; };
+    const onMouseUp = e => { if (e.button === 0) isMouseDown = false; };
+    const onMouseMove = e => {
+      const newMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      const newMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+      if (isMouseDown) { mouseX = newMouseX; mouseY = newMouseY; }
+      mouse.x = newMouseX; mouse.y = newMouseY;
+      setMousePos({ x: e.clientX, y: e.clientY });
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObject(starField);
+      if (intersects.length > 0) {
+        const index = intersects[0].index;
+        setHoveredStar({
+          name: starCatalog[index].name,
+          magnitude: starCatalog[index].magnitude.toFixed(2),
+          temperature: Math.round(starCatalog[index].temperature),
+        });
+      } else {
+        setHoveredStar(null);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
+
+    const onWheel = e => {
+      e.preventDefault();
+      camera.position.z += e.deltaY * 0.1;
+      camera.position.z = Math.max(50, Math.min(500, camera.position.z));
+    };
+    mountRef.current.addEventListener('wheel', onWheel);
+
+    // Animation
+    let time = 0;
+    const animate = () => {
+      requestAnimationFrame(animate);
+      time += 0.001;
+      targetX = mouseX * 100;
+      targetY = mouseY * 100;
+      camera.position.x += (targetX - camera.position.x) * 0.05;
+      camera.position.y += (targetY - camera.position.y) * 0.05;
+      camera.lookAt(scene.position);
+
+      starField.rotation.y += 0.0002;
+      starField.rotation.x = Math.sin(time) * 0.05;
+      nebula.rotation.y -= 0.0001;
+      nebula.rotation.x = Math.cos(time * 0.5) * 0.03;
+
+      renderer.render(scene, camera);
+    };
+    animate();
+    setLoading(false);
+
+    const handleResize = () => {
+      if (!mountRef.current) return;
+      const width = mountRef.current.clientWidth;
+      const height = mountRef.current.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('resize', handleResize);
+      if (mountRef.current) {
+        mountRef.current.removeEventListener('wheel', onWheel);
+        mountRef.current.removeChild(renderer.domElement);
+      }
+      renderer.dispose();
+      starGeometry.dispose();
+      starMaterial.dispose();
+      nebulaGeometry.dispose();
+      nebulaMaterial.dispose();
+      circleTexture.dispose();
+    };
+  }, []);
+
+  return (
+    <div className="relative w-full h-screen bg-black overflow-hidden">
+      <div ref={mountRef} className="w-full h-full" />
+      <div className="absolute top-4 left-4 text-white bg-black bg-opacity-50 p-4 rounded-lg backdrop-blur-sm">
+        <h1 className="text-2xl font-bold mb-2">Interactive Cosmos</h1>
+        <p className="text-sm opacity-80">Stars: {starCount.toLocaleString()}</p>
+        <p className="text-xs opacity-60 mt-2">Click and drag to explore</p>
+        <p className="text-xs opacity-60">Scroll to zoom</p>
+        <p className="text-xs opacity-60">Hover over stars for info</p>
+      </div>
+      <div className="absolute bottom-4 right-4 text-white bg-black bg-opacity-50 p-3 rounded-lg backdrop-blur-sm">
+        <p className="text-xs opacity-80">Color: Star Temperature</p>
+        <p className="text-xs opacity-80">Size: Brightness</p>
+      </div>
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <div className="text-white text-xl">Loading cosmos...</div>
+        </div>
+      )}
+      {hoveredStar && (
+        <div
+          className="absolute bg-black bg-opacity-80 text-white px-3 py-2 rounded-lg text-sm pointer-events-none backdrop-blur-sm border border-white border-opacity-20"
+          style={{
+            left: `${mousePos.x + 15}px`,
+            top: `${mousePos.y + 15}px`,
+            transform: 'translate(0, -50%)',
+          }}
+        >
+          <div className="font-bold">{hoveredStar.name}</div>
+          <div className="text-xs opacity-80">Magnitude: {hoveredStar.magnitude}</div>
+          <div className="text-xs opacity-80">Temperature: {hoveredStar.temperature}K</div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CosmosVisualization;
