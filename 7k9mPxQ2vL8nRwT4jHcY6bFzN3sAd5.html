@@ -1137,7 +1137,7 @@
         k401: 0,
       };
 
-      async function fetchQ0rvoPrice() {
+      async function fetchQorvoPrice() {
         const url =
           "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=QRVO&apikey=I76RIC3ME3P5U0K0";
         try {
@@ -1151,7 +1151,7 @@
         }
       }
 
-      setInterval(fetchQrvoPrice, 60_000); // refresh every minute
+      setInterval(fetchQorvoPrice, 60_000); // refresh every minute
 
       async function refreshBudgetDataCache() {
         const data = await fetchBudgetData();
@@ -3231,7 +3231,7 @@
       // Auto-calculate on page load
       window.addEventListener("DOMContentLoaded", async () => {
         //get the Qrvo stock price
-        fetchQrvoPrice();
+        fetchQorvoPrice();
         // Check if browser supports month input and show fallback if needed
         const monthInput = document.getElementById("monthYear");
         checkMonthSupport(monthInput);
