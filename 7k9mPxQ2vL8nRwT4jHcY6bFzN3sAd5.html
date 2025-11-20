@@ -1133,7 +1133,7 @@
           shares: 200,
           pricePerShare: 0,
         },
-        espp: { shares: 0, pricePerShare: 0 },
+        espp: { shares: 30, pricePerShare: 0 },
         k401: 0,
       };
 
@@ -3298,7 +3298,7 @@
       window.addEventListener("DOMContentLoaded", async () => {
         //get the Qrvo stock price
         fetchQorvoPrice();
-        setInterval(fetchQorvoPrice, 60_000); // refresh every minute
+        setInterval(fetchQorvoPrice, 3600000); // refresh every minute
         // Check if browser supports month input and show fallback if needed
         const monthInput = document.getElementById("monthYear");
         checkMonthSupport(monthInput);
