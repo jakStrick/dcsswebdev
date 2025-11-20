@@ -1131,12 +1131,27 @@
       let stockData = {
         rsu: {
           shares: 200,
-          pricePerShare:
-            "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=QRVO&apikey=I76RIC3ME3P5U0K0",
+          pricePerShare: 0,
         },
         espp: { shares: 0, pricePerShare: 0 },
         k401: 0,
       };
+
+      async function fetchQ0rvoPrice() {
+        const url =
+          "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=QRVO&apikey=I76RIC3ME3P5U0K0";
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          const price = parseFloat(data["Global Quote"]["05. price"]);
+          stockData.rsu.pricePerShare = price;
+          stockData.espp.pricePerShare = price;
+        } catch (err) {
+          console.error("Error fetching QRVO price:", err);
+        }
+      }
+
+      setInterval(fetchQrvoPrice, 60_000); // refresh every minute
 
       async function refreshBudgetDataCache() {
         const data = await fetchBudgetData();
@@ -3215,6 +3230,8 @@
 
       // Auto-calculate on page load
       window.addEventListener("DOMContentLoaded", async () => {
+        //get the Qrvo stock price
+        fetchQrvoPrice();
         // Check if browser supports month input and show fallback if needed
         const monthInput = document.getElementById("monthYear");
         checkMonthSupport(monthInput);
