@@ -1588,6 +1588,9 @@
           billsData.forEach((bill) => {
             if (categories[bill.category]) {
               categories[bill.category].push(bill);
+              console.log(
+                `Bill "${bill.name}" added to category "${bill.category}"`
+              );
             }
           });
 
