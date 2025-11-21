@@ -3290,7 +3290,7 @@
         await loadSavedAdjustments();
 
         // Load saved bank balance from API
-        if (data.bankBalance !== null) {
+        if (adjustedBankBalance !== null) {
           document.getElementById("bankBalance").value =
             adjustedBankBalance.toFixed(2); //data.bankBalance;
         }
