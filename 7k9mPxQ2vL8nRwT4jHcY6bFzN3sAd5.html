@@ -1127,16 +1127,6 @@
         customBills: [],
       };
 
-      // Stock data structure
-      let stockData = {
-        rsu: {
-          shares: 200,
-          pricePerShare: 0,
-        },
-        espp: { shares: 30, pricePerShare: 0 },
-        k401: 0,
-      };
-
       const currencyFmt = new Intl.NumberFormat(undefined, {
         style: "currency",
         currency: "USD",
@@ -1229,8 +1219,11 @@
           customBills: data.customBills || [],
         };
         stockData = data.stockData || {
-          rsu: { shares: 200, pricePerShare: 81 },
-          espp: { shares: 30, pricePerShare: 0 },
+          rsu: { shares: 200, pricePerShare: stockData.rsu.pricePerShare || 0 },
+          espp: {
+            shares: 30,
+            pricePerShare: stockData.espp.pricePerShare || 0,
+          },
           k401: 925.52,
         };
         return budgetDataCache;
