@@ -2993,11 +2993,20 @@
         budgetDataCache.miscExpenses[miscKey] = updatedData;
 
         // Subtract the new amount from bank balance
-        const currentBankBalance =
+        /*const currentBankBalance =
           parseFloat(document.getElementById("bankBalance").value) || 0;
         const newBankBalance = adjustedBalance + amount; //currentBankBalance - newAmount;
         document.getElementById("bankBalance").value =
+          newBankBalance.toFixed(2);*/
+
+        const currentBankBalance =
+          parseFloat(document.getElementById("bankBalance").value) || 0;
+        const newBankBalance = currentBankBalance - newAmount;
+        document.getElementById("bankBalance").value =
           newBankBalance.toFixed(2);
+        await saveBudgetData("bankBalance", {
+          value: newBankBalance.toFixed(2),
+        });
 
         // Save the new bank balance to API
         await saveBudgetData("bankBalance", {
@@ -3013,6 +3022,7 @@
 
         // Recalculate and update displayed values
         calculateBudget();
+        updateDisplayedBankBalance();
       }
 
       // Toggle misc expense history visibility
