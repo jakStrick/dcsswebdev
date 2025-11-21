@@ -3305,7 +3305,8 @@
 				// Note: Misc expenses are now permanently subtracted from base balance
 				// when submitted, so we don't subtract them here
 
-				// Add paychecks that have already occurred (date <= today)
+				// Add paychecks that occurred TODAY only (not all past paychecks)
+				// The Initial Bank Balance already reflects the balance before today's paycheck
 				let totalPaychecksReceived = 0;
 				const today = new Date();
 				today.setHours(0, 0, 0, 0);
@@ -3313,7 +3314,8 @@
 				payPeriods.forEach((period) => {
 					const periodDate = new Date(period.date);
 					periodDate.setHours(0, 0, 0, 0);
-					if (periodDate <= today) {
+					// Only add if payday is TODAY
+					if (periodDate.getTime() === today.getTime()) {
 						totalPaychecksReceived += period.amount;
 					}
 				});
