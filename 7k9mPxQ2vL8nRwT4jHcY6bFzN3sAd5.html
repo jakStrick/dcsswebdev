@@ -1230,8 +1230,8 @@
         };
         stockData = data.stockData || {
           rsu: { shares: 200, pricePerShare: 81 },
-          espp: { shares: 0, pricePerShare: 0 },
-          k401: 0,
+          espp: { shares: 30, pricePerShare: 0 },
+          k401: 925.52,
         };
         return budgetDataCache;
       }
@@ -1500,17 +1500,6 @@
           bimonthly: true,
         },
         {
-          name: "Blue Mountain",
-          category: "Utilities",
-          amount: 65.29,
-          balance: 0,
-          dueDay: 1,
-          ach: true,
-          type: "UP",
-          priority: 2,
-          adjustable: true,
-        },
-        {
           name: "Brooks Pest Service",
           category: "Utilities",
           amount: 109.0,
@@ -1567,6 +1556,17 @@
           priority: 4,
           adjustable: true,
         },
+        {
+          name: "401K Balance",
+          category: "Stock",
+          amount: stockData.k401,
+          balance: 0,
+          dueDay: null,
+          ach: true,
+          type: "UP",
+          priority: 0,
+          adjustable: true,
+        },
       ];
 
       function toggleAdjustments() {
@@ -1583,6 +1583,7 @@
             Utilities: [],
             Budget: [],
             Subscription: [],
+            Stocks: [],
           };
 
           billsData.forEach((bill) => {
@@ -1599,25 +1600,25 @@
             if (categories[category].length > 0) {
               categories[category].forEach((bill, index) => {
                 const fieldHTML = `
-                  <div class="control-item">
-                    <label>${bill.name}${
+                    <div class="control-item">
+                      <label>${bill.name}${
                   bill.bimonthly ? " (Bi-monthly)" : ""
                 }</label>
-                    <input type="number" id="adjust_${
-                      bill.name
-                    }" value="${bill.amount.toFixed(2)}" step="0.01" 
-                           data-bill-name="${
-                             bill.name
-                           }" style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
-                  </div>
-                `;
+                      <input type="number" id="adjust_${
+                        bill.name
+                      }" value="${bill.amount.toFixed(2)}" step="0.01"
+                             data-bill-name="${
+                               bill.name
+                             }" style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
+                    </div>
+                  `;
                 fieldsContainer.innerHTML += fieldHTML;
               });
 
               fieldsContainer.innerHTML += `
+                    </div>
                   </div>
-                </div>
-              `;
+                `;
             }
           });
 
@@ -2246,224 +2247,234 @@
         }
 
         let html = `
-                	
-				<div class="summary">
-					<div class="summary-card" style="background: #4CAF50; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">💵 Total Monthly Income</div>
-						<div class="value" style="color: white;">$${totalIncome.toFixed(2)}</div>
-						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							David: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks + Rental
-						</div>
-					</div>
-					<div class="summary-card" style="background: #E91E63; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">🏠 Rental Income</div>
-						<div class="value" style="color: white; font-weight: 700;">$${rentalIncome.toFixed(
-              2
-            )}</div>
-						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							Received on 1st of month
-						</div>
-					</div>
-					${
-            isCurrentMonth
+
+      <div class="summary">
+      	<div class="summary-card" style="background: #4CAF50; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">💵 Total Monthly Income</div>
+      		<div class="value" style="color: white;">$${totalIncome.toFixed(2)}</div>
+      		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+      			David: ${DavidPaychecksTotal}x | Claudia: ${ClaudiaPaychecksTotal}x paychecks + Rental
+      		</div>
+      	</div>
+      	<div class="summary-card" style="background: #E91E63; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">🏠 Rental Income</div>
+      		<div class="value" style="color: white; font-weight: 700;">$${rentalIncome.toFixed(
+            2
+          )}</div>
+      		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+      			Received on 1st of month
+      		</div>
+      	</div>
+      	${
+          isCurrentMonth
+            ? `
+      	<div class="summary-card" style="background: #5C9FD8; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">🏦 Current Checking Balance</div>
+      		<div class="value" style="color: white;">$${adjustedBankBalance.toFixed(
+            2
+          )}</div>
+      		${
+            totalPaidBills > 0
               ? `
-					<div class="summary-card" style="background: #5C9FD8; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">🏦 Current Checking Balance</div>
-						<div class="value" style="color: white;">$${adjustedBankBalance.toFixed(
-              2
-            )}</div>
-						${
-              totalPaidBills > 0
-                ? `
-						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							Base: $${bankBalance.toFixed(2)} - Paid: $${totalPaidBills.toFixed(2)}
-						</div>
-						`
-                : ""
-            }
-					</div>
-					<div class="summary-card" style="background: #FF9800; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">💸 Remaining Monthly Income</div>
-						<div class="value" style="color: white;">$${remainingIncome.toFixed(2)}</div>
-						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							David: ${DavidPaychecksRemaining}x | Claudia: ${ClaudiaPaychecksRemaining}x left
-						</div>
-					</div>
-					`
+      		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+      			Base: $${bankBalance.toFixed(2)} - Paid: $${totalPaidBills.toFixed(2)}
+      		</div>
+      		`
               : ""
           }
-					<div class="summary-card" style="background: #CE6BA4; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">📋 ${
-              isCurrentMonth ? "Remaining " : "Total "
-            }Bills</div>
-						<div class="value" style="color: white;">$${totalExpenses.toFixed(2)}</div>
-					</div>
-					<div class="summary-card" style="background: ${
-            netCashFlow >= 0 ? "#4CAF50" : "#E91E63"
-          }; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">💹 Net Cash Flow</div>
-						<div class="value" style="color: white;">$${netCashFlow.toFixed(2)}</div>
-					</div>
-					<div class="summary-card" style="background: ${
-            projectedBalance >= 0 ? "#66BB6A" : "#E91E63"
-          }; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">📊 Projected Balance</div>
-						<div class="value" style="color: white;">$${projectedBalance.toFixed(2)}</div>
-						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							After all bills paid
-						</div>
-					</div>
-					
-					<div class="summary-card" style="background: #FDD835; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">💰 Monthly Misc Spending</div>
-						<div class="value" style="color: white; font-weight: 700;">$${totalMiscSpending.toFixed(
-              2
-            )}</div>
-						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							${new Date(year, month - 1).toLocaleString("default", {
-                month: "long",
-                year: "numeric",
-              })}
-						</div>
-					</div>
-					<div class="summary-card" style="background: #26A69A; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">💵 Monthly Other Deposits</div>
-						<div class="value" style="color: white; font-weight: 700;">$${totalMonthlyDeposits.toFixed(
-              2
-            )}</div>
-						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							${new Date(year, month - 1).toLocaleString("default", {
-                month: "long",
-                year: "numeric",
-              })}
-						</div>
-					</div>
-					<div class="summary-card" style="background: #9C27B0; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">💎 Surplus Savings Balance</div>
-						<div class="value" style="color: white;">$${accumulatedSavings.toLocaleString(
-              "en-US",
-              { minimumFractionDigits: 2 }
-            )}</div>
-						<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-							This month: $${monthlySurplus.toFixed(2)}
-						</div>
-					</div>
+      	</div>
+      	<div class="summary-card" style="background: #FF9800; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">💸 Remaining Monthly Income</div>
+      		<div class="value" style="color: white;">$${remainingIncome.toFixed(
+            2
+          )}</div>
+      		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+      			David: ${DavidPaychecksRemaining}x | Claudia: ${ClaudiaPaychecksRemaining}x left
+      		</div>
+      	</div>
+      	`
+            : ""
+        }
+      	<div class="summary-card" style="background: #CE6BA4; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">📋 ${
+            isCurrentMonth ? "Remaining " : "Total "
+          }Bills</div>
+      		<div class="value" style="color: white;">$${totalExpenses.toFixed(
+            2
+          )}</div>
+      	</div>
+      	<div class="summary-card" style="background: ${
+          netCashFlow >= 0 ? "#4CAF50" : "#E91E63"
+        }; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">💹 Net Cash Flow</div>
+      		<div class="value" style="color: white;">$${netCashFlow.toFixed(2)}</div>
+      	</div>
+      	<div class="summary-card" style="background: ${
+          projectedBalance >= 0 ? "#66BB6A" : "#E91E63"
+        }; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">📊 Projected Balance</div>
+      		<div class="value" style="color: white;">$${projectedBalance.toFixed(
+            2
+          )}</div>
+      		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+      			After all bills paid
+      		</div>
+      	</div>
 
-          <div class="summary-card" style="background: #3F51B5; color: white;">
-              <div class="label" style="color: white; font-weight: 600;">📈 RSU Stock Value</div>
-              <div class="value" style="color: white;">$${(
-                (stockData.rsu.shares || 0) * (stockData.rsu.pricePerShare || 0)
-              ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
-              <div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-                ${stockData.rsu.shares || 0} shares @ $${(
+      	<div class="summary-card" style="background: #FDD835; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">💰 Monthly Misc Spending</div>
+      		<div class="value" style="color: white; font-weight: 700;">$${totalMiscSpending.toFixed(
+            2
+          )}</div>
+      		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+      			${new Date(year, month - 1).toLocaleString("default", {
+              month: "long",
+              year: "numeric",
+            })}
+      		</div>
+      	</div>
+      	<div class="summary-card" style="background: #26A69A; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">💵 Monthly Other Deposits</div>
+      		<div class="value" style="color: white; font-weight: 700;">$${totalMonthlyDeposits.toFixed(
+            2
+          )}</div>
+      		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+      			${new Date(year, month - 1).toLocaleString("default", {
+              month: "long",
+              year: "numeric",
+            })}
+      		</div>
+      	</div>
+      	<div class="summary-card" style="background: #9C27B0; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">💎 Surplus Savings Balance</div>
+      		<div class="value" style="color: white;">$${accumulatedSavings.toLocaleString(
+            "en-US",
+            { minimumFractionDigits: 2 }
+          )}</div>
+      		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+      			This month: $${monthlySurplus.toFixed(2)}
+      		</div>
+      	</div>
+
+            <div class="summary-card" style="background: #3F51B5; color: white;">
+                <div class="label" style="color: white; font-weight: 600;">📈 RSU Stock Value</div>
+                <div class="value" style="color: white;">$${(
+                  (stockData.rsu.shares || 0) *
+                  (stockData.rsu.pricePerShare || 0)
+                ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+                  ${stockData.rsu.shares || 0} shares @ $${(
           stockData.rsu.pricePerShare || 0
         ).toFixed(2)}
+            </div>
           </div>
-        </div>
-        <div class="summary-card" style="background: #00897B; color: white;">
-          <div class="label" style="color: white; font-weight: 600;">📊 ESPP Stock Value</div>
-          <div class="value" style="color: white;">$${(
-            (stockData.espp.shares || 0) * (stockData.espp.pricePerShare || 0)
-          ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
-          <div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-            ${stockData.espp.shares || 0} shares @ $${(
+          <div class="summary-card" style="background: #00897B; color: white;">
+            <div class="label" style="color: white; font-weight: 600;">📊 ESPP Stock Value</div>
+            <div class="value" style="color: white;">$${(
+              (stockData.espp.shares || 0) * (stockData.espp.pricePerShare || 0)
+            ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
+              ${stockData.espp.shares || 0} shares @ $${(
           stockData.espp.pricePerShare || 0
         ).toFixed(2)}
+            </div>
           </div>
-        </div>
-        <div class="summary-card" style="background: #FF6F00; color: white;">
-          <div class="label" style="color: white; font-weight: 600;">🏦 401K Balance</div>
-          <div class="value" style="color: white;">$${(
-            stockData.k401 || 0
-          ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
-        </div>
-				</div>
-				<div class="summary-card" style="background: #FF7043; color: white;">
-						<div class="label" style="color: white; font-weight: 600;">💳 Total Debt</div>
-						<div class="value" style="color: white;">$${totalDebt.toLocaleString("en-US", {
+          <div class="summary-card" style="background: #FF6F00; color: white;">
+            <div class="label" style="color: white; font-weight: 600;">🏦 401K Balance</div>
+            <div class="value" style="color: white;">$${(
+              stockData.k401 || 0
+            ).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+          </div>
+      </div>
+      <div class="summary-card" style="background: #FF7043; color: white;">
+      		<div class="label" style="color: white; font-weight: 600;">💳 Total Debt</div>
+      		<div class="value" style="color: white;">$${totalDebt.toLocaleString(
+            "en-US",
+            {
               minimumFractionDigits: 2,
-            })}</div>
-					</div>
+            }
+          )}</div>
+      	</div>
 
-				<!-- Deposit History Section -->
+      <!-- Deposit History Section -->
 
-                ${
-                  totalMonthlyDeposits > 0 &&
-                  budgetDataCache.deposits[depositsKey]?.entries
-                    ? `
-                <div style="margin: 1.5rem 0; padding: 1rem; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 0.5rem; border: 2px solid #28a745;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <h3 style="margin: 0; color: #1b5e20; font-size: 1.125rem;">💵 Deposit History - ${new Date(
-                          year,
-                          month - 1
-                        ).toLocaleString("default", {
-                          month: "long",
-                          year: "numeric",
-                        })}</h3>
-                        <span style="font-weight: 700; color: #1b5e20; font-size: 1.25rem;">$${totalMonthlyDeposits.toFixed(
-                          2
-                        )}</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                        ${budgetDataCache.deposits[depositsKey].entries
-                          .sort(
-                            (a, b) =>
-                              new Date(b.timestamp) - new Date(a.timestamp)
-                          )
-                          .map(
-                            (entry) => `
-                            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: white; border-radius: 0.375rem; border: 1px solid #a5d6a7;">
-                                <div style="flex: 1;">
-                                    <span style="font-weight: 600; color: #1b5e20; font-size: 1rem;">$${entry.amount.toFixed(
-                                      2
-                                    )}</span>
-                                    <span style="color: #2e7d32; margin-left: 0.75rem; font-size: 0.9rem;">${
-                                      entry.comment || "No description"
-                                    }</span>
-                                </div>
-                                <span style="color: #558b2f; font-size: 0.875rem; white-space: nowrap; margin-left: 1rem;">
-                                    ${new Date(
-                                      entry.timestamp
-                                    ).toLocaleString()}
-                                </span>
-                            </div>
-                        `
-                          )
-                          .join("")}
-                    </div>
-                </div>
-                `
-                    : ""
-                }
+                  ${
+                    totalMonthlyDeposits > 0 &&
+                    budgetDataCache.deposits[depositsKey]?.entries
+                      ? `
+                  <div style="margin: 1.5rem 0; padding: 1rem; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 0.5rem; border: 2px solid #28a745;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                          <h3 style="margin: 0; color: #1b5e20; font-size: 1.125rem;">💵 Deposit History - ${new Date(
+                            year,
+                            month - 1
+                          ).toLocaleString("default", {
+                            month: "long",
+                            year: "numeric",
+                          })}</h3>
+                          <span style="font-weight: 700; color: #1b5e20; font-size: 1.25rem;">$${totalMonthlyDeposits.toFixed(
+                            2
+                          )}</span>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                          ${budgetDataCache.deposits[depositsKey].entries
+                            .sort(
+                              (a, b) =>
+                                new Date(b.timestamp) - new Date(a.timestamp)
+                            )
+                            .map(
+                              (entry) => `
+                              <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: white; border-radius: 0.375rem; border: 1px solid #a5d6a7;">
+                                  <div style="flex: 1;">
+                                      <span style="font-weight: 600; color: #1b5e20; font-size: 1rem;">$${entry.amount.toFixed(
+                                        2
+                                      )}</span>
+                                      <span style="color: #2e7d32; margin-left: 0.75rem; font-size: 0.9rem;">${
+                                        entry.comment || "No description"
+                                      }</span>
+                                  </div>
+                                  <span style="color: #558b2f; font-size: 0.875rem; white-space: nowrap; margin-left: 1rem;">
+                                      ${new Date(
+                                        entry.timestamp
+                                      ).toLocaleString()}
+                                  </span>
+                              </div>
+                          `
+                            )
+                            .join("")}
+                      </div>
+                  </div>
+                  `
+                      : ""
+                  }
 
-                <div class="content">
-            `;
+                  <div class="content">
+              `;
 
         // Add alerts based on cash flow
         if (netCashFlow < 0) {
           html += `
-                    <div class="alert alert-danger">
-                        <span class="icon">⚠️</span>
-                        <div>
-                            <strong>Budget Deficit!</strong> David expenses exceed income by $${Math.abs(
-                              netCashFlow
-                            ).toFixed(2)}. 
-                            Consider deferring non-essential payments or negotiating payment plans.
-                        </div>
-                    </div>
-                `;
+                      <div class="alert alert-danger">
+                          <span class="icon">⚠️</span>
+                          <div>
+                              <strong>Budget Deficit!</strong> David expenses exceed income by $${Math.abs(
+                                netCashFlow
+                              ).toFixed(2)}.
+                              Consider deferring non-essential payments or negotiating payment plans.
+                          </div>
+                      </div>
+                  `;
         } else if (netCashFlow > 0) {
           html += `
-                    <div class="alert alert-success">
-                        <span class="icon">✓</span>
-                        <div>
-                            <strong>Budget Surplus!</strong> You have $${netCashFlow.toFixed(
-                              2
-                            )} remaining after all bills. 
-                            Consider applying this to David highest-interest debt.
-                        </div>
-                    </div>
-                `;
+                      <div class="alert alert-success">
+                          <span class="icon">✓</span>
+                          <div>
+                              <strong>Budget Surplus!</strong> You have $${netCashFlow.toFixed(
+                                2
+                              )} remaining after all bills.
+                              Consider applying this to David highest-interest debt.
+                          </div>
+                      </div>
+                  `;
         }
 
         // Render each pay period
@@ -2475,48 +2486,51 @@
           ).toFixed(1);
 
           html += `
-                    <div class="paycheck-section">
-                        <div class="paycheck-header">
-                            <h2>
-                                <span>💵</span>
-                                Paycheck ${index + 1} - ${period.person}
-                                <span style="font-size: 1rem; opacity: 0.9; font-weight: normal;">
-                                    (${period.date.toLocaleDateString("en-US", {
-                                      month: "short",
-                                      day: "numeric",
-                                      year: "numeric",
-                                    })})
-                                </span>
-                            </h2>
-                            <div class="paycheck-info">
-                                <div class="paycheck-amount">$${period.amount.toFixed(
-                                  2
-                                )}</div>
-                                <div class="paycheck-remaining" style="color: ${
-                                  remaining >= 0 ? "#90EE90" : "#FFB6C6"
-                                }">
-                                    Remaining: $${remaining.toFixed(
-                                      2
-                                    )} (${utilizationPercent}% used)
-                                </div>
-                            </div>
-                        </div>
+                      <div class="paycheck-section">
+                          <div class="paycheck-header">
+                              <h2>
+                                  <span>💵</span>
+                                  Paycheck ${index + 1} - ${period.person}
+                                  <span style="font-size: 1rem; opacity: 0.9; font-weight: normal;">
+                                      (${period.date.toLocaleDateString(
+                                        "en-US",
+                                        {
+                                          month: "short",
+                                          day: "numeric",
+                                          year: "numeric",
+                                        }
+                                      )})
+                                  </span>
+                              </h2>
+                              <div class="paycheck-info">
+                                  <div class="paycheck-amount">$${period.amount.toFixed(
+                                    2
+                                  )}</div>
+                                  <div class="paycheck-remaining" style="color: ${
+                                    remaining >= 0 ? "#90EE90" : "#FFB6C6"
+                                  }">
+                                      Remaining: $${remaining.toFixed(
+                                        2
+                                      )} (${utilizationPercent}% used)
+                                  </div>
+                              </div>
+                          </div>
 
-                        <table class="bills-table">
-                            <thead>
-                                <tr>
-                                    <th>Bill Name</th>
-                                    <th>Category</th>
-                                    <th>Due Date</th>
-                                    <th>Amount</th>
-                                    <th>Balance</th>
-                                    <th>Payment Status</th>
-                                    <th>Priority</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
+                          <table class="bills-table">
+                              <thead>
+                                  <tr>
+                                      <th>Bill Name</th>
+                                      <th>Category</th>
+                                      <th>Due Date</th>
+                                      <th>Amount</th>
+                                      <th>Balance</th>
+                                      <th>Payment Status</th>
+                                      <th>Priority</th>
+                                      <th>Actions</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                  `;
 
           // Sort bills by due date
           const sortedBills = [...period.bills].sort(
@@ -2563,61 +2577,65 @@
               paymentStatus === "REMOVE" ? 'class="bill-row-removed"' : "";
 
             html += `
-                        <tr ${rowClass}>
-                            <td>
-                                <div class="bill-name">${bill.name}</div>
-                                ${
-                                  daysUntilDue >= 0 && daysUntilDue <= 3
-                                    ? '<span class="badge badge-priority">Due Soon</span>'
-                                    : ""
-                                }
-                            </td>
-                            <td><span class="bill-category">${
-                              bill.category
-                            }</span></td>
-                            <td><span class="due-date">${bill.dueDate.toLocaleDateString(
-                              "en-US",
-                              { month: "short", day: "numeric" }
-                            )}</span></td>
-                            <td><span class="amount">$${bill.amount.toFixed(
-                              2
-                            )}</span></td>
-                            <td><span class="balance">$${bill.balance.toLocaleString(
-                              "en-US",
-                              { minimumFractionDigits: 2 }
-                            )}</span></td>
-                            <td>
-                                <select class="payment-status-dropdown" 
-                                        data-bill-key="${billKey}"
-                                        data-bill-amount="${bill.amount}"
-                                        data-status="${paymentStatus}"
-                                        onchange="updatePaymentStatus(this)">
-                                    <option value="NP" ${
-                                      paymentStatus === "NP" ? "selected" : ""
-                                    }>NP - Not Paid</option>
-                                    <option value="PNC" ${
-                                      paymentStatus === "PNC" ? "selected" : ""
-                                    }>PNC - Paid (Not Cleared)</option>
-                                    <option value="PCL" ${
-                                      paymentStatus === "PCL" ? "selected" : ""
-                                    }>PCL - Paid & Cleared</option>
-                                    <option value="REMOVE" ${
-                                      paymentStatus === "REMOVE"
-                                        ? "selected"
-                                        : ""
-                                    }>Remove</option>
-                                </select>
-                            </td>
-                            <td><span class="${priorityClass}">${priorityLabel}</span></td>
-                            <td>
-                                ${
-                                  bill.custom
-                                    ? `<button class="btn-delete-bill" onclick="deleteBill(${bill.id})" title="Archive Bill">🗑️</button>`
-                                    : ""
-                                }
-                            </td>
-                        </tr>
-                    `;
+                          <tr ${rowClass}>
+                              <td>
+                                  <div class="bill-name">${bill.name}</div>
+                                  ${
+                                    daysUntilDue >= 0 && daysUntilDue <= 3
+                                      ? '<span class="badge badge-priority">Due Soon</span>'
+                                      : ""
+                                  }
+                              </td>
+                              <td><span class="bill-category">${
+                                bill.category
+                              }</span></td>
+                              <td><span class="due-date">${bill.dueDate.toLocaleDateString(
+                                "en-US",
+                                { month: "short", day: "numeric" }
+                              )}</span></td>
+                              <td><span class="amount">$${bill.amount.toFixed(
+                                2
+                              )}</span></td>
+                              <td><span class="balance">$${bill.balance.toLocaleString(
+                                "en-US",
+                                { minimumFractionDigits: 2 }
+                              )}</span></td>
+                              <td>
+                                  <select class="payment-status-dropdown"
+                                          data-bill-key="${billKey}"
+                                          data-bill-amount="${bill.amount}"
+                                          data-status="${paymentStatus}"
+                                          onchange="updatePaymentStatus(this)">
+                                      <option value="NP" ${
+                                        paymentStatus === "NP" ? "selected" : ""
+                                      }>NP - Not Paid</option>
+                                      <option value="PNC" ${
+                                        paymentStatus === "PNC"
+                                          ? "selected"
+                                          : ""
+                                      }>PNC - Paid (Not Cleared)</option>
+                                      <option value="PCL" ${
+                                        paymentStatus === "PCL"
+                                          ? "selected"
+                                          : ""
+                                      }>PCL - Paid & Cleared</option>
+                                      <option value="REMOVE" ${
+                                        paymentStatus === "REMOVE"
+                                          ? "selected"
+                                          : ""
+                                      }>Remove</option>
+                                  </select>
+                              </td>
+                              <td><span class="${priorityClass}">${priorityLabel}</span></td>
+                              <td>
+                                  ${
+                                    bill.custom
+                                      ? `<button class="btn-delete-bill" onclick="deleteBill(${bill.id})" title="Archive Bill">🗑️</button>`
+                                      : ""
+                                  }
+                              </td>
+                          </tr>
+                      `;
           });
 
           // Add Misc row
@@ -2645,102 +2663,102 @@
           const miscAmount = miscData.total || 0;
 
           html += `
-                        <tr style="background: #fff9e6; border-top: 2px solid #ffc107;">
-                          <td colspan="7" class="misc-unforeseen">
-                            <div style="padding: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                                    <div class="bill-name" style="color: #856404; margin-bottom: 0.75rem;">
-                                        💰 Misc/Unforeseen - Week ${index + 1}
-                                        ${
-                                          miscAmount > 0
-                                            ? `<span style="font-weight: 700; margin-left: 0.5rem;">Total: $${miscAmount.toFixed(
-                                                2
-                                              )}</span>`
-                                            : ""
-                                        }
-                                    </div>
-                                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap;">
-                                        <input type="number" 
-                                               id="misc-input-${miscKey}"
-                                               class="misc-amount-input" 
-                                               data-misc-key="${miscKey}"
-                                               value="0.00" 
-                                               step="0.01"
-                                               min="0"
-                                               placeholder="Amount"
-                                               style="width: 120px; padding: 0.5rem; border: 2px solid #ffc107; border-radius: 0.375rem; font-size: 0.875rem;">
-                                        <input type="text"
-                                               id="misc-comment-${miscKey}"
-                                               placeholder="What was this for? (e.g., Gas, Groceries)"
-                                               style="flex: 1; min-width: 200px; padding: 0.5rem; border: 2px solid #ffc107; border-radius: 0.375rem; font-size: 0.875rem;">
-                                        <button type="button" onclick="submitMiscAmount('${miscKey}')" 
-                                                style="padding: 0.5rem 1rem; background: #ffc107; color: #856404; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; font-size: 0.875rem; white-space: nowrap;"
-                                                onmouseover="this.style.background='#e0a800'" 
-                                                onmouseout="this.style.background='#ffc107'">
-                                            Add Expense
-                                        </button>
-                                    </div>
-                                    ${
-                                      miscData.entries &&
-                                      miscData.entries.length > 0
-                                        ? `
-                                        <div style="margin-top: 0.75rem;">
-                                            <button type="button" 
-                                                    onclick="toggleMiscHistory('${miscKey}')"
-                                                    style="background: none; border: none; color: #856404; cursor: pointer; font-size: 0.875rem; text-decoration: underline; padding: 0;">
-                                                📋 View Expense History (${
-                                                  miscData.entries.length
-                                                } ${
-                                            miscData.entries.length === 1
-                                              ? "entry"
-                                              : "entries"
-                                          })
-                                            </button>
-                                            <div id="misc-history-${miscKey}" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(255, 255, 255, 0.5); border-radius: 0.375rem; border: 1px solid #ffc107;">
-                                                ${miscData.entries
-                                                  .map(
-                                                    (entry, idx) => `
-                                                    <div style="display: flex; justify-content: space-between; padding: 0.25rem 0; border-bottom: 1px solid rgba(255, 193, 7, 0.3);">
-                                                        <span style="color: #5a3e07; font-size: 0.875rem;">
-                                                            <strong>$${entry.amount.toFixed(
-                                                              2
-                                                            )}</strong> - ${
-                                                      entry.comment ||
-                                                      "No description"
-                                                    }
-                                                        </span>
-                                                        <span style="color: #6d4c0d; font-size: 0.75rem;">
-                                                            ${new Date(
-                                                              entry.timestamp
-                                                            ).toLocaleString()}
-                                                        </span>
-                                                    </div>
-                                                `
-                                                  )
-                                                  .join("")}
-                                            </div>
-                                        </div>
-                                    `
-                                        : ""
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                    `;
+                          <tr style="background: #fff9e6; border-top: 2px solid #ffc107;">
+                            <td colspan="7" class="misc-unforeseen">
+                              <div style="padding: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                      <div class="bill-name" style="color: #856404; margin-bottom: 0.75rem;">
+                                          💰 Misc/Unforeseen - Week ${index + 1}
+                                          ${
+                                            miscAmount > 0
+                                              ? `<span style="font-weight: 700; margin-left: 0.5rem;">Total: $${miscAmount.toFixed(
+                                                  2
+                                                )}</span>`
+                                              : ""
+                                          }
+                                      </div>
+                                      <div style="display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap;">
+                                          <input type="number"
+                                                 id="misc-input-${miscKey}"
+                                                 class="misc-amount-input"
+                                                 data-misc-key="${miscKey}"
+                                                 value="0.00"
+                                                 step="0.01"
+                                                 min="0"
+                                                 placeholder="Amount"
+                                                 style="width: 120px; padding: 0.5rem; border: 2px solid #ffc107; border-radius: 0.375rem; font-size: 0.875rem;">
+                                          <input type="text"
+                                                 id="misc-comment-${miscKey}"
+                                                 placeholder="What was this for? (e.g., Gas, Groceries)"
+                                                 style="flex: 1; min-width: 200px; padding: 0.5rem; border: 2px solid #ffc107; border-radius: 0.375rem; font-size: 0.875rem;">
+                                          <button type="button" onclick="submitMiscAmount('${miscKey}')"
+                                                  style="padding: 0.5rem 1rem; background: #ffc107; color: #856404; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; font-size: 0.875rem; white-space: nowrap;"
+                                                  onmouseover="this.style.background='#e0a800'"
+                                                  onmouseout="this.style.background='#ffc107'">
+                                              Add Expense
+                                          </button>
+                                      </div>
+                                      ${
+                                        miscData.entries &&
+                                        miscData.entries.length > 0
+                                          ? `
+                                          <div style="margin-top: 0.75rem;">
+                                              <button type="button"
+                                                      onclick="toggleMiscHistory('${miscKey}')"
+                                                      style="background: none; border: none; color: #856404; cursor: pointer; font-size: 0.875rem; text-decoration: underline; padding: 0;">
+                                                  📋 View Expense History (${
+                                                    miscData.entries.length
+                                                  } ${
+                                              miscData.entries.length === 1
+                                                ? "entry"
+                                                : "entries"
+                                            })
+                                              </button>
+                                              <div id="misc-history-${miscKey}" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(255, 255, 255, 0.5); border-radius: 0.375rem; border: 1px solid #ffc107;">
+                                                  ${miscData.entries
+                                                    .map(
+                                                      (entry, idx) => `
+                                                      <div style="display: flex; justify-content: space-between; padding: 0.25rem 0; border-bottom: 1px solid rgba(255, 193, 7, 0.3);">
+                                                          <span style="color: #5a3e07; font-size: 0.875rem;">
+                                                              <strong>$${entry.amount.toFixed(
+                                                                2
+                                                              )}</strong> - ${
+                                                        entry.comment ||
+                                                        "No description"
+                                                      }
+                                                          </span>
+                                                          <span style="color: #6d4c0d; font-size: 0.75rem;">
+                                                              ${new Date(
+                                                                entry.timestamp
+                                                              ).toLocaleString()}
+                                                          </span>
+                                                      </div>
+                                                  `
+                                                    )
+                                                    .join("")}
+                                              </div>
+                                          </div>
+                                      `
+                                          : ""
+                                      }
+                                  </div>
+                              </td>
+                          </tr>
+                      `;
 
           const totalWithMisc = period.totalAssigned + miscAmount;
 
           html += `
-                                <tr class="totals-row">
-                                    <td colspan="3"><strong>Subtotal</strong></td>
-                                    <td><strong class="amount">$${totalWithMisc.toFixed(
-                                      2
-                                    )}</strong></td>
-                                    <td colspan="3"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                `;
+                                  <tr class="totals-row">
+                                      <td colspan="3"><strong>Subtotal</strong></td>
+                                      <td><strong class="amount">$${totalWithMisc.toFixed(
+                                        2
+                                      )}</strong></td>
+                                      <td colspan="3"></td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  `;
         });
 
         // Add recommendations
@@ -3167,10 +3185,10 @@
                 valueElement.insertAdjacentHTML(
                   "afterend",
                   `<div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                    Base: $${baseBankBalance.toFixed(
-                      2
-                    )} - Paid: $${totalPaid.toFixed(2)}
-                  </div>`
+                      Base: $${baseBankBalance.toFixed(
+                        2
+                      )} - Paid: $${totalPaid.toFixed(2)}
+                    </div>`
                 );
               }
             }
