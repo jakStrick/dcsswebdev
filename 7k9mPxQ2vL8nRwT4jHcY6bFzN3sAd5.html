@@ -1154,6 +1154,7 @@
 				},
 				espp: { shares: 30, pricePerShare: 0 },
 				k401: 0,
+				homeEquity: 0,
 			};
 
 			const currencyFmt = new Intl.NumberFormat(undefined, {
@@ -1252,7 +1253,12 @@
 						pricePerShare: stockData.espp.pricePerShare || 0,
 					},
 					k401: 925.52,
+					homeEquity: 0,
 				};
+				// Ensure homeEquity exists (for data saved before this field was added)
+				if (stockData.homeEquity === undefined) {
+					stockData.homeEquity = 0;
+				}
 				return budgetDataCache;
 			}
 
@@ -1683,6 +1689,13 @@
 					)}" step="0.01"
                      style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
             </div>
+            <div class="control-item">
+              <label>Approximate Home Equity</label>
+              <input type="number" id="adjust_home_equity" value="${stockData.homeEquity.toFixed(
+						2
+					)}" step="0.01"
+                     style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
+            </div>
           `;
 
 					panel.style.display = "block";
@@ -1708,6 +1721,8 @@
 					0;
 				stockData.k401 =
 					parseFloat(document.getElementById("adjust_401k").value) || 0;
+				stockData.homeEquity =
+					parseFloat(document.getElementById("adjust_home_equity").value) || 0;
 
 				// Save stock data to API
 				await saveBudgetData("stockData", stockData);
@@ -2478,6 +2493,12 @@
 					stockData.k401 || 0
 				).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
           </div>
+          <div class="summary-card" style="background: #8E44AD; color: white;">
+            <div class="label" style="color: white; font-weight: 600;">🏠 Approximate Home Equity</div>
+            <div class="value" style="color: white;">$${(
+					stockData.homeEquity || 0
+				).toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+          </div>
       </div>
       <div class="summary-card" style="background: #FF7043; color: white;">
       		<div class="label" style="color: white; font-weight: 600;">💳 Total Debt</div>
@@ -2971,10 +2992,13 @@
 
 				// Get current misc expenses
 				const data = await fetchBudgetData();
-				const currentData = data.miscExpenses[miscKey] || {
-					total: 0,
-					entries: [],
-				};
+				let currentData = data.miscExpenses[miscKey];
+				// Handle both old format (number) and new format (object with entries)
+				if (typeof currentData === "number") {
+					currentData = { total: currentData, entries: [] };
+				} else if (!currentData) {
+					currentData = { total: 0, entries: [] };
+				}
 
 				// Create new entry
 				const newEntry = {

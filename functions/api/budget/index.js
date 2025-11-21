@@ -111,6 +111,16 @@ export async function onRequestGet(context) {
 			custom: true,
 		}));
 
+		// Parse stockData from settings if it exists
+		let stockDataObj = null;
+		if (settingsObj.stockData) {
+			try {
+				stockDataObj = JSON.parse(settingsObj.stockData);
+			} catch {
+				stockDataObj = null;
+			}
+		}
+
 		return new Response(
 			JSON.stringify({
 				success: true,
@@ -123,6 +133,7 @@ export async function onRequestGet(context) {
 					deposits: depositsObj,
 					customBills: customBillsArray,
 					bankBalance: settingsObj.bankBalance || null,
+					stockData: stockDataObj,
 				},
 			}),
 			{
@@ -229,6 +240,14 @@ export async function onRequestPost(context) {
 					"INSERT OR REPLACE INTO surplus_savings (user_id, amount, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)"
 				)
 					.bind(userId, data.amount)
+					.run();
+				break;
+
+			case "stockData":
+				await env.DB.prepare(
+					"INSERT OR REPLACE INTO user_settings (user_id, setting_key, setting_value, updated_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)"
+				)
+					.bind(userId, "stockData", JSON.stringify(data))
 					.run();
 				break;
 
