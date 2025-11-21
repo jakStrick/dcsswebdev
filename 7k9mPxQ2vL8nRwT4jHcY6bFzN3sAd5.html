@@ -2218,13 +2218,36 @@
 							.reduce((sum, p) => sum + p.amount, 0)
 					: totalIncome;
 
-				// For current month: only count expenses from future paychecks
-				// For future months: count all expenses
+				// For current month: only count UNPAID expenses from future paychecks
+				// For future months: count all unpaid expenses
+				// This prevents double-counting bills that are already paid (and subtracted from adjustedBankBalance)
+				const calculateUnpaidExpenses = (allAssignments, filterFuture) => {
+					let total = 0;
+					allAssignments.forEach((period, periodIndex) => {
+						// Skip past periods if filtering for future only
+						if (filterFuture && period.date < today) return;
+
+						period.bills.forEach((bill) => {
+							// Check if bill is paid
+							let statusKey;
+							if (bill.splitItem) {
+								statusKey = `${year}-${month}-${bill.name}-${periodIndex}`;
+							} else {
+								statusKey = `${year}-${month}-${bill.name}`;
+							}
+							const status = budgetDataCache.paymentStatuses[statusKey];
+							// Only count if NOT paid (NP or undefined)
+							if (status !== "PNC" && status !== "PCL") {
+								total += bill.amount;
+							}
+						});
+					});
+					return total;
+				};
+
 				const totalExpenses = isCurrentMonth
-					? assignments
-							.filter((p) => p.date >= today)
-							.reduce((sum, p) => sum + p.totalAssigned, 0)
-					: assignments.reduce((sum, p) => sum + p.totalAssigned, 0);
+					? calculateUnpaidExpenses(assignments, true)
+					: calculateUnpaidExpenses(assignments, false);
 
 				const netCashFlow = remainingIncome - totalExpenses;
 				const totalDebt = billsData.reduce((sum, b) => sum + b.balance, 0);
