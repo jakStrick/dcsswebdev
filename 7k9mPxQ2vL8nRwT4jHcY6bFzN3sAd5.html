@@ -1722,7 +1722,9 @@
 				stockData.k401 =
 					parseFloat(document.getElementById("adjust_401k").value) || 0;
 				stockData.homeEquity =
-					parseFloat(document.getElementById("adjust_home_equity").value) || 0;
+					parseFloat(
+						document.getElementById("adjust_home_equity").value
+					) || 0;
 
 				// Save stock data to API
 				await saveBudgetData("stockData", stockData);
@@ -2406,10 +2408,14 @@
 					2
 				)}</div>
       		${
-					(totalPaidBills > 0 || totalPaychecksReceived > 0)
+					totalPaidBills > 0 || totalPaychecksReceived > 0
 						? `
       		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-      			Base: $${bankBalance.toFixed(2)}${totalPaychecksReceived > 0 ? ` + Income: $${totalPaychecksReceived.toFixed(2)}` : ''} - Paid: $${totalPaidBills.toFixed(2)}
+      			Base: $${bankBalance.toFixed(2)}${
+								totalPaychecksReceived > 0
+									? ` + Income: $${totalPaychecksReceived.toFixed(2)}`
+									: ""
+						  } - Paid: $${totalPaidBills.toFixed(2)}
       		</div>
       		`
 						: ""
@@ -3316,17 +3322,18 @@
 					periodDate.setHours(0, 0, 0, 0);
 					// Only add if payday is TODAY
 					if (periodDate.getTime() === today.getTime()) {
-						totalPaychecksReceived += period.amount;
+						currentBankBalance += period.amount;
 					}
 				});
 
-				const adjustedBalance = baseBankBalance - totalPaid + totalPaychecksReceived;
+				const adjustedBalance =
+					baseBankBalance - totalPaid + totalPaychecksReceived;
 
 				return {
 					adjustedBalance,
 					totalPaid,
 					totalPaychecksReceived,
-					baseBankBalance
+					baseBankBalance,
 				};
 			}
 
@@ -3355,15 +3362,22 @@
 
 						// Add a subtitle showing the adjustment
 						if (totalPaid > 0 || totalPaychecksReceived > 0) {
-							const incomeText = totalPaychecksReceived > 0 ? ` + Income: ${totalPaychecksReceived.toFixed(2)}` : '';
+							const incomeText =
+								totalPaychecksReceived > 0
+									? ` + Income: ${totalPaychecksReceived.toFixed(2)}`
+									: "";
 							const subtitle = valueElement.nextElementSibling;
 							if (subtitle && subtitle.style.fontSize === "0.75rem") {
-								subtitle.innerHTML = `Base: ${baseBankBalance.toFixed(2)}${incomeText} - Paid: ${totalPaid.toFixed(2)}`;
+								subtitle.innerHTML = `Base: ${baseBankBalance.toFixed(
+									2
+								)}${incomeText} - Paid: ${totalPaid.toFixed(2)}`;
 							} else {
 								valueElement.insertAdjacentHTML(
 									"afterend",
 									`<div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                      Base: ${baseBankBalance.toFixed(2)}${incomeText} - Paid: ${totalPaid.toFixed(2)}
+                      Base: ${baseBankBalance.toFixed(
+									2
+								)}${incomeText} - Paid: ${totalPaid.toFixed(2)}
                     </div>`
 								);
 							}
