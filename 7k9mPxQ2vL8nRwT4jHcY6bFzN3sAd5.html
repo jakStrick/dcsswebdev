@@ -1127,6 +1127,16 @@
         customBills: [],
       };
 
+      // Stock data structure
+      let stockData = {
+        rsu: {
+          shares: 200,
+          pricePerShare: 0,
+        },
+        espp: { shares: 30, pricePerShare: 0 },
+        k401: 0,
+      };
+
       const currencyFmt = new Intl.NumberFormat(undefined, {
         style: "currency",
         currency: "USD",
