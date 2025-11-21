@@ -3322,7 +3322,7 @@
 					periodDate.setHours(0, 0, 0, 0);
 					// Only add if payday is TODAY
 					if (periodDate.getTime() === today.getTime()) {
-						currentBankBalance += period.amount;
+						totalPaychecksReceived += period.amount;
 					}
 				});
 
