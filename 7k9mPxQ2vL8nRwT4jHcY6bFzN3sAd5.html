@@ -3290,11 +3290,8 @@
         // Load saved adjustments first
         await loadSavedAdjustments();
 
-        // Load saved bank balance from API
-        if (adjustedBankBalance !== null) {
-          document.getElementById("bankBalance").value =
-            adjustedBankBalance.toFixed(2); //data.bankBalance;
-        }
+        document.getElementById("bankBalance").value =
+          calculateAdjustedBankBalance(); //data.bankBalance;
 
         // Update payday label on load
         updatePaydayLabel();
