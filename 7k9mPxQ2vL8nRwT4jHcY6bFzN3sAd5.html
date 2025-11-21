@@ -2252,9 +2252,11 @@
 				const netCashFlow = remainingIncome - totalExpenses;
 				const totalDebt = billsData.reduce((sum, b) => sum + b.balance, 0);
 
-				// Calculate adjusted bank balance (subtracting paid bills) - needed for projectedBalance
-				const adjustedBankBalance = calculateAdjustedBankBalance();
-				const totalPaidBills = bankBalance - adjustedBankBalance;
+				// Calculate adjusted bank balance (subtracting paid bills, adding received paychecks)
+				const balanceData = calculateAdjustedBankBalance();
+				const adjustedBankBalance = balanceData.adjustedBalance;
+				const totalPaidBills = balanceData.totalPaid;
+				const totalPaychecksReceived = balanceData.totalPaychecksReceived;
 
 				// Projected balance should use adjusted balance (not raw balance)
 				// because adjusted balance already accounts for paid bills
@@ -2404,10 +2406,10 @@
 					2
 				)}</div>
       		${
-					totalPaidBills > 0
+					(totalPaidBills > 0 || totalPaychecksReceived > 0)
 						? `
       		<div style="font-size: 0.75rem; color: rgba(255,255,255,0.95); margin-top: 0.25rem;">
-      			Base: $${bankBalance.toFixed(2)} - Paid: $${totalPaidBills.toFixed(2)}
+      			Base: $${bankBalance.toFixed(2)}${totalPaychecksReceived > 0 ? ` + Income: $${totalPaychecksReceived.toFixed(2)}` : ''} - Paid: $${totalPaidBills.toFixed(2)}
       		</div>
       		`
 						: ""
@@ -3303,15 +3305,36 @@
 				// Note: Misc expenses are now permanently subtracted from base balance
 				// when submitted, so we don't subtract them here
 
-				return baseBankBalance - totalPaid;
+				// Add paychecks that have already occurred (date <= today)
+				let totalPaychecksReceived = 0;
+				const today = new Date();
+				today.setHours(0, 0, 0, 0);
+
+				payPeriods.forEach((period) => {
+					const periodDate = new Date(period.date);
+					periodDate.setHours(0, 0, 0, 0);
+					if (periodDate <= today) {
+						totalPaychecksReceived += period.amount;
+					}
+				});
+
+				const adjustedBalance = baseBankBalance - totalPaid + totalPaychecksReceived;
+
+				return {
+					adjustedBalance,
+					totalPaid,
+					totalPaychecksReceived,
+					baseBankBalance
+				};
 			}
 
 			// Update the displayed bank balance in the summary card
 			function updateDisplayedBankBalance() {
-				const adjustedBalance = calculateAdjustedBankBalance();
-				const baseBankBalance =
-					parseFloat(document.getElementById("bankBalance").value) || 0;
-				const totalPaid = baseBankBalance - adjustedBalance;
+				const balanceData = calculateAdjustedBankBalance();
+				const adjustedBalance = balanceData.adjustedBalance;
+				const baseBankBalance = balanceData.baseBankBalance;
+				const totalPaid = balanceData.totalPaid;
+				const totalPaychecksReceived = balanceData.totalPaychecksReceived;
 
 				// Find and update the bank balance display using a proper selector
 				const labels = document.querySelectorAll(".summary-card .label");
@@ -3329,19 +3352,16 @@
 						valueElement.innerHTML = `${adjustedBalance.toFixed(2)}`;
 
 						// Add a subtitle showing the adjustment
-						if (totalPaid > 0) {
+						if (totalPaid > 0 || totalPaychecksReceived > 0) {
+							const incomeText = totalPaychecksReceived > 0 ? ` + Income: ${totalPaychecksReceived.toFixed(2)}` : '';
 							const subtitle = valueElement.nextElementSibling;
 							if (subtitle && subtitle.style.fontSize === "0.75rem") {
-								subtitle.innerHTML = `Base: ${baseBankBalance.toFixed(
-									2
-								)} - Paid: ${totalPaid.toFixed(2)}`;
+								subtitle.innerHTML = `Base: ${baseBankBalance.toFixed(2)}${incomeText} - Paid: ${totalPaid.toFixed(2)}`;
 							} else {
 								valueElement.insertAdjacentHTML(
 									"afterend",
 									`<div style="font-size: 0.75rem; color: #6c757d; margin-top: 0.25rem;">
-                      Base: ${baseBankBalance.toFixed(
-									2
-								)} - Paid: ${totalPaid.toFixed(2)}
+                      Base: ${baseBankBalance.toFixed(2)}${incomeText} - Paid: ${totalPaid.toFixed(2)}
                     </div>`
 								);
 							}
