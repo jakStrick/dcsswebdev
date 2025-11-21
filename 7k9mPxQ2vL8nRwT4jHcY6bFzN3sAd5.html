@@ -1588,7 +1588,6 @@
           billsData.forEach((bill) => {
             if (categories[bill.category]) {
               categories[bill.category].push(bill);
-              alert("in for each loop");
               console.log(
                 `Bill "${bill.name}" added to category "${bill.category}"`
               );
@@ -1598,52 +1597,6 @@
           // Render bills by category
           Object.keys(categories).forEach((category) => {
             if (categories[category].length > 0) {
-              fieldsContainer.innerHTML += `
-                <div style="margin-bottom: 1.5rem;">
-                  <h4 style="color: #667eea; margin-bottom: 0.75rem; font-size: 1rem; border-bottom: 2px solid #667eea; padding-bottom: 0.25rem;">${category}</h4>
-                  <div class="control-group">
-                    <div style="margin-bottom: 1.5rem;">
-          <h4 style="color: #667eea; margin-bottom: 0.75rem; font-size: 1rem; border-bottom: 2px solid #667eea; padding-bottom: 0.25rem;">💼 Investments & Retirement</h4>
-          <div class="control-group">
-            <div class="control-item">
-              <label>RSU Shares</label>
-              <input type="number" id="adjust_rsu_shares" value="${(
-                stockData.rsu.shares || 0
-              ).toFixed(0)}" step="1" 
-                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
-            </div>
-            <div class="control-item">
-              <label>RSU Price per Share</label>
-              <input type="number" id="adjust_rsu_price" value="${(
-                stockData.rsu.pricePerShare || 0
-              ).toFixed(2)}" step="0.01" 
-                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
-            </div>
-            <div class="control-item">
-              <label>ESPP Shares</label>
-              <input type="number" id="adjust_espp_shares" value="${(
-                stockData.espp.shares || 0
-              ).toFixed(0)}" step="1" 
-                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
-            </div>
-            <div class="control-item">
-              <label>ESPP Price per Share</label>
-              <input type="number" id="adjust_espp_price" value="${(
-                stockData.espp.pricePerShare || 0
-              ).toFixed(2)}" step="0.01" 
-                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
-            </div>
-            <div class="control-item">
-              <label>401K Balance</label>
-              <input type="number" id="adjust_401k" value="${(
-                stockData.k401 || 0
-              ).toFixed(2)}" step="0.01" 
-                    style="padding: 0.75rem; border: 2px solid #dee2e6; border-radius: 0.5rem; font-size: 1rem;">
-      </div>
-    </div>
-  </div>
-              `;
-
               categories[category].forEach((bill, index) => {
                 const fieldHTML = `
                   <div class="control-item">
