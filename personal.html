@@ -1,540 +1,549 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="images/logo/DCSS_Logo.jpg" />
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- Favicon -->
+		<link rel="icon" type="image/png" href="images/logo/DCSS_Logo.jpg" />
 
-    <!-- Cloudflare Turnstile Script -->
-    <script
-      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-      async
-      defer
-    ></script>
+		<!-- Cloudflare Turnstile Script -->
+		<script
+			src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+			async
+			defer></script>
 
-    <title>Personal Login - DCSS Web Dev</title>
+		<title>Personal Login - DCSS Web Dev</title>
 
-    <!-- External CSS -->
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="./assets/css/glassmorphism-styles.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="./assets/css/personal-styles.css"
-    />
-  </head>
-  <body>
-    <div class="login-container">
-      <div class="login-header">
-        <div class="login-logo">🔐</div>
-        <h1 class="login-title">Personal Dashboard</h1>
-        <p class="login-subtitle">Secure Access Portal</p>
-      </div>
+		<!-- External CSS -->
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="./assets/css/glassmorphism-styles.css" />
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="./assets/css/personal-styles.css" />
+	</head>
+	<body>
+		<div class="login-container">
+			<div class="login-header">
+				<div class="login-logo">🔐</div>
+				<h1 class="login-title">Personal Dashboard</h1>
+				<p class="login-subtitle">Secure Access Portal</p>
+			</div>
 
-      <div class="login-body">
-        <div class="form-toggle">
+			<div class="login-body">
+				<!--<div class="form-toggle">
           <button class="toggle-btn active" id="loginToggle">Login</button>
           <button class="toggle-btn" id="registerToggle">Register</button>
-        </div>
+        </div>-->
 
-        <div id="messageBox" class="message"></div>
+				<div id="messageBox" class="message"></div>
 
-        <!-- Login Form -->
-        <form id="loginForm" class="form-section active">
-          <div class="form-group">
-            <label class="form-label" for="loginEmail">Email Address</label>
-            <input
-              type="email"
-              id="loginEmail"
-              class="form-input"
-              placeholder="your.email@example.com"
-              required
-            />
-          </div>
+				<!-- Login Form -->
+				<form id="loginForm" class="form-section active">
+					<div class="form-group">
+						<label class="form-label" for="loginEmail"
+							>Email Address</label
+						>
+						<input
+							type="email"
+							id="loginEmail"
+							class="form-input"
+							placeholder="your.email@example.com"
+							required />
+					</div>
 
-          <div class="form-group">
-            <label class="form-label" for="loginPassword">Password</label>
-            <input
-              type="password"
-              id="loginPassword"
-              class="form-input"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
+					<div class="form-group">
+						<label class="form-label" for="loginPassword">Password</label>
+						<input
+							type="password"
+							id="loginPassword"
+							class="form-input"
+							placeholder="Enter your password"
+							required />
+					</div>
 
-          <div class="form-actions">
-            <div class="remember-me">
-              <input type="checkbox" id="rememberMe" />
-              <label for="rememberMe">Remember me</label>
-            </div>
-            <a href="#" class="forgot-link">Forgot password?</a>
-          </div>
-          <div class="form-label" style="text-align: center">
-            This page is protected by Cloudflare Turnstile
-          </div>
-          <!-- Cloudflare Turnstile Widget -->
-          <div class="form-group">
-            <div
-              class="cf-turnstile"
-              data-sitekey="0x4AAAAAAB78oLdGOamx8q46"
-              data-theme="auto"
-              data-size="flexible"
-              data-callback="onTurnstileSuccess"
-              data-error-callback="onTurnstileError"
-              data-expired-callback="onTurnstileExpired"
-            ></div>
-          </div>
+					<div class="form-actions">
+						<div class="remember-me">
+							<input type="checkbox" id="rememberMe" />
+							<label for="rememberMe">Remember me</label>
+						</div>
+						<a href="#" class="forgot-link">Forgot password?</a>
+					</div>
+					<div class="form-label" style="text-align: center">
+						This page is protected by Cloudflare Turnstile
+					</div>
+					<!-- Cloudflare Turnstile Widget -->
+					<div class="form-group">
+						<div
+							class="cf-turnstile"
+							data-sitekey="0x4AAAAAAB78oLdGOamx8q46"
+							data-theme="auto"
+							data-size="flexible"
+							data-callback="onTurnstileSuccess"
+							data-error-callback="onTurnstileError"
+							data-expired-callback="onTurnstileExpired"></div>
+					</div>
 
-          <button type="submit" class="submit-btn" id="loginBtn">
-            Log In
-            <span class="loading-spinner" id="loginSpinner"></span>
-          </button>
-        </form>
+					<button type="submit" class="submit-btn" id="loginBtn">
+						Log In
+						<span class="loading-spinner" id="loginSpinner"></span>
+					</button>
+				</form>
 
-        <!-- Registration Form -->
-        <form id="registerForm" class="form-section">
-          <div class="form-group">
-            <label class="form-label" for="registerName">Full Name</label>
-            <input
-              type="text"
-              id="registerName"
-              class="form-input"
-              placeholder="John Doe"
-              required
-            />
-          </div>
+				<!-- Registration Form -->
+				<form id="registerForm" class="form-section">
+					<div class="form-group">
+						<label class="form-label" for="registerName">Full Name</label>
+						<input
+							type="text"
+							id="registerName"
+							class="form-input"
+							placeholder="John Doe"
+							required />
+					</div>
 
-          <div class="form-group">
-            <label class="form-label" for="registerEmail">Email Address</label>
-            <input
-              type="email"
-              id="registerEmail"
-              class="form-input"
-              placeholder="your.email@example.com"
-              required
-            />
-          </div>
+					<div class="form-group">
+						<label class="form-label" for="registerEmail"
+							>Email Address</label
+						>
+						<input
+							type="email"
+							id="registerEmail"
+							class="form-input"
+							placeholder="your.email@example.com"
+							required />
+					</div>
 
-          <div class="form-group">
-            <label class="form-label" for="registerPhone"
-              >Phone Number (Optional)</label
-            >
-            <input
-              type="tel"
-              id="registerPhone"
-              class="form-input"
-              placeholder="+1 (555) 123-4567"
-            />
-            <small
-              style="
-                color: #54038b;
-                font-size: 0.8rem;
+					<div class="form-group">
+						<label class="form-label" for="registerPhone"
+							>Phone Number (Optional)</label
+						>
+						<input
+							type="tel"
+							id="registerPhone"
+							class="form-input"
+							placeholder="+1 (555) 123-4567" />
+						<small
+							style="
+								color: #54038b;
+								font-size: 0.8rem;
 
-                margin-top: 4px;
-                margin-left: 5px;
-                display: block;
-              "
-            >
-              <strong
-                >Required for SMS-based two-factor authentication. Format:
-                +1234567890</strong
-              >
-            </small>
-          </div>
+								margin-top: 4px;
+								margin-left: 5px;
+								display: block;
+							">
+							<strong
+								>Required for SMS-based two-factor authentication.
+								Format: +1234567890</strong
+							>
+						</small>
+					</div>
 
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="enable2FA" style="margin-right: 8px" />
-              Enable two-factor authentication (requires phone number)
-            </label>
-          </div>
+					<div class="form-group">
+						<label class="checkbox-label">
+							<input
+								type="checkbox"
+								id="enable2FA"
+								style="margin-right: 8px" />
+							Enable two-factor authentication (requires phone number)
+						</label>
+					</div>
 
-          <div class="form-group">
-            <label class="form-label" for="registerPassword">Password</label>
-            <input
-              type="password"
-              id="registerPassword"
-              class="form-input"
-              placeholder="Create a strong password"
-              required
-            />
-            <div class="password-strength" id="passwordStrength">
-              <div class="password-strength-bar" id="passwordStrengthBar"></div>
-            </div>
-            <div class="password-strength-text" id="passwordStrengthText"></div>
-          </div>
+					<div class="form-group">
+						<label class="form-label" for="registerPassword"
+							>Password</label
+						>
+						<input
+							type="password"
+							id="registerPassword"
+							class="form-input"
+							placeholder="Create a strong password"
+							required />
+						<div class="password-strength" id="passwordStrength">
+							<div
+								class="password-strength-bar"
+								id="passwordStrengthBar"></div>
+						</div>
+						<div
+							class="password-strength-text"
+							id="passwordStrengthText"></div>
+					</div>
 
-          <div class="form-group">
-            <label class="form-label" for="registerPasswordConfirm"
-              >Confirm Password</label
-            >
-            <input
-              type="password"
-              id="registerPasswordConfirm"
-              class="form-input"
-              placeholder="Re-enter your password"
-              required
-            />
-          </div>
-          <div class="form-label" style="text-align: center">
-            This page is protected by Cloudflare Turnstile
-          </div>
+					<div class="form-group">
+						<label class="form-label" for="registerPasswordConfirm"
+							>Confirm Password</label
+						>
+						<input
+							type="password"
+							id="registerPasswordConfirm"
+							class="form-input"
+							placeholder="Re-enter your password"
+							required />
+					</div>
+					<div class="form-label" style="text-align: center">
+						This page is protected by Cloudflare Turnstile
+					</div>
 
-          <!-- Cloudflare Turnstile Widget -->
-          <div class="form-group">
-            <div
-              class="cf-turnstile"
-              data-sitekey="0x4AAAAAAB78oLdGOamx8q46"
-              data-theme="auto"
-              data-size="flexible"
-              data-callback="onTurnstileSuccess"
-              data-error-callback="onTurnstileError"
-              data-expired-callback="onTurnstileExpired"
-            ></div>
-          </div>
+					<!-- Cloudflare Turnstile Widget -->
+					<div class="form-group">
+						<div
+							class="cf-turnstile"
+							data-sitekey="0x4AAAAAAB78oLdGOamx8q46"
+							data-theme="auto"
+							data-size="flexible"
+							data-callback="onTurnstileSuccess"
+							data-error-callback="onTurnstileError"
+							data-expired-callback="onTurnstileExpired"></div>
+					</div>
 
-          <button type="submit" class="submit-btn" id="registerBtn">
-            Create Account
-            <span class="loading-spinner" id="registerSpinner"></span>
-          </button>
-        </form>
-      </div>
+					<button type="submit" class="submit-btn" id="registerBtn">
+						Create Account
+						<span class="loading-spinner" id="registerSpinner"></span>
+					</button>
+				</form>
+			</div>
 
-      <div class="login-footer">
-        <a href="index.html">← Back to Home</a>
-      </div>
-    </div>
+			<div class="login-footer">
+				<a href="index.html">← Back to Home</a>
+			</div>
+		</div>
 
-    <script>
-      // Toggle between login and register forms
-      const loginToggle = document.getElementById("loginToggle");
-      const registerToggle = document.getElementById("registerToggle");
-      const loginForm = document.getElementById("loginForm");
-      const registerForm = document.getElementById("registerForm");
-      const messageBox = document.getElementById("messageBox");
+		<script>
+			// Toggle between login and register forms
+			const loginToggle = document.getElementById("loginToggle");
+			const registerToggle = document.getElementById("registerToggle");
+			const loginForm = document.getElementById("loginForm");
+			const registerForm = document.getElementById("registerForm");
+			const messageBox = document.getElementById("messageBox");
 
-      loginToggle.addEventListener("click", () => {
-        loginToggle.classList.add("active");
-        registerToggle.classList.remove("active");
-        loginForm.classList.add("active");
-        registerForm.classList.remove("active");
-        clearMessage();
-      });
+			loginToggle.addEventListener("click", () => {
+				loginToggle.classList.add("active");
+				registerToggle.classList.remove("active");
+				loginForm.classList.add("active");
+				registerForm.classList.remove("active");
+				clearMessage();
+			});
 
-      registerToggle.addEventListener("click", () => {
-        registerToggle.classList.add("active");
-        loginToggle.classList.remove("active");
-        registerForm.classList.add("active");
-        loginForm.classList.remove("active");
-        clearMessage();
-      });
+			registerToggle.addEventListener("click", () => {
+				registerToggle.classList.add("active");
+				loginToggle.classList.remove("active");
+				registerForm.classList.add("active");
+				loginForm.classList.remove("active");
+				clearMessage();
+			});
 
-      // Password strength indicator
-      const registerPassword = document.getElementById("registerPassword");
-      const passwordStrength = document.getElementById("passwordStrength");
-      const passwordStrengthBar = document.getElementById(
-        "passwordStrengthBar"
-      );
-      const passwordStrengthText = document.getElementById(
-        "passwordStrengthText"
-      );
+			// Password strength indicator
+			const registerPassword = document.getElementById("registerPassword");
+			const passwordStrength = document.getElementById("passwordStrength");
+			const passwordStrengthBar = document.getElementById(
+				"passwordStrengthBar"
+			);
+			const passwordStrengthText = document.getElementById(
+				"passwordStrengthText"
+			);
 
-      registerPassword.addEventListener("input", (e) => {
-        const password = e.target.value;
-        if (password.length === 0) {
-          passwordStrength.classList.remove("show");
-          passwordStrengthText.textContent = "";
-          return;
-        }
+			registerPassword.addEventListener("input", (e) => {
+				const password = e.target.value;
+				if (password.length === 0) {
+					passwordStrength.classList.remove("show");
+					passwordStrengthText.textContent = "";
+					return;
+				}
 
-        passwordStrength.classList.add("show");
-        const strength = calculatePasswordStrength(password);
+				passwordStrength.classList.add("show");
+				const strength = calculatePasswordStrength(password);
 
-        let width = 0;
-        let color = "";
-        let text = "";
+				let width = 0;
+				let color = "";
+				let text = "";
 
-        if (strength < 2) {
-          width = 25;
-          color = "#f44336";
-          text = "Weak";
-        } else if (strength < 3) {
-          width = 50;
-          color = "#ff9800";
-          text = "Fair";
-        } else if (strength < 4) {
-          width = 75;
-          color = "#ffeb3b";
-          text = "Good";
-        } else {
-          width = 100;
-          color = "#4caf50";
-          text = "Strong";
-        }
+				if (strength < 2) {
+					width = 25;
+					color = "#f44336";
+					text = "Weak";
+				} else if (strength < 3) {
+					width = 50;
+					color = "#ff9800";
+					text = "Fair";
+				} else if (strength < 4) {
+					width = 75;
+					color = "#ffeb3b";
+					text = "Good";
+				} else {
+					width = 100;
+					color = "#4caf50";
+					text = "Strong";
+				}
 
-        passwordStrengthBar.style.width = width + "%";
-        passwordStrengthBar.style.background = color;
-        passwordStrengthText.textContent = text;
-        passwordStrengthText.style.color = color;
-      });
+				passwordStrengthBar.style.width = width + "%";
+				passwordStrengthBar.style.background = color;
+				passwordStrengthText.textContent = text;
+				passwordStrengthText.style.color = color;
+			});
 
-      function calculatePasswordStrength(password) {
-        let strength = 0;
-        if (password.length >= 8) strength++;
-        if (password.length >= 12) strength++;
-        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-        if (/\d/.test(password)) strength++;
-        if (/[^a-zA-Z0-9]/.test(password)) strength++;
-        return strength;
-      }
+			function calculatePasswordStrength(password) {
+				let strength = 0;
+				if (password.length >= 8) strength++;
+				if (password.length >= 12) strength++;
+				if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+				if (/\d/.test(password)) strength++;
+				if (/[^a-zA-Z0-9]/.test(password)) strength++;
+				return strength;
+			}
 
-      // 2FA checkbox handler - make phone number required when 2FA is enabled
-      const enable2FACheckbox = document.getElementById("enable2FA");
-      const phoneInput = document.getElementById("registerPhone");
+			// 2FA checkbox handler - make phone number required when 2FA is enabled
+			const enable2FACheckbox = document.getElementById("enable2FA");
+			const phoneInput = document.getElementById("registerPhone");
 
-      enable2FACheckbox.addEventListener("change", (e) => {
-        if (e.target.checked) {
-          phoneInput.required = true;
-          phoneInput.placeholder = "+1 (555) 123-4567 (Required for 2FA)";
-        } else {
-          phoneInput.required = false;
-          phoneInput.placeholder = "+1 (555) 123-4567";
-        }
-      });
+			enable2FACheckbox.addEventListener("change", (e) => {
+				if (e.target.checked) {
+					phoneInput.required = true;
+					phoneInput.placeholder = "+1 (555) 123-4567 (Required for 2FA)";
+				} else {
+					phoneInput.required = false;
+					phoneInput.placeholder = "+1 (555) 123-4567";
+				}
+			});
 
-      // Message handling
-      function showMessage(text, type) {
-        messageBox.textContent = text;
-        messageBox.className = `message ${type} show`;
-      }
+			// Message handling
+			function showMessage(text, type) {
+				messageBox.textContent = text;
+				messageBox.className = `message ${type} show`;
+			}
 
-      function clearMessage() {
-        messageBox.className = "message";
-      }
+			function clearMessage() {
+				messageBox.className = "message";
+			}
 
-      // Login form submission
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        clearMessage();
+			// Login form submission
+			loginForm.addEventListener("submit", async (e) => {
+				e.preventDefault();
+				clearMessage();
 
-        // Get Turnstile token
-        const turnstileResponse = turnstile.getResponse(
-          document.getElementById("loginTurnstile")
-        );
-        if (!turnstileResponse) {
-          showMessage("Please complete the security verification", "error");
-          return;
-        }
+				// Get Turnstile token
+				const turnstileResponse = turnstile.getResponse(
+					document.getElementById("loginTurnstile")
+				);
+				if (!turnstileResponse) {
+					showMessage(
+						"Please complete the security verification",
+						"error"
+					);
+					return;
+				}
 
-        const email = document.getElementById("loginEmail").value;
-        const password = document.getElementById("loginPassword").value;
-        const rememberMe = document.getElementById("rememberMe").checked;
-        const loginBtn = document.getElementById("loginBtn");
-        const loginSpinner = document.getElementById("loginSpinner");
+				const email = document.getElementById("loginEmail").value;
+				const password = document.getElementById("loginPassword").value;
+				const rememberMe = document.getElementById("rememberMe").checked;
+				const loginBtn = document.getElementById("loginBtn");
+				const loginSpinner = document.getElementById("loginSpinner");
 
-        loginBtn.disabled = true;
-        loginSpinner.classList.add("show");
+				loginBtn.disabled = true;
+				loginSpinner.classList.add("show");
 
-        try {
-          const response = await fetch("/api/auth/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password, rememberMe }),
-          });
+				try {
+					const response = await fetch("/api/auth/login", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ email, password, rememberMe }),
+					});
 
-          const data = await response.json();
+					const data = await response.json();
 
-          if (response.ok) {
-            // Check if 2FA is required
-            if (data.requiresTwoFactor) {
-              // Store temporary auth data for 2FA verification
-              sessionStorage.setItem(
-                "tempAuthData",
-                JSON.stringify({
-                  userId: data.userId,
-                  phoneNumber: data.phoneNumber,
-                  maskedPhone: data.maskedPhone,
-                  rememberMe: data.rememberMe,
-                  expiresAt: data.expiresAt,
-                })
-              );
+					if (response.ok) {
+						// Check if 2FA is required
+						if (data.requiresTwoFactor) {
+							// Store temporary auth data for 2FA verification
+							sessionStorage.setItem(
+								"tempAuthData",
+								JSON.stringify({
+									userId: data.userId,
+									phoneNumber: data.phoneNumber,
+									maskedPhone: data.maskedPhone,
+									rememberMe: data.rememberMe,
+									expiresAt: data.expiresAt,
+								})
+							);
 
-              showMessage(
-                `Verification code sent to ${data.maskedPhone}`,
-                "success"
-              );
+							showMessage(
+								`Verification code sent to ${data.maskedPhone}`,
+								"success"
+							);
 
-              // Redirect to 2FA verification page after brief delay
-              setTimeout(() => {
-                window.location.href = "verify-2fa.html";
-              }, 1500);
-            } else {
-              // No 2FA - proceed with normal login
-              showMessage("Login successful! Redirecting...", "success");
-              // Store session token
-              localStorage.setItem("authToken", data.token);
-              if (rememberMe) {
-                localStorage.setItem("rememberMe", "true");
-              }
-              // Redirect to dashboard
-              setTimeout(() => {
-                window.location.href = "personal-dashboard.html";
-              }, 1000);
-            }
-          } else {
-            showMessage(
-              data.error || "Login failed. Please try again.",
-              "error"
-            );
-          }
-        } catch (error) {
-          console.error("Login error:", error);
-          showMessage(
-            "Connection error. Please check your internet and try again.",
-            "error"
-          );
-        } finally {
-          loginBtn.disabled = false;
-          loginSpinner.classList.remove("show");
-        }
-      });
+							// Redirect to 2FA verification page after brief delay
+							setTimeout(() => {
+								window.location.href = "verify-2fa.html";
+							}, 1500);
+						} else {
+							// No 2FA - proceed with normal login
+							showMessage("Login successful! Redirecting...", "success");
+							// Store session token
+							localStorage.setItem("authToken", data.token);
+							if (rememberMe) {
+								localStorage.setItem("rememberMe", "true");
+							}
+							// Redirect to dashboard
+							setTimeout(() => {
+								window.location.href = "personal-dashboard.html";
+							}, 1000);
+						}
+					} else {
+						showMessage(
+							data.error || "Login failed. Please try again.",
+							"error"
+						);
+					}
+				} catch (error) {
+					console.error("Login error:", error);
+					showMessage(
+						"Connection error. Please check your internet and try again.",
+						"error"
+					);
+				} finally {
+					loginBtn.disabled = false;
+					loginSpinner.classList.remove("show");
+				}
+			});
 
-      // Registration form submission
-      registerForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        clearMessage();
+			// Registration form submission
+			registerForm.addEventListener("submit", async (e) => {
+				e.preventDefault();
+				clearMessage();
 
-        // Get Turnstile token
-        const turnstileResponse = turnstile.getResponse(
-          document.getElementById("registerTurnstile")
-        );
-        if (!turnstileResponse) {
-          showMessage("Please complete the security verification", "error");
-          return;
-        }
+				// Get Turnstile token
+				const turnstileResponse = turnstile.getResponse(
+					document.getElementById("registerTurnstile")
+				);
+				if (!turnstileResponse) {
+					showMessage(
+						"Please complete the security verification",
+						"error"
+					);
+					return;
+				}
 
-        const name = document.getElementById("registerName").value;
-        const email = document.getElementById("registerEmail").value;
-        const phone = document.getElementById("registerPhone").value;
-        const enable2FA = document.getElementById("enable2FA").checked;
-        const password = document.getElementById("registerPassword").value;
-        const confirmPassword = document.getElementById(
-          "registerPasswordConfirm"
-        ).value;
-        const registerBtn = document.getElementById("registerBtn");
-        const registerSpinner = document.getElementById("registerSpinner");
+				const name = document.getElementById("registerName").value;
+				const email = document.getElementById("registerEmail").value;
+				const phone = document.getElementById("registerPhone").value;
+				const enable2FA = document.getElementById("enable2FA").checked;
+				const password = document.getElementById("registerPassword").value;
+				const confirmPassword = document.getElementById(
+					"registerPasswordConfirm"
+				).value;
+				const registerBtn = document.getElementById("registerBtn");
+				const registerSpinner = document.getElementById("registerSpinner");
 
-        // Validation
-        if (password !== confirmPassword) {
-          showMessage("Passwords do not match!", "error");
-          return;
-        }
+				// Validation
+				if (password !== confirmPassword) {
+					showMessage("Passwords do not match!", "error");
+					return;
+				}
 
-        if (password.length < 8) {
-          showMessage("Password must be at least 8 characters long!", "error");
-          return;
-        }
+				if (password.length < 8) {
+					showMessage(
+						"Password must be at least 8 characters long!",
+						"error"
+					);
+					return;
+				}
 
-        // Validate phone number if 2FA is enabled
-        if (enable2FA && !phone) {
-          showMessage(
-            "Phone number is required for two-factor authentication!",
-            "error"
-          );
-          return;
-        }
+				// Validate phone number if 2FA is enabled
+				if (enable2FA && !phone) {
+					showMessage(
+						"Phone number is required for two-factor authentication!",
+						"error"
+					);
+					return;
+				}
 
-        // Basic phone validation (E.164 format)
-        if (
-          phone &&
-          !/^\+?[1-9]\d{1,14}$/.test(phone.replace(/[\s()-]/g, ""))
-        ) {
-          showMessage(
-            "Please enter a valid phone number in E.164 format (e.g., +12345678901)",
-            "error"
-          );
-          return;
-        }
+				// Basic phone validation (E.164 format)
+				if (
+					phone &&
+					!/^\+?[1-9]\d{1,14}$/.test(phone.replace(/[\s()-]/g, ""))
+				) {
+					showMessage(
+						"Please enter a valid phone number in E.164 format (e.g., +12345678901)",
+						"error"
+					);
+					return;
+				}
 
-        registerBtn.disabled = true;
-        registerSpinner.classList.add("show");
+				registerBtn.disabled = true;
+				registerSpinner.classList.add("show");
 
-        try {
-          const requestBody = {
-            name,
-            email,
-            password,
-            phoneNumber: phone ? phone.replace(/[\s()-]/g, "") : null,
-            twoFactorEnabled: enable2FA,
-          };
+				try {
+					const requestBody = {
+						name,
+						email,
+						password,
+						phoneNumber: phone ? phone.replace(/[\s()-]/g, "") : null,
+						twoFactorEnabled: enable2FA,
+					};
 
-          const response = await fetch("/api/auth/register", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(requestBody),
-          });
+					const response = await fetch("/api/auth/register", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(requestBody),
+					});
 
-          const data = await response.json();
+					const data = await response.json();
 
-          if (response.ok) {
-            showMessage(
-              "Registration successful! You can now log in.",
-              "success"
-            );
-            // Switch to login form after 2 seconds
-            setTimeout(() => {
-              loginToggle.click();
-              document.getElementById("loginEmail").value = email;
-            }, 2000);
-          } else {
-            showMessage(
-              data.error || "Registration failed. Please try again.",
-              "error"
-            );
-          }
-        } catch (error) {
-          console.error("Registration error:", error);
-          showMessage(
-            "Connection error. Please check your internet and try again.",
-            "error"
-          );
-        } finally {
-          registerBtn.disabled = false;
-          registerSpinner.classList.remove("show");
-        }
-      });
+					if (response.ok) {
+						showMessage(
+							"Registration successful! You can now log in.",
+							"success"
+						);
+						// Switch to login form after 2 seconds
+						setTimeout(() => {
+							loginToggle.click();
+							document.getElementById("loginEmail").value = email;
+						}, 2000);
+					} else {
+						showMessage(
+							data.error || "Registration failed. Please try again.",
+							"error"
+						);
+					}
+				} catch (error) {
+					console.error("Registration error:", error);
+					showMessage(
+						"Connection error. Please check your internet and try again.",
+						"error"
+					);
+				} finally {
+					registerBtn.disabled = false;
+					registerSpinner.classList.remove("show");
+				}
+			});
 
-      // Check if already logged in
-      window.addEventListener("DOMContentLoaded", () => {
-        const token = localStorage.getItem("authToken");
-        if (token) {
-          // Verify token is still valid
-          fetch("/api/auth/verify", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
-            .then((response) => {
-              if (response.ok) {
-                window.location.href = "personal-dashboard.html";
-              } else {
-                localStorage.removeItem("authToken");
-              }
-            })
-            .catch(() => {
-              localStorage.removeItem("authToken");
-            });
-        }
-      });
-    </script>
-  </body>
+			// Check if already logged in
+			window.addEventListener("DOMContentLoaded", () => {
+				const token = localStorage.getItem("authToken");
+				if (token) {
+					// Verify token is still valid
+					fetch("/api/auth/verify", {
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					})
+						.then((response) => {
+							if (response.ok) {
+								window.location.href = "personal-dashboard.html";
+							} else {
+								localStorage.removeItem("authToken");
+							}
+						})
+						.catch(() => {
+							localStorage.removeItem("authToken");
+						});
+				}
+			});
+		</script>
+	</body>
 </html>
